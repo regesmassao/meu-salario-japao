@@ -18,13 +18,19 @@ expenses: [],
 name: “”
 };
 
+/* =========================================================
+DADOS
+========================================================= */
+
 function cloneInitial() {
 return JSON.parse(JSON.stringify(initial));
 }
 
 function loadData() {
 try {
-const saved = JSON.parse(localStorage.getItem(KEY));
+const saved = JSON.parse(
+localStorage.getItem(KEY)
+);
 
 if (!saved) {
   return cloneInitial();
@@ -36,11 +42,17 @@ return {
     ...initial.salary,
     ...(saved.salary || {})
   },
-  days: saved.days || {},
-  expenses: Array.isArray(saved.expenses)
-    ? saved.expenses
-    : [],
-  name: saved.name || ""
+  days:
+    saved.days &&
+    typeof saved.days === "object"
+      ? saved.days
+      : {},
+  expenses:
+    Array.isArray(saved.expenses)
+      ? saved.expenses
+      : [],
+  name:
+    saved.name || ""
 };
 
 } catch {
@@ -49,87 +61,186 @@ return cloneInitial();
 }
 
 let data = loadData();
-let viewMonth = data.month;
 
-/* =========================
+let viewMonth =
+data.month ||
+new Date().toISOString().slice(0, 7);
+
+/* =========================================================
 ELEMENTOS
-========================= */
+========================================================= */
 
-const grossEl = document.getElementById(“gross”);
-const overtimeEl = document.getElementById(“overtime”);
-const netEl = document.getElementById(“net”);
-const availableEl = document.getElementById(“available”);
+const grossEl =
+document.getElementById(“gross”);
 
-const monthTitleEl = document.getElementById(“monthTitle”);
-const daysEl = document.getElementById(“days”);
-const limitTextEl = document.getElementById(“limitText”);
+const overtimeEl =
+document.getElementById(“overtime”);
 
-const baseSalaryEl = document.getElementById(“baseSalary”);
-const normalHoursEl = document.getElementById(“normalHours”);
-const otRateEl = document.getElementById(“otRate”);
-const nightRateEl = document.getElementById(“nightRate”);
-const nightFixedEl = document.getElementById(“nightFixed”);
-const benefitsEl = document.getElementById(“benefits”);
-const deductionsEl = document.getElementById(“deductions”);
+const netEl =
+document.getElementById(“net”);
 
-const userNameEl = document.getElementById(“userName”);
+const availableEl =
+document.getElementById(“available”);
 
-const expensesListEl = document.getElementById(“expensesList”);
-const expenseTotalEl = document.getElementById(“expenseTotal”);
+const monthTitleEl =
+document.getElementById(“monthTitle”);
 
-const prevMonthBtn = document.getElementById(“prevMonth”);
-const nextMonthBtn = document.getElementById(“nextMonth”);
+const daysEl =
+document.getElementById(“days”);
 
-const saveSalaryBtn = document.getElementById(“saveSalary”);
-const addExpenseBtn = document.getElementById(“addExpense”);
+const limitTextEl =
+document.getElementById(“limitText”);
 
-const exportBtn = document.getElementById(“exportBtn”);
-const importFileEl = document.getElementById(“importFile”);
-const resetBtn = document.getElementById(“resetBtn”);
+const baseSalaryEl =
+document.getElementById(“baseSalary”);
 
-const installBtn = document.getElementById(“installBtn”);
+const normalHoursEl =
+document.getElementById(“normalHours”);
 
-/* =========================
-AUXILIARES
-========================= */
+const otRateEl =
+document.getElementById(“otRate”);
+
+const nightRateEl =
+document.getElementById(“nightRate”);
+
+const nightFixedEl =
+document.getElementById(“nightFixed”);
+
+const benefitsEl =
+document.getElementById(“benefits”);
+
+const deductionsEl =
+document.getElementById(“deductions”);
+
+const userNameEl =
+document.getElementById(“userName”);
+
+const expensesListEl =
+document.getElementById(“expensesList”);
+
+const expenseTotalEl =
+document.getElementById(“expenseTotal”);
+
+const prevMonthBtn =
+document.getElementById(“prevMonth”);
+
+const nextMonthBtn =
+document.getElementById(“nextMonth”);
+
+const addDayBtn =
+document.getElementById(“addDay”);
+
+const saveSalaryBtn =
+document.getElementById(“saveSalary”);
+
+const addExpenseBtn =
+document.getElementById(“addExpense”);
+
+const exportBtn =
+document.getElementById(“exportBtn”);
+
+const importFileEl =
+document.getElementById(“importFile”);
+
+const resetBtn =
+document.getElementById(“resetBtn”);
+
+const installBtn =
+document.getElementById(“installBtn”);
+
+/* =========================================================
+FORMATAÇÃO
+========================================================= */
 
 function yen(value) {
-return new Intl.NumberFormat(“ja-JP”, {
+
+return new Intl.NumberFormat(
+“ja-JP”,
+{
 style: “currency”,
 currency: “JPY”,
 maximumFractionDigits: 0
-}).format(Math.round(Number(value) || 0));
+}
+).format(
+Math.round(
+Number(value) || 0
+)
+);
 }
 
 function saveData() {
-data.month = viewMonth;
-localStorage.setItem(KEY, JSON.stringify(data));
+
+data.month =
+viewMonth;
+
+localStorage.setItem(
+KEY,
+JSON.stringify(data)
+);
 }
 
+/* =========================================================
+CALENDÁRIO
+========================================================= */
+
 function daysInMonth(yearMonth) {
-const [year, month] = yearMonth.split(”-”).map(Number);
-return new Date(year, month, 0).getDate();
+
+const parts =
+yearMonth.split(”-”).map(Number);
+
+const year =
+parts[0];
+
+const month =
+parts[1];
+
+return new Date(
+year,
+month,
+0
+).getDate();
 }
 
 function dateKey(day) {
-return ${viewMonth}-${String(day).padStart(2, "0")};
+
+return (
+viewMonth +
+“-” +
+String(day).padStart(2, “0”)
+);
 }
 
 function formatMonth(yearMonth) {
-const date = new Date(${yearMonth}-01T12:00:00);
 
-return date.toLocaleDateString(“pt-BR”, {
+const date =
+new Date(
+${yearMonth}-01T12:00:00
+);
+
+return date.toLocaleDateString(
+“pt-BR”,
+{
 month: “long”,
 year: “numeric”
-});
+}
+);
 }
 
-function minutes(time) {
-if (!time || !time.includes(”:”)) {
+/* =========================================================
+HORÁRIOS
+========================================================= */
+
+function minutesFromTime(time) {
+
+if (
+!time ||
+!time.includes(”:”)
+) {
 return null;
 }
 
-const parts = time.split(”:”).map(Number);
+const parts =
+time.split(”:”).map(Number);
 
 if (
 parts.length !== 2 ||
@@ -139,132 +250,207 @@ Number.isNaN(parts[1])
 return null;
 }
 
-return parts[0] * 60 + parts[1];
+return (
+parts[0] * 60 +
+parts[1]
+);
 }
 
-/* =========================
-CALCULAR HORAS
-========================= */
+function calculateHours(
+start,
+end,
+breakHours
+) {
 
-function calculateHours(start, end, breakHours) {
+const startMinutes =
+minutesFromTime(start);
 
-const startMin = minutes(start);
-const endMin = minutes(end);
+const endMinutes =
+minutesFromTime(end);
 
-if (startMin === null || endMin === null) {
+if (
+startMinutes === null ||
+endMinutes === null
+) {
 return 0;
 }
 
-let total = endMin - startMin;
+let totalMinutes =
+endMinutes -
+startMinutes;
 
-if (total < 0) {
-total += 24 * 60;
+// Turno atravessando meia-noite
+if (totalMinutes < 0) {
+totalMinutes +=
+24 * 60;
 }
 
-const breakMin =
-Math.max(0, Number(breakHours) || 0) * 60;
+const breakMinutes =
+Math.max(
+0,
+Number(breakHours) || 0
+) * 60;
 
-total -= breakMin;
+totalMinutes -=
+breakMinutes;
 
-if (total < 0) {
-total = 0;
+if (totalMinutes < 0) {
+totalMinutes = 0;
 }
 
-return total / 60;
+return totalMinutes / 60;
 }
 
-/* =========================
+/* =========================================================
 DIA PADRÃO
-========================= */
+========================================================= */
 
 function defaultDay() {
+
 return {
 status: “worked”,
-start: “08:00”,
-end: “17:00”,
+
+start: "08:00",
+end: "17:00",
 break: 1,
 hours: 8,
 night: 0
+
 };
 }
 
-/* =========================
+/* =========================================================
 CÁLCULO DO MÊS
-========================= */
+========================================================= */
 
 function calculateMonth() {
 
 let totalHours = 0;
+
 let totalOvertime = 0;
+
 let totalNight = 0;
+
 let nightDays = 0;
 
-Object.keys(data.days).forEach(key => {
+Object.keys(data.days)
+.forEach(key => {
 
-if (!key.startsWith(viewMonth)) {
-  return;
-}
-const day = data.days[key];
-if (!day || day.status !== "worked") {
-  return;
-}
-const hours =
-  Number(day.hours) || 0;
-const overtime =
-  Math.max(0, hours - 8);
-const night =
-  Math.max(0, Number(day.night) || 0);
-totalHours += hours;
-totalOvertime += overtime;
-totalNight += night;
-if (night > 0) {
-  nightDays++;
-}
-
+  if (
+    !key.startsWith(
+      viewMonth + "-"
+    )
+  ) {
+    return;
+  }
+  const day =
+    data.days[key];
+  if (
+    !day ||
+    day.status !== "worked"
+  ) {
+    return;
+  }
+  const hours =
+    Math.max(
+      0,
+      Number(day.hours) || 0
+    );
+  const overtime =
+    Math.max(
+      0,
+      hours - 8
+    );
+  const night =
+    Math.max(
+      0,
+      Number(day.night) || 0
+    );
+  totalHours +=
+    hours;
+  totalOvertime +=
+    overtime;
+  totalNight +=
+    night;
+  if (night > 0) {
+    nightDays++;
+  }
 });
 
 const base =
-Number(data.salary.base) || 0;
+Number(
+data.salary.base
+) || 0;
 
-const normal =
-Number(data.salary.normal) || 160;
+const normalHours =
+Number(
+data.salary.normal
+) || 160;
 
 const hourly =
-normal > 0
-? base / normal
+normalHours > 0
+? base / normalHours
 : 0;
 
-const otPercent =
-(Number(data.salary.ot) || 0) / 100;
+const overtimeRate =
+(
+Number(
+data.salary.ot
+) || 0
+) / 100;
 
-const nightPercent =
-(Number(data.salary.night) || 0) / 100;
+const nightRate =
+(
+Number(
+data.salary.night
+) || 0
+) / 100;
 
 const overtimePay =
 hourly *
-otPercent *
+overtimeRate *
 totalOvertime;
 
 const nightPay =
 hourly *
-nightPercent *
+nightRate *
 totalNight;
 
 const nightFixedPay =
 nightDays *
-(Number(data.salary.nightFixed) || 0);
+(
+Number(
+data.salary.nightFixed
+) || 0
+);
 
 const benefits =
-Number(data.salary.benefits) || 0;
+Number(
+data.salary.benefits
+) || 0;
 
 const deductions =
-Number(data.salary.deductions) || 0;
+Number(
+data.salary.deductions
+) || 0;
 
 const expenses =
 data.expenses.reduce(
-(sum, expense) =>
-sum + (Number(expense.amount) || 0),
-0
+(
+total,
+expense
+) => {
+
+    return (
+      total +
+      (
+        Number(
+          expense.amount
+        ) || 0
+      )
+    );
+  },
+  0
 );
 
 const gross =
@@ -275,12 +461,15 @@ nightFixedPay +
 benefits;
 
 const net =
-gross - deductions;
+gross -
+deductions;
 
 const available =
-net - expenses;
+net -
+expenses;
 
 return {
+
 totalHours,
 totalOvertime,
 totalNight,
@@ -292,12 +481,13 @@ gross,
 net,
 expenses,
 available
+
 };
 }
 
-/* =========================
-ATUALIZAR TOPO
-========================= */
+/* =========================================================
+RESUMO
+========================================================= */
 
 function updateSummary() {
 
@@ -305,25 +495,34 @@ const result =
 calculateMonth();
 
 grossEl.textContent =
-yen(result.gross);
+yen(
+result.gross
+);
 
 overtimeEl.textContent =
-result.totalOvertime.toFixed(1) + “h”;
+result.totalOvertime
+.toFixed(1) +
+“h”;
 
 netEl.textContent =
-yen(result.net);
+yen(
+result.net
+);
 
 availableEl.textContent =
-yen(result.available);
+yen(
+result.available
+);
 
 limitTextEl.textContent =
-result.totalOvertime.toFixed(1) +
+result.totalOvertime
+.toFixed(1) +
 “h / 45h”;
 }
 
-/* =========================
+/* =========================================================
 SALÁRIO
-========================= */
+========================================================= */
 
 function renderSalary() {
 
@@ -352,47 +551,86 @@ userNameEl.value =
 data.name || “”;
 }
 
-/* =========================
-DIAS
-========================= */
+/* =========================================================
+DIAS DO MÊS
+========================================================= */
 
 function renderDays() {
 
 daysEl.innerHTML = “”;
 
+// Corrige mês inválido
+if (
+!viewMonth ||
+!/^\d{4}-\d{2}$/.test(
+viewMonth
+)
+) {
+
+viewMonth =
+  new Date()
+    .toISOString()
+    .slice(0, 7);
+
+}
+
 const totalDays =
-daysInMonth(viewMonth);
+daysInMonth(
+viewMonth
+);
 
 for (
-let number = 1;
-number <= totalDays;
-number++
+let dayNumber = 1;
+dayNumber <= totalDays;
+dayNumber++
 ) {
 
 const key =
-  dateKey(number);
-const day =
-  data.days[key]
-    ? {
-        ...defaultDay(),
-        ...data.days[key]
-      }
-    : defaultDay();
+  dateKey(
+    dayNumber
+  );
+/*
+ * Cria o dia somente se
+ * ele ainda não existir.
+ *
+ * Isso evita apagar dados
+ * já registrados.
+ */
+if (
+  !data.days[key]
+) {
+  data.days[key] =
+    defaultDay();
+}
+const day = {
+  ...defaultDay(),
+  ...data.days[key]
+};
 const date =
-  new Date(`${key}T12:00:00`);
+  new Date(
+    `${key}T12:00:00`
+  );
 const weekday =
   date.toLocaleDateString(
     "pt-BR",
-    { weekday: "short" }
+    {
+      weekday: "short"
+    }
   );
 const container =
-  document.createElement("div");
-container.className = "day";
+  document.createElement(
+    "div"
+  );
+container.className =
+  "day";
 container.innerHTML = `
   <div class="dayhead">
     <span class="daydate">
-      ${String(number).padStart(2, "0")}
-      · ${weekday}
+      ${String(
+        dayNumber
+      ).padStart(2, "0")}
+      ·
+      ${weekday}
     </span>
     <span class="badge">
       ${
@@ -413,10 +651,18 @@ container.innerHTML = `
         data-key="${key}"
         data-field="status"
       >
-        <option value="worked">Trabalho</option>
-        <option value="off">Folga</option>
-        <option value="yukyu">Yūkyū</option>
-        <option value="absent">Falta</option>
+        <option value="worked">
+          Trabalho
+        </option>
+        <option value="off">
+          Folga
+        </option>
+        <option value="yukyu">
+          Yūkyū
+        </option>
+        <option value="absent">
+          Falta
+        </option>
       </select>
     </label>
     <label>
@@ -429,6 +675,7 @@ container.innerHTML = `
         min="0"
         max="24"
         value="${day.hours}"
+        inputmode="decimal"
       >
     </label>
     <label>
@@ -459,6 +706,7 @@ container.innerHTML = `
         min="0"
         max="12"
         value="${day.break}"
+        inputmode="decimal"
       >
     </label>
     <label>
@@ -471,111 +719,131 @@ container.innerHTML = `
         min="0"
         max="24"
         value="${day.night}"
+        inputmode="decimal"
       >
     </label>
   </div>
 `;
+/*
+ * Define o valor correto
+ * do seletor de status.
+ */
+const statusSelect =
+  container.querySelector(
+    '[data-field="status"]'
+  );
+statusSelect.value =
+  day.status;
+/*
+ * Eventos dos campos
+ */
 const controls =
   container.querySelectorAll(
     "input, select"
   );
-controls.forEach(control => {
-  control.value =
-    day[control.dataset.field];
-  control.addEventListener(
-    "input",
-    () => {
-      const field =
-        control.dataset.field;
-      if (!data.days[key]) {
-        data.days[key] =
-          defaultDay();
+controls.forEach(
+  control => {
+    control.addEventListener(
+      "change",
+      () => {
+        const field =
+          control.dataset.field;
+        let value =
+          control.value;
+        if (
+          control.type ===
+          "number"
+        ) {
+          value =
+            Number(
+              value
+            ) || 0;
+        }
+        data.days[key][field] =
+          value;
+        /*
+         * Entrada, saída ou intervalo:
+         * recalcula horas.
+         */
+        if (
+          field === "start" ||
+          field === "end" ||
+          field === "break"
+        ) {
+          const calculated =
+            calculateHours(
+              data.days[key].start,
+              data.days[key].end,
+              data.days[key].break
+            );
+          data.days[key].hours =
+            Math.round(
+              calculated * 4
+            ) / 4;
+        }
+        saveData();
+        updateSummary();
+        /*
+         * Atualiza somente a lista
+         * depois de salvar.
+         */
+        renderDays();
       }
-      let value =
-        control.value;
-      if (
-        control.type === "number"
-      ) {
-        value =
-          Number(value) || 0;
-      }
-      data.days[key][field] =
-        value;
-      /*
-       * Entrada, saída ou intervalo
-       * recalculam automaticamente
-       * as horas trabalhadas.
-       */
-      if (
-        field === "start" ||
-        field === "end" ||
-        field === "break"
-      ) {
-        const calculated =
-          calculateHours(
-            data.days[key].start,
-            data.days[key].end,
-            data.days[key].break
-          );
-        data.days[key].hours =
-          Math.round(
-            calculated * 4
-          ) / 4;
-      }
-      saveData();
-      updateSummary();
-    }
-  );
-  control.addEventListener(
-    "change",
-    () => {
-      const field =
-        control.dataset.field;
-      if (
-        field === "start" ||
-        field === "end" ||
-        field === "break"
-      ) {
-        const calculated =
-          calculateHours(
-            data.days[key].start,
-            data.days[key].end,
-            data.days[key].break
-          );
-        data.days[key].hours =
-          Math.round(
-            calculated * 4
-          ) / 4;
-      }
-      saveData();
-      renderDays();
-      updateSummary();
-    }
-  );
-});
-daysEl.appendChild(container);
+    );
+  }
+);
+daysEl.appendChild(
+  container
+);
 
 }
+
+/*
+
+* Salva os dias criados.
+    */
+
+saveData();
 }
 
-/* =========================
+/* =========================================================
 DESPESAS
-========================= */
+========================================================= */
 
 function escapeHTML(value) {
-return String(value ?? “”)
-.replace(/&/g, “&”)
-.replace(/</g, “<”)
-.replace(/>/g, “>”)
-.replace(/”/g, “"”)
-.replace(/’/g, “'”);
+
+return String(
+value ?? “”
+)
+.replace(
+/&/g,
+“&”
+)
+.replace(
+/</g,
+“<”
+)
+.replace(
+/>/g,
+“>”
+)
+.replace(
+/”/g,
+“"”
+)
+.replace(
+/’/g,
+“'”
+);
 }
 
 function renderExpenses() {
 
 expensesListEl.innerHTML = “”;
 
-if (!data.expenses.length) {
+if (
+!data.expenses.length
+) {
 
 expensesListEl.innerHTML =
   '<p class="note">Nenhuma despesa cadastrada.</p>';
@@ -583,17 +851,26 @@ expensesListEl.innerHTML =
 } else {
 
 data.expenses.forEach(
-  (expense, index) => {
+  (
+    expense,
+    index
+  ) => {
     const row =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
     row.className =
       "expense";
     row.innerHTML = `
       <span>
-        ${escapeHTML(expense.name)}
+        ${escapeHTML(
+          expense.name
+        )}
         <br>
         <small>
-          ${yen(expense.amount)}
+          ${yen(
+            expense.amount
+          )}
         </small>
       </span>
       <button>
@@ -601,7 +878,9 @@ data.expenses.forEach(
       </button>
     `;
     row
-      .querySelector("button")
+      .querySelector(
+        "button"
+      )
       .addEventListener(
         "click",
         () => {
@@ -614,7 +893,9 @@ data.expenses.forEach(
           updateSummary();
         }
       );
-    expensesListEl.appendChild(row);
+    expensesListEl.appendChild(
+      row
+    );
   }
 );
 
@@ -622,47 +903,66 @@ data.expenses.forEach(
 
 expenseTotalEl.textContent =
 yen(
-calculateMonth().expenses
+calculateMonth()
+.expenses
 );
 }
 
-/* =========================
+/* =========================================================
 ABAS
-========================= */
+========================================================= */
 
 document
 .querySelectorAll(”.tab”)
-.forEach(button => {
+.forEach(
+button => {
 
-button.addEventListener(
-  "click",
-  () => {
-    document
-      .querySelectorAll(".tab")
-      .forEach(tab =>
-        tab.classList.remove("active")
+  button.addEventListener(
+    "click",
+    () => {
+      document
+        .querySelectorAll(
+          ".tab"
+        )
+        .forEach(
+          tab =>
+            tab.classList
+              .remove(
+                "active"
+              )
+        );
+      document
+        .querySelectorAll(
+          ".panel"
+        )
+        .forEach(
+          panel =>
+            panel.classList
+              .remove(
+                "active"
+              )
+        );
+      button.classList.add(
+        "active"
       );
-    document
-      .querySelectorAll(".panel")
-      .forEach(panel =>
-        panel.classList.remove("active")
-      );
-    button.classList.add("active");
-    const panel =
-      document.getElementById(
-        button.dataset.tab
-      );
-    if (panel) {
-      panel.classList.add("active");
+      const panel =
+        document.getElementById(
+          button.dataset.tab
+        );
+      if (panel) {
+        panel.classList.add(
+          "active"
+        );
+      }
     }
-  }
+  );
+}
+
 );
 
-});
-
-/* =========================
+/* =========================================================
 MUDAR MÊS
-========================= */
+========================================================= */
 
 prevMonthBtn.addEventListener(
 “click”,
@@ -676,7 +976,8 @@ date.setMonth(
   date.getMonth() - 1
 );
 viewMonth =
-  date.toISOString()
+  date
+    .toISOString()
     .slice(0, 7);
 saveData();
 render();
@@ -696,7 +997,8 @@ date.setMonth(
   date.getMonth() + 1
 );
 viewMonth =
-  date.toISOString()
+  date
+    .toISOString()
     .slice(0, 7);
 saveData();
 render();
@@ -704,9 +1006,36 @@ render();
 }
 );
 
-/* =========================
+/* =========================================================
+BOTÃO + DIA
+========================================================= */
+
+if (addDayBtn) {
+
+addDayBtn.addEventListener(
+“click”,
+() => {
+
+  const firstDay =
+    dateKey(1);
+  const existing =
+    data.days[firstDay];
+  if (!existing) {
+    data.days[firstDay] =
+      defaultDay();
+  }
+  saveData();
+  renderDays();
+  updateSummary();
+}
+
+);
+
+}
+
+/* =========================================================
 SALVAR SALÁRIO
-========================= */
+========================================================= */
 
 saveSalaryBtn.addEventListener(
 “click”,
@@ -714,19 +1043,33 @@ saveSalaryBtn.addEventListener(
 
 data.salary = {
   base:
-    Number(baseSalaryEl.value) || 0,
+    Number(
+      baseSalaryEl.value
+    ) || 0,
   normal:
-    Number(normalHoursEl.value) || 160,
+    Number(
+      normalHoursEl.value
+    ) || 160,
   ot:
-    Number(otRateEl.value) || 0,
+    Number(
+      otRateEl.value
+    ) || 0,
   night:
-    Number(nightRateEl.value) || 0,
+    Number(
+      nightRateEl.value
+    ) || 0,
   nightFixed:
-    Number(nightFixedEl.value) || 0,
+    Number(
+      nightFixedEl.value
+    ) || 0,
   benefits:
-    Number(benefitsEl.value) || 0,
+    Number(
+      benefitsEl.value
+    ) || 0,
   deductions:
-    Number(deductionsEl.value) || 0
+    Number(
+      deductionsEl.value
+    ) || 0
 };
 data.name =
   userNameEl.value.trim();
@@ -739,9 +1082,9 @@ alert(
 }
 );
 
-/* =========================
+/* =========================================================
 NOME
-========================= */
+========================================================= */
 
 userNameEl.addEventListener(
 “change”,
@@ -754,9 +1097,9 @@ saveData();
 }
 );
 
-/* =========================
-DESPESA
-========================= */
+/* =========================================================
+ADICIONAR DESPESA
+========================================================= */
 
 addExpenseBtn.addEventListener(
 “click”,
@@ -776,11 +1119,14 @@ const amount =
     )
   );
 if (
-  Number.isFinite(amount) &&
+  Number.isFinite(
+    amount
+  ) &&
   amount > 0
 ) {
   data.expenses.push({
-    name: name.trim(),
+    name:
+      name.trim(),
     amount
   });
   saveData();
@@ -791,46 +1137,55 @@ if (
 }
 );
 
-/* =========================
-BACKUP
-========================= */
+/* =========================================================
+EXPORTAR BACKUP
+========================================================= */
 
 exportBtn.addEventListener(
 “click”,
 () => {
 
+const json =
+  JSON.stringify(
+    data,
+    null,
+    2
+  );
 const blob =
   new Blob(
-    [
-      JSON.stringify(
-        data,
-        null,
-        2
-      )
-    ],
+    [json],
     {
       type:
         "application/json"
     }
   );
 const url =
-  URL.createObjectURL(blob);
+  URL.createObjectURL(
+    blob
+  );
 const link =
-  document.createElement("a");
-link.href = url;
+  document.createElement(
+    "a"
+  );
+link.href =
+  url;
 link.download =
   "meu-salario-japao-backup.json";
-document.body.appendChild(link);
+document.body.appendChild(
+  link
+);
 link.click();
 link.remove();
-URL.revokeObjectURL(url);
+URL.revokeObjectURL(
+  url
+);
 
 }
 );
 
-/* =========================
-IMPORTAR
-========================= */
+/* =========================================================
+IMPORTAR BACKUP
+========================================================= */
 
 importFileEl.addEventListener(
 “change”,
@@ -868,7 +1223,8 @@ reader.onload = () => {
         imported.name || ""
     };
     viewMonth =
-      data.month;
+      data.month ||
+      viewMonth;
     saveData();
     render();
     alert(
@@ -881,24 +1237,26 @@ reader.onload = () => {
   }
   importFileEl.value = "";
 };
-reader.readAsText(file);
+reader.readAsText(
+  file
+);
 
 }
 );
 
-/* =========================
-RESET
-========================= */
+/* =========================================================
+RESTAURAR
+========================================================= */
 
 resetBtn.addEventListener(
 “click”,
 () => {
 
-if (
-  !confirm(
+const confirmed =
+  confirm(
     "Apagar todos os dados deste aparelho?"
-  )
-) {
+  );
+if (!confirmed) {
   return;
 }
 data =
@@ -911,11 +1269,12 @@ render();
 }
 );
 
-/* =========================
-PWA
-========================= */
+/* =========================================================
+INSTALAÇÃO PWA
+========================================================= */
 
-let deferredPrompt = null;
+let deferredPrompt =
+null;
 
 window.addEventListener(
 “beforeinstallprompt”,
@@ -925,7 +1284,8 @@ event.preventDefault();
 deferredPrompt =
   event;
 if (installBtn) {
-  installBtn.hidden = false;
+  installBtn.hidden =
+    false;
 }
 
 }
@@ -942,20 +1302,27 @@ async () => {
   }
   deferredPrompt.prompt();
   try {
-    await deferredPrompt.userChoice;
+    await
+      deferredPrompt.userChoice;
   } catch {}
-  deferredPrompt = null;
-  installBtn.hidden = true;
+  deferredPrompt =
+    null;
+  installBtn.hidden =
+    true;
 }
 
 );
+
 }
 
-/* =========================
+/* =========================================================
 SERVICE WORKER
-========================= */
+========================================================= */
 
-if (“serviceWorker” in navigator) {
+if (
+“serviceWorker”
+in navigator
+) {
 
 window.addEventListener(
 “load”,
@@ -963,7 +1330,7 @@ window.addEventListener(
 
   navigator.serviceWorker
     .register(
-      "./sw.js?v=32"
+      "./sw.js?v=33"
     )
     .then(
       registration => {
@@ -981,21 +1348,28 @@ window.addEventListener(
 }
 
 );
+
 }
 
-/* =========================
-RENDER
-========================= */
+/* =========================================================
+INICIAR
+========================================================= */
 
 function render() {
 
 monthTitleEl.textContent =
-formatMonth(viewMonth);
+formatMonth(
+viewMonth
+);
 
 renderSalary();
+
 renderDays();
+
 renderExpenses();
+
 updateSummary();
+
 }
 
 render();
