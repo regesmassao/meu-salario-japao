@@ -1,1 +1,109 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#111827"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Meu Salário Japão"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icons/icon-192.png"><link rel="stylesheet" href="style.css"><title>Meu Salário Japão 🇯🇵 — V4.1</title></head><body><header class="topbar"><div><div class="eyebrow">🇯🇵 MEU SALÁRIO JAPÃO</div><h1>Meu Salário Japão</h1><p>V4.1 • cálculo simples para quem trabalha no Japão</p></div><button id="themeBtn" class="icon-btn">☀️</button></header><main class="container"><section class="hero card"><div><span class="badge">V4.1</span><h2>Quanto você vai receber?</h2><p>Escolha seu tipo de salário e informe horas, adicionais e bônus.</p></div><div class="hero-number" id="heroNet">¥ 0</div></section><section class="tabs card"><button class="tab active" data-mode="hourly">💴 Por hora</button><button class="tab" data-mode="monthly">👔 Mensal / Shain</button></section><section class="card form-card"><div class="section-title"><span>1</span><div><h3>Salário base</h3><p>Preencha os valores do seu contrato.</p></div></div><div id="hourlyFields"><label>Valor por hora (¥)<input id="hourlyRate" type="number" inputmode="decimal" value="1230" min="0"></label><div class="grid2"><label>Horas normais<input id="normalHours" type="number" inputmode="decimal" value="160" min="0" step="0.5"></label><label>Horas extras<input id="overtimeHours" type="number" inputmode="decimal" value="0" min="0" step="0.5"></label></div></div><div id="monthlyFields" class="hidden"><label>Salário mensal (¥)<input id="monthlySalary" type="number" inputmode="decimal" value="250000" min="0"></label><div class="grid2"><label>Horas extras<input id="monthlyOvertimeHours" type="number" inputmode="decimal" value="0" min="0" step="0.5"></label><label>Horas-base / mês<input id="monthlyBaseHours" type="number" inputmode="decimal" value="160" min="1" step="1"></label></div></div></section><section class="card form-card"><div class="section-title"><span>2</span><div><h3>Adicionais</h3><p>Configure os extras do mês.</p></div></div><div class="grid2"><label>Adicional noturno (%)<input id="nightPercent" type="number" inputmode="decimal" value="25" min="0" step="0.1"></label><label>Horas noturnas<input id="nightHours" type="number" inputmode="decimal" value="0" min="0" step="0.5"></label><label>Adicional noturno por dia (¥)<input id="nightFixed" type="number" inputmode="decimal" value="1500" min="0"></label><label>Refeição / benefício mensal (¥)<input id="mealMonthly" type="number" inputmode="decimal" value="3500" min="0"></label><label>Dias de trabalho noturno<input id="nightDays" type="number" inputmode="decimal" value="0" min="0" step="1"></label><label>Outros adicionais (¥)<input id="otherAllowances" type="number" inputmode="decimal" value="0" min="0"></label></div></section><section class="card form-card"><div class="section-title"><span>3</span><div><h3>Bônus</h3><p>Inclua o bônus se quiser acompanhar o total anual.</p></div></div><div class="grid2"><label>Bônus do mês (¥)<input id="monthlyBonus" type="number" inputmode="decimal" value="0" min="0"></label><label>Bônus anual estimado (¥)<input id="annualBonus" type="number" inputmode="decimal" value="0" min="0"></label></div></section><section class="card result-card"><div class="result-head"><div><span class="eyebrow">RESULTADO ESTIMADO</span><h2>Resumo do mês</h2></div><button id="saveBtn" class="small-btn">💾 Salvar</button></div><div class="result-grid"><div><span>Salário base</span><strong id="rBase">¥ 0</strong></div><div><span>Hora extra</span><strong id="rOvertime">¥ 0</strong></div><div><span>Noturno</span><strong id="rNight">¥ 0</strong></div><div><span>Refeição</span><strong id="rMeal">¥ 0</strong></div><div><span>Outros</span><strong id="rOther">¥ 0</strong></div><div><span>Bônus</span><strong id="rBonus">¥ 0</strong></div></div><div class="gross-line"><span>Total bruto estimado</span><strong id="rGross">¥ 0</strong></div><div class="net-box"><div><span>Estimativa de líquido</span><strong id="rNet">¥ 0</strong></div><label class="switch-row">Usar estimativa de descontos<input id="useDeductions" type="checkbox" checked></label><div id="deductionWrap"><label>Descontos estimados (%)<input id="deductionPercent" type="number" inputmode="decimal" value="18" min="0" max="60" step="0.5"></label></div></div><p class="notice">⚠️ O líquido é apenas uma estimativa. Impostos, seguro social, pensão e regras da empresa variam.</p></section><section class="card history-card"><div class="result-head"><div><span class="eyebrow">HISTÓRICO</span><h2>Meses salvos</h2></div><button id="clearHistory" class="small-btn danger">Limpar</button></div><div id="historyList" class="history-list"><div class="empty">Nenhum cálculo salvo ainda.</div></div></section><section class="card info-card"><h3>Como usar</h3><ol><li>Escolha <b>Por hora</b> ou <b>Mensal / Shain</b>.</li><li>Informe horas normais, extras e noturnas.</li><li>Adicione refeição, adicionais e bônus.</li><li>Confira o bruto e a estimativa de líquido.</li><li>Toque em <b>Salvar</b> para guardar o mês no histórico.</li></ol></section></main><footer>Meu Salário Japão 🇯🇵 • V4.1</footer><script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+<title>Meu Salário Japão 🇯🇵</title>
+</head>
+<body>
+<header class="top">
+  <div>
+    <h1>Meu Salário Japão 🇯🇵</h1>
+    <p>Calculadora e controle de jornada</p>
+  </div>
+  <button id="themeBtn" class="iconBtn" aria-label="Alternar tema">🌙</button>
+</header>
+
+<main>
+<section class="card">
+  <h2>💴 Calculadora salarial</h2>
+  <div class="tabs">
+    <button class="tab active" data-mode="hourly">💴 Por hora</button>
+    <button class="tab" data-mode="monthly">👔 Mensal / Seishain</button>
+  </div>
+
+  <div id="hourlyBox" class="grid">
+    <label>Valor por hora (¥)<input id="hourlyRate" type="number" inputmode="decimal" value="1230" min="0"></label>
+  </div>
+
+  <div id="monthlyBox" class="grid hidden">
+    <label>Salário mensal (¥)<input id="monthlySalary" type="number" inputmode="decimal" value="250000" min="0"></label>
+    <label>Horas-base / mês<input id="baseHours" type="number" inputmode="decimal" value="160" min="1"></label>
+  </div>
+
+  <div class="grid">
+    <label>Horas normais<input id="normalHours" type="number" inputmode="decimal" value="160" min="0" step="0.01"></label>
+    <label>Horas extras (25%)<input id="overtimeHours" type="number" inputmode="decimal" value="0" min="0" step="0.01"></label>
+    <label>Adicional noturno (%)<input id="nightPercent" type="number" inputmode="decimal" value="25" min="0" step="0.01"></label>
+    <label>Horas noturnas<input id="nightHours" type="number" inputmode="decimal" value="0" min="0" step="0.01"></label>
+    <label>Adicional noturno por dia (¥)<input id="nightFixed" type="number" inputmode="decimal" value="1500" min="0"></label>
+    <label>Dias de trabalho noturno<input id="nightDays" type="number" inputmode="decimal" value="0" min="0"></label>
+    <label>Refeição / benefício mensal (¥)<input id="mealMonthly" type="number" inputmode="decimal" value="3500" min="0"></label>
+    <label>Outros adicionais (¥)<input id="otherAllowance" type="number" inputmode="decimal" value="0" min="0"></label>
+    <label>Bônus anual (¥)<input id="annualBonus" type="number" inputmode="decimal" value="960000" min="0"></label>
+    <label>Descontos estimados (%)<input id="deduction" type="number" inputmode="decimal" value="18" min="0" max="100" step="0.1"></label>
+  </div>
+
+  <div class="result">
+    <div><span>Bruto mensal</span><strong id="gross">¥0</strong></div>
+    <div><span>Descontos estimados</span><strong id="deductions">¥0</strong></div>
+    <div><span>Líquido estimado</span><strong id="net">¥0</strong></div>
+    <div><span>Hora-base calculada</span><strong id="rateOut">¥0</strong></div>
+  </div>
+  <button id="calcBtn" class="primary">Calcular</button>
+</section>
+
+<section class="card">
+  <div class="sectionHead">
+    <div>
+      <h2>📅 Controle de Jornada</h2>
+      <p>Registre entrada, intervalo e saída de cada dia.</p>
+    </div>
+    <div class="monthNav">
+      <button id="prevMonth" class="smallBtn">‹</button>
+      <span id="monthLabel"></span>
+      <button id="nextMonth" class="smallBtn">›</button>
+    </div>
+  </div>
+
+  <div class="calendar">
+    <div class="week"><span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span></div>
+    <div id="calendarGrid" class="days"></div>
+  </div>
+
+  <div id="dayEditor" class="editor hidden">
+    <div class="editorTitle">
+      <h3 id="editorDate">Dia</h3>
+      <button id="closeEditor" class="smallBtn">✕</button>
+    </div>
+    <div class="grid">
+      <label>Entrada<input id="timeIn" type="time"></label>
+      <label>Saída para almoço<input id="lunchOut" type="time"></label>
+      <label>Retorno do almoço<input id="lunchIn" type="time"></label>
+      <label>Saída<input id="timeOut" type="time"></label>
+    </div>
+    <label>Observação (opcional)<input id="dayNote" type="text" maxlength="100" placeholder="Ex.: turno noturno"></label>
+    <div id="daySummary" class="daySummary"></div>
+    <div class="actions">
+      <button id="saveDay" class="primary">💾 Salvar dia</button>
+      <button id="deleteDay" class="danger">🗑️ Excluir</button>
+    </div>
+  </div>
+
+  <div class="historyHead">
+    <h3>📋 Histórico do mês</h3>
+    <span id="monthTotals"></span>
+  </div>
+  <div id="history" class="history"></div>
+</section>
+</main>
+
+<footer>Meu Salário Japão 🇯🇵 — V4.2</footer>
+<script src="app.js"></script>
+</body>
+</html>
