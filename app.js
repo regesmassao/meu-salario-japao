@@ -26,24 +26,27 @@ function deleteData(key){localStorage.removeItem(STORAGE+"-"+key)}
 function keyFor(y,m,d){return `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`}
 function parseKey(key){const [y,m,d]=key.split("-").map(Number);return {y,m:m-1,d}}
 
-function overlapMinutes(a,b,c,d){
-  const split=(s,e)=>e>s?[[s,e]]:[[s,1440],[0,e]];
-  let total=0;
-  for(const [x,y] of split(a,b)) for(const [u,v] of split(c,d)) total+=Math.max(0,Math.min(y,v)-Math.max(x,u));
-  return total;
+function nightOverlap(a,b){
+  if(a==null||b==null)return 0;
+  const parts=b>a?[[a,b]]:[[a,1440],[0,b]];
+  let n=0;
+  for(const [x,y] of parts){
+    n+=Math.max(0,Math.min(y,1440)-Math.max(x,1320));
+    n+=Math.max(0,Math.min(y,300)-Math.max(x,0));
+  }
+  return n;
 }
 function calcDay(data){
   const start=timeMinutes(data.in), out=timeMinutes(data.out);
-  if(start==null||out==null)return {hours:0,worked:0,break:0,normalHours:0,overtimeHours:0,nightHours:0,nightDay:false};
+  if(start==null||out==null)return {hours:0,worked:0,break:0,normal:0,overtime:0,night:0,nightDay:false};
   const total=duration(start,out);
-  const lunchOut=timeMinutes(data.lunchOut), lunchIn=timeMinutes(data.lunchIn);
-  const breakM=(lunchOut!=null&&lunchIn!=null)?duration(lunchOut,lunchIn):0;
+  const breakM=(data.lunchOut&&data.lunchIn)?duration(timeMinutes(data.lunchOut),timeMinutes(data.lunchIn)):0;
   const worked=Math.max(0,total-breakM);
-  const normalM=Math.min(worked,480);
-  const overtimeM=Math.max(0,worked-480);
-  let nightM=overlapMinutes(start,out,1320,300);
-  if(lunchOut!=null&&lunchIn!=null) nightM=Math.max(0,nightM-overlapMinutes(lunchOut,lunchIn,1320,300));
-  return {hours:worked/60,worked,break:breakM,normalHours:normalM/60,overtimeHours:overtimeM/60,nightHours:nightM/60,nightDay:nightM>0};
+  let night=nightOverlap(start,out);
+  if(data.lunchOut&&data.lunchIn)night=Math.max(0,night-nightOverlap(timeMinutes(data.lunchOut),timeMinutes(data.lunchIn)));
+  const normal=Math.min(worked,480);
+  const overtime=Math.max(0,worked-480);
+  return {hours:worked/60,worked,break:breakM,normal:normal/60,overtime:overtime/60,night:night/60,nightDay:night>0};
 }
 function fmtHours(h){
   const total=Math.round(h*60);
@@ -93,12 +96,11 @@ function openDay(key){
 function updateDaySummary(){
   const data={in:$("timeIn").value,lunchOut:$("lunchOut").value,lunchIn:$("lunchIn").value,out:$("timeOut").value};
   const c=calcDay(data);
-  if(!c.worked){$("daySummary").textContent="Preencha entrada e saída para calcular.";return;}
   const br=c.break?` · intervalo ${fmtHours(c.break/60)}`:"";
-  const extra=c.overtimeHours?` · ⏱️ Extra: ${fmtHours(c.overtimeHours)}`:"";
-  const night=c.nightHours?` · 🌙 Noturnas: ${fmtHours(c.nightHours)}`:"";
-  const nd=c.nightDay?" · 1 dia noturno":"";
-  $("daySummary").textContent=`⏱️ Trabalhado: ${fmtHours(c.hours)} · Normal: ${fmtHours(c.normalHours)}${extra}${night}${nd}${br}`;
+  const ex=c.overtime?` · Extras: ${fmtHours(c.overtime)}`:"";
+  const ni=c.night?` · 🌙 Noturnas: ${fmtHours(c.night)}`:"";
+  const nd=c.nightDay?" · 🌙 Dia noturno":"";
+  $("daySummary").textContent=c.worked?`⏱️ Trabalhado: ${fmtHours(c.hours)} · Normal: ${fmtHours(c.normal)}${ex}${ni}${nd}${br}`:"Preencha entrada e saída para calcular.";
 }
 function saveCurrentDay(){
   if(!selectedKey)return;
@@ -113,9 +115,10 @@ function renderHistory(){
   const h=$("history");h.innerHTML="";
   let total=0,normalTotal=0,overtimeTotal=0,nightTotal=0,nightDays=0,days=0;
   for(let d=1;d<=count;d++){
-    const key=keyFor(y,m,d),data=dayData(key); if(!data)continue;
+    const key=keyFor(y,m,d),data=dayData(key);
+    if(!data)continue;
     const c=calcDay(data); if(!c.worked)continue;
-    days++; total+=c.hours; normalTotal+=c.normalHours; overtimeTotal+=c.overtimeHours; nightTotal+=c.nightHours; if(c.nightDay)nightDays++;
+    days++;total+=c.hours;normalTotal+=c.normal;overtimeTotal+=c.overtime;nightTotal+=c.night;if(c.nightDay)nightDays++;
     const row=document.createElement("div");row.className="row";
     const date=document.createElement("div");date.textContent=String(d).padStart(2,"0")+"/"+String(m+1).padStart(2,"0");
     const times=document.createElement("div");times.textContent=`${data.in} → ${data.out}${data.note?" · "+data.note:""}`;
@@ -123,11 +126,9 @@ function renderHistory(){
     row.append(date,times,hours);row.onclick=()=>openDay(key);row.style.cursor="pointer";h.appendChild(row);
   }
   if(!days)h.innerHTML='<div class="empty">Nenhum dia registrado neste mês.</div>';
-  $("monthTotals").textContent=`${days} dia(s) · ${fmtHours(total)} · Normais: ${fmtHours(normalTotal)} · Extras: ${fmtHours(overtimeTotal)} · Noturnas: ${fmtHours(nightTotal)} · Dias noturnos: ${nightDays}`;
-  $("normalHours").value=normalTotal.toFixed(2);
-  $("overtimeHours").value=overtimeTotal.toFixed(2);
-  $("nightHours").value=nightTotal.toFixed(2);
-  $("nightDays").value=nightDays;
+  $("monthTotals").textContent=`${days} dia(s) · ${fmtHours(total)} · Extras: ${fmtHours(overtimeTotal)} · Noturnas: ${fmtHours(nightTotal)} · Dias noturnos: ${nightDays}`;
+  const set=(id,v)=>{const e=$(id);if(e)e.value=Number(v).toFixed(2)};
+  set("normalHours",normalTotal);set("overtimeHours",overtimeTotal);set("nightHours",nightTotal);set("nightDays",nightDays);
   calculate();
 }
 
