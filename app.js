@@ -28,25 +28,44 @@ function parseKey(key){const [y,m,d]=key.split("-").map(Number);return {y,m:m-1,
 
 function nightOverlap(a,b){
   if(a==null||b==null)return 0;
-  const parts=b>a?[[a,b]]:[[a,1440],[0,b]];
-  let n=0;
+  const parts=b>=a?[[a,b]]:[[a,1440],[0,b]];
+  let total=0;
   for(const [x,y] of parts){
-    n+=Math.max(0,Math.min(y,1440)-Math.max(x,1320));
-    n+=Math.max(0,Math.min(y,300)-Math.max(x,0));
+    total+=Math.max(0,Math.min(y,1440)-Math.max(x,1320));
+    total+=Math.max(0,Math.min(y,300)-Math.max(x,0));
   }
-  return n;
+  return total;
 }
 function calcDay(data){
   const start=timeMinutes(data.in), out=timeMinutes(data.out);
   if(start==null||out==null)return {hours:0,worked:0,break:0,normal:0,overtime:0,night:0,nightDay:false};
   const total=duration(start,out);
-  const breakM=(data.lunchOut&&data.lunchIn)?duration(timeMinutes(data.lunchOut),timeMinutes(data.lunchIn)):0;
-  const worked=Math.max(0,total-breakM);
-  let night=nightOverlap(start,out);
-  if(data.lunchOut&&data.lunchIn)night=Math.max(0,night-nightOverlap(timeMinutes(data.lunchOut),timeMinutes(data.lunchIn)));
-  const normal=Math.min(worked,480);
-  const overtime=Math.max(0,worked-480);
-  return {hours:worked/60,worked,break:breakM,normal:normal/60,overtime:overtime/60,night:night/60,nightDay:night>0};
+  const lunchM=(data.lunchOut&&data.lunchIn)?duration(timeMinutes(data.lunchOut),timeMinutes(data.lunchIn)):0;
+  const worked=Math.max(0,total-lunchM);
+  let nightM=nightOverlap(start,out);
+  if(data.lunchOut&&data.lunchIn) nightM=Math.max(0,nightM-nightOverlap(timeMinutes(data.lunchOut),timeMinutes(data.lunchIn)));
+  const normalM=Math.min(worked,480);
+  const overtimeM=Math.max(0,worked-480);
+  return {hours:worked/60,worked,break:lunchM,normal:normalM/60,overtime:overtimeM/60,night:nightM/60,nightDay:nightM>0};
+}
+function getMonthJourneyTotals(){
+  const y=viewDate.getFullYear(),m=viewDate.getMonth(),count=new Date(y,m+1,0).getDate();
+  let normal=0,overtime=0,night=0,nightDays=0,total=0,days=0;
+  for(let d=1;d<=count;d++){
+    const data=dayData(keyFor(y,m,d)); if(!data)continue;
+    const c=calcDay(data); if(!c.worked)continue;
+    days++; total+=c.hours; normal+=c.normal; overtime+=c.overtime; night+=c.night;
+    if(c.nightDay)nightDays++;
+  }
+  return {days,total,normal,overtime,night,nightDays};
+}
+function syncJourneyToCalculator(){
+  const t=getMonthJourneyTotals();
+  $("normalHours").value=t.normal.toFixed(2);
+  $("overtimeHours").value=t.overtime.toFixed(2);
+  $("nightHours").value=t.night.toFixed(2);
+  $("nightDays").value=String(t.nightDays);
+  return t;
 }
 function fmtHours(h){
   const total=Math.round(h*60);
@@ -97,28 +116,30 @@ function updateDaySummary(){
   const data={in:$("timeIn").value,lunchOut:$("lunchOut").value,lunchIn:$("lunchIn").value,out:$("timeOut").value};
   const c=calcDay(data);
   const br=c.break?` · intervalo ${fmtHours(c.break/60)}`:"";
-  const ex=c.overtime?` · Extras: ${fmtHours(c.overtime)}`:"";
-  const ni=c.night?` · 🌙 Noturnas: ${fmtHours(c.night)}`:"";
-  const nd=c.nightDay?" · 🌙 Dia noturno":"";
-  $("daySummary").textContent=c.worked?`⏱️ Trabalhado: ${fmtHours(c.hours)} · Normal: ${fmtHours(c.normal)}${ex}${ni}${nd}${br}`:"Preencha entrada e saída para calcular.";
+  const ex=c.overtime?` · extra ${fmtHours(c.overtime)}`:"";
+  const ni=c.night?` · 🌙 ${fmtHours(c.night)}`:"";
+  const nd=c.nightDay?" · 1 dia noturno":"";
+  $("daySummary").textContent=c.worked?`⏱️ Trabalhado: ${fmtHours(c.hours)}${br}${ex}${ni}${nd}`:"Preencha entrada e saída para calcular.";
 }
 function saveCurrentDay(){
   if(!selectedKey)return;
   const data={in:$("timeIn").value,lunchOut:$("lunchOut").value,lunchIn:$("lunchIn").value,out:$("timeOut").value,note:$("dayNote").value.trim()};
   if(!data.in||!data.out){alert("Informe pelo menos a entrada e a saída.");return}
   saveData(selectedKey,data);
+  syncJourneyToCalculator();
+  calculate();
   renderCalendar();
   openDay(selectedKey);
 }
 function renderHistory(){
   const y=viewDate.getFullYear(),m=viewDate.getMonth(),count=new Date(y,m+1,0).getDate();
   const h=$("history");h.innerHTML="";
-  let total=0,normalTotal=0,overtimeTotal=0,nightTotal=0,nightDays=0,days=0;
+  let total=0,days=0;
   for(let d=1;d<=count;d++){
     const key=keyFor(y,m,d),data=dayData(key);
     if(!data)continue;
     const c=calcDay(data); if(!c.worked)continue;
-    days++;total+=c.hours;normalTotal+=c.normal;overtimeTotal+=c.overtime;nightTotal+=c.night;if(c.nightDay)nightDays++;
+    days++;total+=c.hours;
     const row=document.createElement("div");row.className="row";
     const date=document.createElement("div");date.textContent=String(d).padStart(2,"0")+"/"+String(m+1).padStart(2,"0");
     const times=document.createElement("div");times.textContent=`${data.in} → ${data.out}${data.note?" · "+data.note:""}`;
@@ -126,10 +147,9 @@ function renderHistory(){
     row.append(date,times,hours);row.onclick=()=>openDay(key);row.style.cursor="pointer";h.appendChild(row);
   }
   if(!days)h.innerHTML='<div class="empty">Nenhum dia registrado neste mês.</div>';
-  $("monthTotals").textContent=`${days} dia(s) · ${fmtHours(total)} · Extras: ${fmtHours(overtimeTotal)} · Noturnas: ${fmtHours(nightTotal)} · Dias noturnos: ${nightDays}`;
-  const set=(id,v)=>{const e=$(id);if(e)e.value=Number(v).toFixed(2)};
-  set("normalHours",normalTotal);set("overtimeHours",overtimeTotal);set("nightHours",nightTotal);set("nightDays",nightDays);
-  calculate();
+  const t=getMonthJourneyTotals();
+  $("monthTotals").textContent=`${days} dia(s) · ${fmtHours(total)} · Normais: ${fmtHours(t.normal)} · Extras: ${fmtHours(t.overtime)} · Noturnas: ${fmtHours(t.night)} · Dias noturnos: ${t.nightDays}`;
+  syncJourneyToCalculator();
 }
 
 function hourlyRate(){
@@ -157,8 +177,8 @@ document.querySelectorAll(".tab").forEach(btn=>btn.onclick=()=>{
 });
 $("calcBtn").onclick=calculate;
 document.querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{if(i.closest(".card")&&i.id!=="dayNote")calculate();if(i.id.startsWith("time")||i.id.startsWith("lunch"))updateDaySummary()}));
-$("prevMonth").onclick=()=>{viewDate.setMonth(viewDate.getMonth()-1);renderCalendar()};
-$("nextMonth").onclick=()=>{viewDate.setMonth(viewDate.getMonth()+1);renderCalendar()};
+$("prevMonth").onclick=()=>{viewDate.setMonth(viewDate.getMonth()-1);syncJourneyToCalculator();calculate();renderCalendar()};
+$("nextMonth").onclick=()=>{viewDate.setMonth(viewDate.getMonth()+1);syncJourneyToCalculator();calculate();renderCalendar()};
 $("saveDay").onclick=saveCurrentDay;
 $("deleteDay").onclick=()=>{
   if(selectedKey&&dayData(selectedKey)){deleteData(selectedKey);renderCalendar();openDay(selectedKey)}
@@ -166,6 +186,6 @@ $("deleteDay").onclick=()=>{
 $("closeEditor").onclick=()=>{$("dayEditor").classList.add("hidden");selectedKey=null};
 $("themeBtn").onclick=()=>{document.body.classList.toggle("dark");localStorage.setItem("msj-theme",document.body.classList.contains("dark")?"dark":"light")};
 if(localStorage.getItem("msj-theme")==="dark")document.body.classList.add("dark");
-calculate();renderCalendar();
+syncJourneyToCalculator();calculate();renderCalendar();
 
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
