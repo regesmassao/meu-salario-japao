@@ -26,13 +26,51 @@ function deleteData(key){localStorage.removeItem(STORAGE+"-"+key)}
 function keyFor(y,m,d){return `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`}
 function parseKey(key){const [y,m,d]=key.split("-").map(Number);return {y,m:m-1,d}}
 
+function overlapMinutes(a,b,c,d){
+  // Returns overlap between two intervals on a 24h clock.
+  // The second interval may cross midnight.
+  const split = (s,e) => e>s ? [[s,e]] : [[s,1440],[0,e]];
+  let total=0;
+  for(const [x,y] of split(a,b)){
+    for(const [u,v] of split(c,d)){
+      total += Math.max(0, Math.min(y,v)-Math.max(x,u));
+    }
+  }
+  return total;
+}
 function calcDay(data){
   const start=timeMinutes(data.in), out=timeMinutes(data.out);
-  if(start==null||out==null)return {hours:0,worked:0,break:0};
+  if(start==null||out==null)return {
+    hours:0,worked:0,break:0,normalHours:0,overtimeHours:0,nightHours:0,nightDay:false
+  };
+
   const total=duration(start,out);
-  const breakM=(data.lunchOut&&data.lunchIn)?duration(timeMinutes(data.lunchOut),timeMinutes(data.lunchIn)):0;
+  const lunchOut=timeMinutes(data.lunchOut);
+  const lunchIn=timeMinutes(data.lunchIn);
+  const breakM=(lunchOut!=null&&lunchIn!=null)?duration(lunchOut,lunchIn):0;
   const worked=Math.max(0,total-breakM);
-  return {hours:worked/60,worked,break:breakM};
+
+  // Standard daily journey used by the calendar: 8 hours.
+  // Anything above 8h worked in the day is automatically overtime.
+  const normalM=Math.min(worked,480);
+  const overtimeM=Math.max(0,worked-480);
+
+  // Japan night-work period: 22:00–05:00.
+  // Subtract the lunch interval if it overlaps the night period.
+  let nightM=overlapMinutes(start,out,1320,300);
+  if(lunchOut!=null&&lunchIn!=null){
+    nightM=Math.max(0,nightM-overlapMinutes(lunchOut,lunchIn,1320,300));
+  }
+
+  return {
+    hours:worked/60,
+    worked,
+    break:breakM,
+    normalHours:normalM/60,
+    overtimeHours:overtimeM/60,
+    nightHours:nightM/60,
+    nightDay:nightM>0
+  };
 }
 function fmtHours(h){
   const total=Math.round(h*60);
@@ -80,10 +118,23 @@ function openDay(key){
   $("dayEditor").scrollIntoView({behavior:"smooth",block:"nearest"});
 }
 function updateDaySummary(){
-  const data={in:$("timeIn").value,lunchOut:$("lunchOut").value,lunchIn:$("lunchIn").value,out:$("timeOut").value};
+  const data={
+    in:$("timeIn").value,
+    lunchOut:$("lunchOut").value,
+    lunchIn:$("lunchIn").value,
+    out:$("timeOut").value
+  };
   const c=calcDay(data);
+  if(!c.worked){
+    $("daySummary").textContent="Preencha entrada e saída para calcular.";
+    return;
+  }
   const br=c.break?` · intervalo ${fmtHours(c.break/60)}`:"";
-  $("daySummary").textContent=c.worked?`⏱️ Trabalhado: ${fmtHours(c.hours)}${br}`:"Preencha entrada e saída para calcular.";
+  const night=c.nightHours?` · 🌙 ${fmtHours(c.nightHours)}`:"";
+  const extra=c.overtimeHours?` · ⏱️ Extra ${fmtHours(c.overtimeHours)}`:"";
+  const nightDay=c.nightDay?" · 🌙 dia noturno":"";
+  $("daySummary").textContent=
+    `⏱️ Trabalhado: ${fmtHours(c.hours)} · Normal: ${fmtHours(c.normalHours)}${extra}${night}${nightDay}${br}`;
 }
 function saveCurrentDay(){
   if(!selectedKey)return;
@@ -96,20 +147,47 @@ function saveCurrentDay(){
 function renderHistory(){
   const y=viewDate.getFullYear(),m=viewDate.getMonth(),count=new Date(y,m+1,0).getDate();
   const h=$("history");h.innerHTML="";
-  let total=0,days=0;
+  let total=0,normalTotal=0,overtimeTotal=0,nightTotal=0,nightDays=0,days=0;
+
   for(let d=1;d<=count;d++){
     const key=keyFor(y,m,d),data=dayData(key);
     if(!data)continue;
     const c=calcDay(data); if(!c.worked)continue;
-    days++;total+=c.hours;
+
+    days++;
+    total+=c.hours;
+    normalTotal+=c.normalHours;
+    overtimeTotal+=c.overtimeHours;
+    nightTotal+=c.nightHours;
+    if(c.nightDay)nightDays++;
+
     const row=document.createElement("div");row.className="row";
-    const date=document.createElement("div");date.textContent=String(d).padStart(2,"0")+"/"+String(m+1).padStart(2,"0");
-    const times=document.createElement("div");times.textContent=`${data.in} → ${data.out}${data.note?" · "+data.note:""}`;
-    const hours=document.createElement("div");hours.className="hours";hours.textContent=fmtHours(c.hours);
-    row.append(date,times,hours);row.onclick=()=>openDay(key);row.style.cursor="pointer";h.appendChild(row);
+    const date=document.createElement("div");
+    date.textContent=String(d).padStart(2,"0")+"/"+String(m+1).padStart(2,"0");
+    const times=document.createElement("div");
+    times.textContent=`${data.in} → ${data.out}${data.note?" · "+data.note:""}`;
+    const hours=document.createElement("div");
+    hours.className="hours";
+    hours.textContent=fmtHours(c.hours);
+
+    row.append(date,times,hours);
+    row.onclick=()=>openDay(key);
+    row.style.cursor="pointer";
+    h.appendChild(row);
   }
+
   if(!days)h.innerHTML='<div class="empty">Nenhum dia registrado neste mês.</div>';
-  $("monthTotals").textContent=`${days} dia(s) · ${fmtHours(total)}`;
+  $("monthTotals").textContent=`${days} dia(s) · ${fmtHours(total)} · Extras: ${fmtHours(overtimeTotal)} · Noturnas: ${fmtHours(nightTotal)} · Dias noturnos: ${nightDays}`;
+
+  // The calendar is the source of truth for the current month's jornada.
+  // Keep the existing salary calculator fields, but fill the journey-related
+  // values automatically from the calendar.
+  $("normalHours").value=normalTotal.toFixed(2);
+  $("overtimeHours").value=overtimeTotal.toFixed(2);
+  $("nightHours").value=nightTotal.toFixed(2);
+  $("nightDays").value=nightDays;
+
+  calculate();
 }
 
 function hourlyRate(){
