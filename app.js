@@ -1,15 +1,11 @@
 const $=id=>document.getElementById(id);
 function val(id){
-  const raw=$(id).value||"";
-  if(id==="overtimeHours" && typeof raw==="string" && raw.includes("h")){
-    const m=raw.match(/(\d+(?:[.,]\d+)?)\s*h(?:\s*(\d+)\s*(?:m|min))?/i);
-    if(m){
-      const h=Number(m[1].replace(",","."));
-      const mins=m[2]?Number(m[2]):0;
-      return h+mins/60;
-    }
+  const raw=String($(id).value||"").trim().toLowerCase();
+  if(id==="overtimeHours" && /h/.test(raw)){
+    const m=raw.match(/([0-9]+(?:[.,][0-9]+)?)\s*h(?:\s*([0-9]+)\s*min)?/);
+    if(m) return Number(m[1].replace(",","."))+(m[2]?Number(m[2])/60:0);
   }
-  return Number(raw)||0;
+  return Number(raw.replace(",","."))||0;
 }
 let mode="hourly";
 let viewDate=new Date();
