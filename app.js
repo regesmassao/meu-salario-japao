@@ -7,6 +7,7 @@ const val=id=>{
   }
   return Number(raw||0);
 };
+let currentLang=localStorage.getItem("msj-language")||"pt-BR";
 let mode="hourly";
 let viewDate=new Date();
 viewDate.setDate(1);
@@ -185,7 +186,6 @@ if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.ser
 
 
 // ===== V4.3 — Idiomas e configurações =====
-var currentLang=localStorage.getItem("msj-language")||"pt-BR";
 const I18N={
 "pt-BR":{title:"Meu Salário Japão 🇯🇵",subtitle:"Calculadora e controle de jornada",settings:"⚙️ Configurações",language:"🌐 Idioma",note:"O idioma é salvo neste aparelho. Novos idiomas podem ser adicionados sem alterar seus registros.",calc:"💴 Calculadora salarial",hourlyTab:"💴 Por hora",monthlyTab:"👔 Mensal / Seishain",hourlyRate:"Valor por hora (¥)",monthlySalary:"Salário mensal (¥)",baseHours:"Horas-base / mês",normalHours:"Horas normais",overtimeHours:"Horas extras (25%)",nightPercent:"Adicional noturno (%)",nightHours:"Horas noturnas",nightFixed:"Adicional noturno por dia (¥)",nightDays:"Dias de trabalho noturno",mealMonthly:"Refeição / benefício mensal (¥)",otherAllowance:"Outros adicionais (¥)",annualBonus:"Bônus anual (¥)",deduction:"Descontos estimados (%)",gross:"Bruto mensal",deductions:"Descontos estimados",net:"Líquido estimado",rateOut:"Hora-base calculada",calculate:"Calcular",journey:"📅 Controle de Jornada",journeyDesc:"Registre entrada, intervalo e saída de cada dia.",history:"📋 Histórico do mês",entry:"Entrada",lunchOut:"Saída para almoço",lunchIn:"Retorno do almoço",exit:"Saída",noteLabel:"Observação (opcional)",notePlaceholder:"Ex.: turno noturno",save:"💾 Salvar dia",delete:"🗑️ Excluir",needTimes:"Informe pelo menos a entrada e a saída.",empty:"Nenhum dia registrado neste mês.",footer:"Meu Salário Japão 🇯🇵 — V4.3",close:"Fechar",theme:"Alternar tema",days:"dia(s)",normal:"Normais",extra:"Extras",nights:"Noturnas",nightDays:"Dias noturnos",week:["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"],worked:"Trabalhado",break:"intervalo",nightDay:"dia noturno",fillTimes:"Preencha entrada e saída para calcular."},
 "ja-JP":{title:"日本給与 🇯🇵",subtitle:"給与計算と勤務時間管理",settings:"⚙️ 設定",language:"🌐 言語",note:"言語設定はこの端末に保存されます。記録データは変更されません。",calc:"💴 給与計算",hourlyTab:"💴 時給",monthlyTab:"👔 月給 / 正社員",hourlyRate:"時給 (¥)",monthlySalary:"月給 (¥)",baseHours:"月の基準時間",normalHours:"通常勤務時間",overtimeHours:"残業時間 (25%)",nightPercent:"深夜割増 (%)",nightHours:"深夜勤務時間",nightFixed:"深夜勤務日額 (¥)",nightDays:"深夜勤務日数",mealMonthly:"食事 / 月額手当 (¥)",otherAllowance:"その他手当 (¥)",annualBonus:"年間賞与 (¥)",deduction:"推定控除率 (%)",gross:"月額総支給",deductions:"推定控除額",net:"推定手取り",rateOut:"計算時給",calculate:"計算する",journey:"📅 勤務時間管理",journeyDesc:"毎日の出勤、休憩、退勤を記録します。",history:"📋 月間履歴",entry:"出勤",lunchOut:"昼休み開始",lunchIn:"昼休み終了",exit:"退勤",noteLabel:"メモ (任意)",notePlaceholder:"例：夜勤",save:"💾 保存",delete:"🗑️ 削除",needTimes:"出勤と退勤の時間を入力してください。",empty:"この月の記録はありません。",footer:"日本給与 🇯🇵 — V4.3",close:"閉じる",theme:"テーマ切替",days:"日",normal:"通常",extra:"残業",nights:"深夜",nightDays:"深夜日数",week:["日","月","火","水","木","金","土"],worked:"勤務",break:"休憩",nightDay:"深夜日",fillTimes:"出勤と退勤を入力すると計算できます。"},
