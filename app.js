@@ -1,5 +1,16 @@
 const $=id=>document.getElementById(id);
-const val=id=>Number($(id).value||0);
+function val(id){
+  const raw=$(id).value||"";
+  if(id==="overtimeHours" && typeof raw==="string" && raw.includes("h")){
+    const m=raw.match(/(\d+(?:[.,]\d+)?)\s*h(?:\s*(\d+)\s*(?:m|min))?/i);
+    if(m){
+      const h=Number(m[1].replace(",","."));
+      const mins=m[2]?Number(m[2]):0;
+      return h+mins/60;
+    }
+  }
+  return Number(raw)||0;
+}
 let mode="hourly";
 let viewDate=new Date();
 viewDate.setDate(1);
@@ -50,6 +61,11 @@ function calcDay(data){
 function fmtHours(h){
   const total=Math.round(h*60);
   return `${Math.floor(total/60)}h ${String(total%60).padStart(2,"0")}m`;
+}
+function fmtHoursShort(h){
+  const total=Math.round(h*60);
+  const hours=Math.floor(total/60), mins=total%60;
+  return mins ? `${hours}h ${mins}min` : `${hours}h`;
 }
 function monthLabel(){
   $("monthLabel").textContent=viewDate.toLocaleDateString("pt-BR",{month:"long",year:"numeric"});
@@ -127,7 +143,7 @@ function renderHistory(){
   if(!days)h.innerHTML='<div class="empty">Nenhum dia registrado neste mês.</div>';
   $("monthTotals").textContent=`${days} dia(s) · ${fmtHours(total)} · Normais: ${fmtHours(normalTotal)} · Extras: ${fmtHours(overtimeTotal)} · Noturnas: ${fmtHours(nightTotal)} · Dias noturnos: ${nightDays}`;
   $("normalHours").value=normalTotal.toFixed(2);
-  $("overtimeHours").value=overtimeTotal.toFixed(2);
+  $("overtimeHours").value=fmtHoursShort(overtimeTotal);
   $("nightHours").value=nightTotal.toFixed(2);
   $("nightDays").value=String(nightDays);
   calculate();
