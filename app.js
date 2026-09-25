@@ -56,7 +56,7 @@ function calcDay(data){
 }
 function fmtHours(h){
   const total=Math.round(h*60);
-  return `${Math.floor(total/60)}h ${String(total%60).padStart(2,"0")}m`;
+  return `${Math.floor(total/60)}h ${String(total%60).padStart(2,"0")}min`;
 }
 function fmtHoursShort(h){
   const total=Math.round(h*60);
