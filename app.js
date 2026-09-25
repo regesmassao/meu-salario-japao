@@ -26,13 +26,26 @@ function deleteData(key){localStorage.removeItem(STORAGE+"-"+key)}
 function keyFor(y,m,d){return `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`}
 function parseKey(key){const [y,m,d]=key.split("-").map(Number);return {y,m:m-1,d}}
 
+function nightOverlap(a,b){
+  if(a==null||b==null)return 0;
+  const parts=b>=a?[[a,b]]:[[a,1440],[0,b]];
+  let n=0;
+  for(const [x,y] of parts){
+    n+=Math.max(0,Math.min(y,300)-Math.max(x,0));
+    n+=Math.max(0,Math.min(y,1440)-Math.max(x,1320));
+  }
+  return n;
+}
 function calcDay(data){
   const start=timeMinutes(data.in), out=timeMinutes(data.out);
-  if(start==null||out==null)return {hours:0,worked:0,break:0};
+  if(start==null||out==null)return {hours:0,worked:0,break:0,normal:0,overtime:0,night:0,nightDay:false};
   const total=duration(start,out);
-  const breakM=(data.lunchOut&&data.lunchIn)?duration(timeMinutes(data.lunchOut),timeMinutes(data.lunchIn)):0;
+  const lunchOut=timeMinutes(data.lunchOut), lunchIn=timeMinutes(data.lunchIn);
+  const breakM=(lunchOut!=null&&lunchIn!=null)?duration(lunchOut,lunchIn):0;
   const worked=Math.max(0,total-breakM);
-  return {hours:worked/60,worked,break:breakM};
+  let nightM=nightOverlap(start,out);
+  if(lunchOut!=null&&lunchIn!=null)nightM=Math.max(0,nightM-nightOverlap(lunchOut,lunchIn));
+  return {hours:worked/60,worked,break:breakM,normal:Math.min(worked,480)/60,overtime:Math.max(0,worked-480)/60,night:nightM/60,nightDay:nightM>0};
 }
 function fmtHours(h){
   const total=Math.round(h*60);
@@ -83,7 +96,10 @@ function updateDaySummary(){
   const data={in:$("timeIn").value,lunchOut:$("lunchOut").value,lunchIn:$("lunchIn").value,out:$("timeOut").value};
   const c=calcDay(data);
   const br=c.break?` · intervalo ${fmtHours(c.break/60)}`:"";
-  $("daySummary").textContent=c.worked?`⏱️ Trabalhado: ${fmtHours(c.hours)}${br}`:"Preencha entrada e saída para calcular.";
+  const extra=c.overtime?` · Extra: ${fmtHours(c.overtime)}`:"";
+  const night=c.night?` · 🌙 Noturno: ${fmtHours(c.night)}`:"";
+  const nd=c.nightDay?" · 1 dia noturno":"";
+  $("daySummary").textContent=c.worked?`⏱️ Trabalhado: ${fmtHours(c.hours)}${br}${extra}${night}${nd}`:"Preencha entrada e saída para calcular.";
 }
 function saveCurrentDay(){
   if(!selectedKey)return;
@@ -96,12 +112,12 @@ function saveCurrentDay(){
 function renderHistory(){
   const y=viewDate.getFullYear(),m=viewDate.getMonth(),count=new Date(y,m+1,0).getDate();
   const h=$("history");h.innerHTML="";
-  let total=0,days=0;
+  let total=0,normalTotal=0,overtimeTotal=0,nightTotal=0,nightDays=0,days=0;
   for(let d=1;d<=count;d++){
     const key=keyFor(y,m,d),data=dayData(key);
     if(!data)continue;
     const c=calcDay(data); if(!c.worked)continue;
-    days++;total+=c.hours;
+    days++;total+=c.hours;normalTotal+=c.normal;overtimeTotal+=c.overtime;nightTotal+=c.night;if(c.nightDay)nightDays++;
     const row=document.createElement("div");row.className="row";
     const date=document.createElement("div");date.textContent=String(d).padStart(2,"0")+"/"+String(m+1).padStart(2,"0");
     const times=document.createElement("div");times.textContent=`${data.in} → ${data.out}${data.note?" · "+data.note:""}`;
@@ -109,7 +125,12 @@ function renderHistory(){
     row.append(date,times,hours);row.onclick=()=>openDay(key);row.style.cursor="pointer";h.appendChild(row);
   }
   if(!days)h.innerHTML='<div class="empty">Nenhum dia registrado neste mês.</div>';
-  $("monthTotals").textContent=`${days} dia(s) · ${fmtHours(total)}`;
+  $("monthTotals").textContent=`${days} dia(s) · ${fmtHours(total)} · Normais: ${fmtHours(normalTotal)} · Extras: ${fmtHours(overtimeTotal)} · Noturnas: ${fmtHours(nightTotal)} · Dias noturnos: ${nightDays}`;
+  $("normalHours").value=normalTotal.toFixed(2);
+  $("overtimeHours").value=overtimeTotal.toFixed(2);
+  $("nightHours").value=nightTotal.toFixed(2);
+  $("nightDays").value=String(nightDays);
+  calculate();
 }
 
 function hourlyRate(){
@@ -149,74 +170,3 @@ if(localStorage.getItem("msj-theme")==="dark")document.body.classList.add("dark"
 calculate();renderCalendar();
 
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
-
-
-/* V4.2.1 — jornada automática */
-function msjTime(v){
-  if(!v)return null;
-  const p=String(v).split(":").map(Number);
-  if(p.length<2||!Number.isFinite(p[0])||!Number.isFinite(p[1]))return null;
-  return p[0]*60+p[1];
-}
-function msjDuration(a,b){
-  if(a==null||b==null)return 0;
-  let d=b-a;
-  if(d<0)d+=1440;
-  return d;
-}
-function msjNightOverlap(a,b){
-  if(a==null||b==null)return 0;
-  const parts=b>=a?[[a,b]]:[[a,1440],[0,b]];
-  let n=0;
-  for(const [x,y] of parts){
-    n+=Math.max(0,Math.min(y,300)-Math.max(x,0));
-    n+=Math.max(0,Math.min(y,1440)-Math.max(x,1320));
-  }
-  return n;
-}
-function msjJourney(d){
-  const a=msjTime(d?.in), b=msjTime(d?.out);
-  if(a==null||b==null)return {worked:0,normal:0,overtime:0,night:0,nightDay:false};
-  const lo=msjTime(d?.lunchOut), li=msjTime(d?.lunchIn);
-  const lunch=(lo!=null&&li!=null)?msjDuration(lo,li):0;
-  const worked=Math.max(0,msjDuration(a,b)-lunch);
-  let night=msjNightOverlap(a,b);
-  if(lo!=null&&li!=null)night=Math.max(0,night-msjNightOverlap(lo,li));
-  return {worked:worked/60,normal:Math.min(worked,480)/60,overtime:Math.max(0,worked-480)/60,night:night/60,nightDay:night>0};
-}
-function msjSyncMonthTotals(){
-  try{
-    let normal=0,extra=0,night=0,nightDays=0;
-    const now=new Date();
-    const y=now.getFullYear(),m=now.getMonth();
-    if(typeof dayData==="function"&&typeof keyFor==="function"){
-      const days=new Date(y,m+1,0).getDate();
-      for(let d=1;d<=days;d++){
-        const rec=dayData(keyFor(y,m,d));
-        if(!rec)continue;
-        const c=msjJourney(rec);
-        normal+=c.normal; extra+=c.overtime; night+=c.night;
-        if(c.nightDay)nightDays++;
-      }
-    }
-    const put=(id,v)=>{
-      const e=document.getElementById(id);
-      if(e)e.value=Number(v).toFixed(2);
-    };
-    put("normalHours",normal);
-    put("overtimeHours",extra);
-    put("nightHours",night);
-    put("nightDays",nightDays);
-    put("workedNightDays",nightDays);
-    if(typeof calculate==="function")calculate();
-  }catch(e){console.warn("V4.2.1 sync:",e)}
-}
-
-
-try{
-  if(document.readyState==="loading"){
-    document.addEventListener("DOMContentLoaded",()=>setTimeout(msjSyncMonthTotals,50));
-  }else{
-    setTimeout(msjSyncMonthTotals,50);
-  }
-}catch(e){}
