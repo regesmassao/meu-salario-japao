@@ -16,7 +16,7 @@
     <h1>Meu Salário Japão 🇯🇵</h1>
     <p>Calculadora e controle de jornada</p>
   </div>
-  <button id="themeBtn" class="iconBtn" aria-label="Alternar tema">🌙</button>
+  <div class="topActions"><button id="settingsBtn" class="iconBtn" aria-label="Configurações" type="button">⚙️</button><button id="themeBtn" class="iconBtn" aria-label="Alternar tema">🌙</button></div>
 </header>
 
 <main>
@@ -104,9 +104,9 @@
 </main>
 
 
-<div id="settingsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
-  <div class="modalCard">
-    <div class="modalHead"><h2 id="settingsTitle">⚙️ Configurações</h2><button id="closeSettings" class="smallBtn" type="button">✕</button></div>
+<div id="settingsModal" class="msjModal" hidden>
+  <div class="msjModalCard" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="msjModalHead"><h2 id="settingsTitle">⚙️ Configurações</h2><button id="closeSettings" class="smallBtn" type="button">✕</button></div>
     <label id="languageLabel">🌐 Idioma
       <select id="languageSelect">
         <option value="pt-BR">🇧🇷 Português</option>
@@ -122,7 +122,27 @@
     <p class="settingsNote">O idioma é salvo neste aparelho. Seus registros não são alterados.</p>
   </div>
 </div>
-<footer>Meu Salário Japão 🇯🇵 — V4.2</footer>
+<footer>Meu Salário Japão 🇯🇵 — V4.3.4</footer>
 <script src="app.js"></script>
+<script>
+(function(){
+  const btn=document.getElementById("settingsBtn"), modal=document.getElementById("settingsModal"), close=document.getElementById("closeSettings"), sel=document.getElementById("languageSelect");
+  if(!btn||!modal||!close||!sel)return;
+  const langs={
+    "pt-BR":{title:"Meu Salário Japão 🇯🇵",sub:"Calculadora e controle de jornada",settings:"⚙️ Configurações",language:"🌐 Idioma",note:"O idioma é salvo neste aparelho. Seus registros não são alterados.",close:"Fechar"},
+    "ja-JP":{title:"日本の給与 🇯🇵",sub:"給与計算と勤務時間管理",settings:"⚙️ 設定",language:"🌐 言語",note:"言語設定はこの端末に保存されます。勤務記録は変更されません。",close:"閉じる"},
+    "en-US":{title:"Japan Salary 🇯🇵",sub:"Salary calculator and work-time tracker",settings:"⚙️ Settings",language:"🌐 Language",note:"Your language is saved on this device. Your records are not changed.",close:"Close"}
+  };
+  let lang=localStorage.getItem("msj-language")||"pt-BR"; if(!langs[lang])lang="pt-BR";
+  function apply(){const x=langs[lang]; document.documentElement.lang=lang; document.title=x.title; const h=document.querySelector(".top h1"),p=document.querySelector(".top p"); if(h)h.textContent=x.title;if(p)p.textContent=x.sub; document.getElementById("settingsTitle").textContent=x.settings; document.getElementById("languageLabel").firstChild.nodeValue=x.language+"\n      "; document.querySelector(".settingsNote").textContent=x.note; close.setAttribute("aria-label",x.close); sel.value=lang;}
+  btn.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();modal.hidden=false;});
+  close.addEventListener("click",function(){modal.hidden=true;});
+  modal.addEventListener("click",function(e){if(e.target===modal)modal.hidden=true;});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")modal.hidden=true;});
+  sel.addEventListener("change",function(){if(!langs[sel.value]){alert("Este idioma será adicionado em uma próxima versão.");sel.value=lang;return;}lang=sel.value;localStorage.setItem("msj-language",lang);apply();});
+  apply();
+})();
+</script>
+
 </body>
 </html>
