@@ -182,3 +182,36 @@ if(localStorage.getItem("msj-theme")==="dark")document.body.classList.add("dark"
 calculate();renderCalendar();
 
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
+
+
+// Configurações e idioma — módulo isolado para não interferir nos cálculos.
+(function(){
+  const settingsBtn=document.getElementById("settingsBtn");
+  const settingsModal=document.getElementById("settingsModal");
+  const closeSettings=document.getElementById("closeSettings");
+  const languageSelect=document.getElementById("languageSelect");
+  if(!settingsBtn||!settingsModal||!closeSettings||!languageSelect)return;
+  const LANG_KEY="msj-language";
+  const translations={
+    "pt-BR":{title:"⚙️ Configurações",language:"🌐 Idioma",note:"Mais idiomas serão adicionados nas próximas versões."},
+    ja:{title:"⚙️ 設定",language:"🌐 言語",note:"今後のバージョンでさらに言語を追加します。"},
+    en:{title:"⚙️ Settings",language:"🌐 Language",note:"More languages will be added in future versions."}
+  };
+  function openSettings(){settingsModal.classList.remove("hidden");languageSelect.value=localStorage.getItem(LANG_KEY)||"pt-BR";}
+  function close(){settingsModal.classList.add("hidden");}
+  function applyLanguage(lang){
+    if(!translations[lang])lang="pt-BR";
+    localStorage.setItem(LANG_KEY,lang);
+    const t=translations[lang];
+    document.documentElement.lang=lang;
+    document.getElementById("settingsTitle").textContent=t.title;
+    document.querySelector(".settingLabel").childNodes[0].textContent=t.language+"\n      ";
+    document.querySelector(".settingNote").textContent=t.note;
+  }
+  settingsBtn.addEventListener("click",openSettings);
+  closeSettings.addEventListener("click",close);
+  settingsModal.addEventListener("click",e=>{if(e.target===settingsModal)close();});
+  languageSelect.addEventListener("change",e=>applyLanguage(e.target.value));
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")close();});
+  applyLanguage(localStorage.getItem(LANG_KEY)||"pt-BR");
+})();
