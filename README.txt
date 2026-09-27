@@ -1,10 +1,12 @@
-Meu Salário Japão 🇯🇵 — V4.3
+Meu Salário Japão 🇯🇵 — V4.3.1
 
 Base: V4.2.1
 Novidades:
 - Evolução mensal com gráficos.
 - Bruto, líquido, horas trabalhadas, horas extras, horas noturnas e dias trabalhados por mês.
 - Comparação automática com o mês anterior.
+- Painel reduzido para os últimos 6 meses, otimizado para iPhone.
+- O mês selecionado pode usar o cálculo atual quando ainda não houver snapshot salvo.
 - Dados do calendário e cálculos existentes preservados.
 - Dados antigos continuam usando a mesma chave de armazenamento.
 - Configurações/idiomas não foram alterados nesta versão.
@@ -12,3 +14,4 @@ Novidades:
 Importante:
 - Para registrar bruto/líquido no histórico de um mês, abra esse mês e toque em "Calcular".
 - As horas e dias vêm automaticamente do calendário.
+- Se o mês selecionado ainda não tiver snapshot, o painel pode mostrar o cálculo atual da calculadora sem alterar o histórico.

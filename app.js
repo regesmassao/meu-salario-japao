@@ -163,6 +163,16 @@ function monthlySnapshot(key){
 function saveMonthlySnapshot(key,data){
   localStorage.setItem(MONTHLY_STORAGE+"-"+key,JSON.stringify(data));
 }
+function currentCalculatedValues(){
+  const rate=hourlyRate();
+  const normal=mode==="monthly"?val("monthlySalary"):rate*val("normalHours");
+  const overtime=rate*1.25*val("overtimeHours");
+  const night=rate*(val("nightPercent")/100)*val("nightHours")+val("nightFixed")*val("nightDays");
+  const meal=val("mealMonthly");
+  const gross=normal+overtime+night+meal+val("otherAllowance");
+  const deductions=gross*(val("deduction")/100);
+  return {gross,net:gross-deductions};
+}
 function monthStats(key){
   const [y,m]=key.split("-").map(Number);
   const count=new Date(y,m,0).getDate();
@@ -176,7 +186,15 @@ function monthStats(key){
     if(c.nightDay)nightDays++;
   }
   const snap=monthlySnapshot(key);
-  return {key,days,hours,overtime,night,nightDays,gross:snap?.gross??null,net:snap?.net??null};
+  let gross=snap?.gross??null, net=snap?.net??null;
+  // Se o mês selecionado ainda não tem snapshot, usa o cálculo atualmente
+  // exibido na calculadora. Isso evita que o painel fique vazio depois de
+  // atualizar o aplicativo, sem alterar os dados históricos já salvos.
+  if(gross==null && key===monthlyKey() && days>0){
+    const current=currentCalculatedValues();
+    if(current.gross>0){gross=current.gross;net=current.net;}
+  }
+  return {key,days,hours,overtime,night,nightDays,gross,net};
 }
 function changeText(current,previous){
   if(current==null||previous==null||previous===0)return "—";
@@ -219,7 +237,9 @@ function renderDashboard(){
   const dash=$("monthlyDashboard");
   if(!dash)return;
   const months=[];
-  for(let i=11;i>=0;i--){
+  // No iPhone, seis meses dão uma leitura muito mais clara sem esconder
+  // os valores. O mês selecionado no calendário fica sempre por último.
+  for(let i=5;i>=0;i--){
     const d=new Date(viewDate.getFullYear(),viewDate.getMonth()-i,1);
     months.push(monthStats(monthlyKey(d)));
   }
@@ -247,7 +267,7 @@ function renderDashboard(){
     ${renderChart("➕ Horas extras por mês",make("overtime","hours"),"hours")}
     ${renderChart("🌙 Horas noturnas por mês",make("night","hours"),"hours")}
     ${renderChart("📅 Dias trabalhados por mês",make("days","number"),"number")}
-    <div class="dashboardNote">Os valores de bruto e líquido aparecem após clicar em <strong>Calcular</strong> em cada mês. Os dados de jornada vêm do calendário.</div>`;
+    <div class="dashboardNote">Mostrando os últimos 6 meses até <strong>${monthName(monthlyKey())}</strong>. As horas e dias vêm do calendário. Bruto e líquido usam o valor salvo em cada mês; no mês selecionado, se ainda não houver histórico salvo, o painel usa o cálculo atual da calculadora.</div>`;
 }
 function calculate(saveSnapshot=false){
   const rate=hourlyRate();
