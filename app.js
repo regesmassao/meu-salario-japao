@@ -12,6 +12,7 @@ let viewDate=new Date();
 viewDate.setDate(1);
 let selectedKey=null;
 const STORAGE="msj-v4-2-days";
+const MONTHLY_STORAGE="msj-v4-3-months";
 
 function money(n){return "¥"+Math.round(n).toLocaleString("ja-JP")}
 function timeMinutes(t){
@@ -119,6 +120,7 @@ function saveCurrentDay(){
   if(!data.in||!data.out){alert("Informe pelo menos a entrada e a saída.");return}
   saveData(selectedKey,data);
   renderCalendar();
+  renderDashboard();
   openDay(selectedKey);
 }
 function renderHistory(){
@@ -148,7 +150,106 @@ function renderHistory(){
 function hourlyRate(){
   return mode==="monthly" ? val("monthlySalary")/Math.max(1,val("baseHours")) : val("hourlyRate");
 }
-function calculate(){
+function monthlyKey(date=viewDate){
+  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}`;
+}
+function monthName(key){
+  const [y,m]=key.split("-").map(Number);
+  return new Date(y,m-1,1).toLocaleDateString("pt-BR",{month:"short",year:"2-digit"}).replace(".", "");
+}
+function monthlySnapshot(key){
+  try{return JSON.parse(localStorage.getItem(MONTHLY_STORAGE+"-"+key)||"null")}catch(e){return null}
+}
+function saveMonthlySnapshot(key,data){
+  localStorage.setItem(MONTHLY_STORAGE+"-"+key,JSON.stringify(data));
+}
+function monthStats(key){
+  const [y,m]=key.split("-").map(Number);
+  const count=new Date(y,m,0).getDate();
+  let hours=0,overtime=0,night=0,nightDays=0,days=0;
+  for(let d=1;d<=count;d++){
+    const data=dayData(`${key}-${String(d).padStart(2,"0")}`);
+    if(!data)continue;
+    const c=calcDay(data);
+    if(!c.worked)continue;
+    days++; hours+=c.hours; overtime+=c.overtime; night+=c.night;
+    if(c.nightDay)nightDays++;
+  }
+  const snap=monthlySnapshot(key);
+  return {key,days,hours,overtime,night,nightDays,gross:snap?.gross??null,net:snap?.net??null};
+}
+function changeText(current,previous){
+  if(current==null||previous==null||previous===0)return "—";
+  const pct=((current-previous)/previous)*100;
+  if(Math.abs(pct)<0.005)return "0.00%";
+  return `${pct>0?"▲ +":"▼ −"}${Math.abs(pct).toFixed(2)}%`;
+}
+function metricValue(v,format){
+  if(v==null)return "—";
+  if(format==="money")return money(v);
+  if(format==="hours")return fmtHours(v);
+  return Math.round(v).toLocaleString("pt-BR");
+}
+function renderMetricCard(label,values,format){
+  const current=values[values.length-1]?.value??null;
+  const previous=values.length>1?values[values.length-2]?.value??null:null;
+  return `<div class="metricCard">
+    <div class="metricTitle">${label}</div>
+    <strong>${metricValue(current,format)}</strong>
+    <span>${changeText(current,previous)}</span>
+  </div>`;
+}
+function renderChart(title,items,format){
+  const numeric=items.map(x=>x.value).filter(v=>typeof v==="number");
+  const max=Math.max(...numeric,1);
+  const bars=items.map(x=>{
+    const h=x.value==null?0:Math.max(5,(x.value/max)*100);
+    const display=metricValue(x.value,format);
+    const change=x.change;
+    return `<div class="barItem">
+      <div class="barValue">${display}</div>
+      <div class="barTrack"><div class="barFill" style="height:${h}%"></div></div>
+      <div class="barLabel">${x.label}</div>
+      <div class="barChange">${change}</div>
+    </div>`;
+  }).join("");
+  return `<div class="chartBox"><h4>${title}</h4><div class="bars">${bars}</div></div>`;
+}
+function renderDashboard(){
+  const dash=$("monthlyDashboard");
+  if(!dash)return;
+  const months=[];
+  for(let i=11;i>=0;i--){
+    const d=new Date(viewDate.getFullYear(),viewDate.getMonth()-i,1);
+    months.push(monthStats(monthlyKey(d)));
+  }
+  const labels=months.map(x=>monthName(x.key));
+  const make=(field,format)=>months.map((x,i)=>({
+    label:labels[i],value:x[field],
+    change:i===0?"—":changeText(x[field],months[i-1][field])
+  }));
+  const latest=months[months.length-1];
+  dash.innerHTML=`
+    <div class="sectionHead dashboardHead">
+      <div><h2>📈 Evolução mensal</h2><p>Comparação automática com o mês anterior.</p></div>
+    </div>
+    <div class="metricGrid">
+      ${renderMetricCard("💴 Bruto mensal",make("gross","money"),"money")}
+      ${renderMetricCard("💰 Líquido mensal",make("net","money"),"money")}
+      ${renderMetricCard("⏱️ Horas trabalhadas",make("hours","hours"),"hours")}
+      ${renderMetricCard("➕ Horas extras",make("overtime","hours"),"hours")}
+      ${renderMetricCard("🌙 Horas noturnas",make("night","hours"),"hours")}
+      ${renderMetricCard("📅 Dias trabalhados",make("days","number"),"number")}
+    </div>
+    ${renderChart("💴 Bruto por mês",make("gross","money"),"money")}
+    ${renderChart("💰 Líquido por mês",make("net","money"),"money")}
+    ${renderChart("⏱️ Horas trabalhadas por mês",make("hours","hours"),"hours")}
+    ${renderChart("➕ Horas extras por mês",make("overtime","hours"),"hours")}
+    ${renderChart("🌙 Horas noturnas por mês",make("night","hours"),"hours")}
+    ${renderChart("📅 Dias trabalhados por mês",make("days","number"),"number")}
+    <div class="dashboardNote">Os valores de bruto e líquido aparecem após clicar em <strong>Calcular</strong> em cada mês. Os dados de jornada vêm do calendário.</div>`;
+}
+function calculate(saveSnapshot=false){
   const rate=hourlyRate();
   const normal=mode==="monthly"?val("monthlySalary"):rate*val("normalHours");
   const overtime=rate*1.25*val("overtimeHours");
@@ -156,10 +257,22 @@ function calculate(){
   const meal=val("mealMonthly");
   const gross=normal+overtime+night+meal+val("otherAllowance");
   const deductions=gross*(val("deduction")/100);
+  const net=gross-deductions;
   $("gross").textContent=money(gross);
   $("deductions").textContent=money(deductions);
-  $("net").textContent=money(gross-deductions);
+  $("net").textContent=money(net);
   $("rateOut").textContent=money(rate);
+  if(saveSnapshot){
+    saveMonthlySnapshot(monthlyKey(),{
+      gross,net,updatedAt:Date.now(),
+      mode,
+      normalHours:val("normalHours"),
+      overtimeHours:val("overtimeHours"),
+      nightHours:val("nightHours"),
+      nightDays:val("nightDays")
+    });
+    renderDashboard();
+  }
 }
 document.querySelectorAll(".tab").forEach(btn=>btn.onclick=()=>{
   mode=btn.dataset.mode;
@@ -168,50 +281,17 @@ document.querySelectorAll(".tab").forEach(btn=>btn.onclick=()=>{
   $("monthlyBox").classList.toggle("hidden",mode!=="monthly");
   calculate();
 });
-$("calcBtn").onclick=calculate;
+$("calcBtn").onclick=()=>calculate(true);
 document.querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{if(i.closest(".card")&&i.id!=="dayNote")calculate();if(i.id.startsWith("time")||i.id.startsWith("lunch"))updateDaySummary()}));
-$("prevMonth").onclick=()=>{viewDate.setMonth(viewDate.getMonth()-1);renderCalendar()};
-$("nextMonth").onclick=()=>{viewDate.setMonth(viewDate.getMonth()+1);renderCalendar()};
+$("prevMonth").onclick=()=>{viewDate.setMonth(viewDate.getMonth()-1);renderCalendar();renderDashboard()};
+$("nextMonth").onclick=()=>{viewDate.setMonth(viewDate.getMonth()+1);renderCalendar();renderDashboard()};
 $("saveDay").onclick=saveCurrentDay;
 $("deleteDay").onclick=()=>{
-  if(selectedKey&&dayData(selectedKey)){deleteData(selectedKey);renderCalendar();openDay(selectedKey)}
+  if(selectedKey&&dayData(selectedKey)){deleteData(selectedKey);renderCalendar();renderDashboard();openDay(selectedKey)}
 };
 $("closeEditor").onclick=()=>{$("dayEditor").classList.add("hidden");selectedKey=null};
 $("themeBtn").onclick=()=>{document.body.classList.toggle("dark");localStorage.setItem("msj-theme",document.body.classList.contains("dark")?"dark":"light")};
 if(localStorage.getItem("msj-theme")==="dark")document.body.classList.add("dark");
-calculate();renderCalendar();
+calculate();renderCalendar();renderDashboard();
 
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
-
-
-// Configurações e idioma — módulo isolado para não interferir nos cálculos.
-(function(){
-  const settingsBtn=document.getElementById("settingsBtn");
-  const settingsModal=document.getElementById("settingsModal");
-  const closeSettings=document.getElementById("closeSettings");
-  const languageSelect=document.getElementById("languageSelect");
-  if(!settingsBtn||!settingsModal||!closeSettings||!languageSelect)return;
-  const LANG_KEY="msj-language";
-  const translations={
-    "pt-BR":{title:"⚙️ Configurações",language:"🌐 Idioma",note:"Mais idiomas serão adicionados nas próximas versões."},
-    ja:{title:"⚙️ 設定",language:"🌐 言語",note:"今後のバージョンでさらに言語を追加します。"},
-    en:{title:"⚙️ Settings",language:"🌐 Language",note:"More languages will be added in future versions."}
-  };
-  function openSettings(){settingsModal.classList.remove("hidden");languageSelect.value=localStorage.getItem(LANG_KEY)||"pt-BR";}
-  function close(){settingsModal.classList.add("hidden");}
-  function applyLanguage(lang){
-    if(!translations[lang])lang="pt-BR";
-    localStorage.setItem(LANG_KEY,lang);
-    const t=translations[lang];
-    document.documentElement.lang=lang;
-    document.getElementById("settingsTitle").textContent=t.title;
-    document.querySelector(".settingLabel").childNodes[0].textContent=t.language+"\n      ";
-    document.querySelector(".settingNote").textContent=t.note;
-  }
-  settingsBtn.addEventListener("click",openSettings);
-  closeSettings.addEventListener("click",close);
-  settingsModal.addEventListener("click",e=>{if(e.target===settingsModal)close();});
-  languageSelect.addEventListener("change",e=>applyLanguage(e.target.value));
-  document.addEventListener("keydown",e=>{if(e.key==="Escape")close();});
-  applyLanguage(localStorage.getItem(LANG_KEY)||"pt-BR");
-})();
