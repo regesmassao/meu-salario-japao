@@ -46,12 +46,24 @@
     <label>Refeição / benefício mensal (¥)<input id="mealMonthly" type="number" inputmode="decimal" value="3500" min="0"></label>
     <label>Outros adicionais (¥)<input id="otherAllowance" type="number" inputmode="decimal" value="0" min="0"></label>
     <label>Bônus anual (¥)<input id="annualBonus" type="number" inputmode="decimal" value="960000" min="0"></label>
-    <label>Descontos estimados (%)<input id="deduction" type="number" inputmode="decimal" value="18" min="0" max="100" step="0.1"></label>
+    <label>Modo de descontos<select id="deductionMode"><option value="percent">Estimativa (%)</option><option value="detailed">Detalhado (¥)</option></select></label>
+  </div>
+
+  <div id="detailedDeductions" class="grid hidden deductionBox">
+    <div class="fullWidth"><strong>🧾 Descontos detalhados</strong><small>Use esta opção quando quiser reproduzir o holerite real.</small></div>
+    <label>Seguro emprego (¥)<input id="employmentInsurance" type="number" inputmode="decimal" value="0" min="0"></label>
+    <label>Imposto de renda (¥)<input id="incomeTax" type="number" inputmode="decimal" value="0" min="0"></label>
+    <label>Salário adiantado (¥)<input id="advanceSalary" type="number" inputmode="decimal" value="0" min="0"></label>
+    <label>Água / luz / gás (¥)<input id="utilities" type="number" inputmode="decimal" value="0" min="0"></label>
+    <label>Aluguel (¥)<input id="rentDeduction" type="number" inputmode="decimal" value="0" min="0"></label>
+    <label>Outros descontos (¥)<input id="otherDeduction" type="number" inputmode="decimal" value="0" min="0"></label>
   </div>
 
   <div class="result">
     <div><span>Bruto mensal</span><strong id="gross">¥0</strong></div>
-    <div><span>Descontos estimados</span><strong id="deductions">¥0</strong></div>
+    <div><span id="mandatoryLabel">Descontos obrigatórios</span><strong id="mandatoryDeductions">¥0</strong></div>
+    <div><span>Outros descontos</span><strong id="otherDeductions">¥0</strong></div>
+    <div><span>Total de descontos</span><strong id="deductions">¥0</strong></div>
     <div><span>Líquido estimado</span><strong id="net">¥0</strong></div>
     <div><span>Hora-base calculada</span><strong id="rateOut">¥0</strong></div>
   </div>
@@ -113,7 +125,7 @@
 </section>
 </main>
 
-<footer>Meu Salário Japão 🇯🇵 — V4.3</footer>
+<footer>Meu Salário Japão 🇯🇵 — V4.4</footer>
 <script src="app.js"></script>
 </body>
 </html>

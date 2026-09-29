@@ -163,6 +163,16 @@ function monthlySnapshot(key){
 function saveMonthlySnapshot(key,data){
   localStorage.setItem(MONTHLY_STORAGE+"-"+key,JSON.stringify(data));
 }
+function deductionValues(gross){
+  const detailed=$("deductionMode")?.value==="detailed";
+  if(!detailed){
+    const total=gross*(val("deduction")/100);
+    return {mandatory:total,other:0,total};
+  }
+  const mandatory=val("employmentInsurance")+val("incomeTax");
+  const other=val("advanceSalary")+val("utilities")+val("rentDeduction")+val("otherDeduction");
+  return {mandatory,other,total:mandatory+other};
+}
 function currentCalculatedValues(){
   const rate=hourlyRate();
   const normal=mode==="monthly"?val("monthlySalary"):rate*val("normalHours");
@@ -170,8 +180,8 @@ function currentCalculatedValues(){
   const night=rate*(val("nightPercent")/100)*val("nightHours")+val("nightFixed")*val("nightDays");
   const meal=val("mealMonthly");
   const gross=normal+overtime+night+meal+val("otherAllowance");
-  const deductions=gross*(val("deduction")/100);
-  return {gross,net:gross-deductions};
+  const d=deductionValues(gross);
+  return {gross,net:gross-d.total,mandatory:d.mandatory,otherDeductions:d.other,deductions:d.total};
 }
 function monthStats(key){
   const [y,m]=key.split("-").map(Number);
@@ -276,16 +286,20 @@ function calculate(saveSnapshot=false){
   const night=rate*(val("nightPercent")/100)*val("nightHours")+val("nightFixed")*val("nightDays");
   const meal=val("mealMonthly");
   const gross=normal+overtime+night+meal+val("otherAllowance");
-  const deductions=gross*(val("deduction")/100);
-  const net=gross-deductions;
+  const d=deductionValues(gross);
+  const net=gross-d.total;
   $("gross").textContent=money(gross);
-  $("deductions").textContent=money(deductions);
+  const detailed=$("deductionMode")?.value==="detailed";
+  $("mandatoryLabel").textContent=detailed?"Descontos obrigatórios":"Descontos estimados";
+  $("mandatoryDeductions").textContent=money(d.mandatory);
+  $("otherDeductions").textContent=money(d.other);
+  $("deductions").textContent=money(d.total);
   $("net").textContent=money(net);
   $("rateOut").textContent=money(rate);
   if(saveSnapshot){
     saveMonthlySnapshot(monthlyKey(),{
-      gross,net,updatedAt:Date.now(),
-      mode,
+      gross,net,mandatoryDeductions:d.mandatory,otherDeductions:d.other,deductions:d.total,updatedAt:Date.now(),
+      mode,deductionMode:$("deductionMode")?.value||"percent",
       normalHours:val("normalHours"),
       overtimeHours:val("overtimeHours"),
       nightHours:val("nightHours"),
@@ -301,6 +315,10 @@ document.querySelectorAll(".tab").forEach(btn=>btn.onclick=()=>{
   $("monthlyBox").classList.toggle("hidden",mode!=="monthly");
   calculate();
 });
+$("deductionMode").onchange=()=>{
+  $("detailedDeductions").classList.toggle("hidden",$("deductionMode").value!=="detailed");
+  calculate();
+};
 $("calcBtn").onclick=()=>calculate(true);
 document.querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{if(i.closest(".card")&&i.id!=="dayNote")calculate();if(i.id.startsWith("time")||i.id.startsWith("lunch"))updateDaySummary()}));
 $("prevMonth").onclick=()=>{viewDate.setMonth(viewDate.getMonth()-1);renderCalendar();renderDashboard()};

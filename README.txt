@@ -1,4 +1,4 @@
-Meu Salário Japão 🇯🇵 — V4.3.1
+Meu Salário Japão 🇯🇵 — V4.4
 
 Base: V4.2.1
 Novidades:
@@ -9,7 +9,9 @@ Novidades:
 - O mês selecionado pode usar o cálculo atual quando ainda não houver snapshot salvo.
 - Dados do calendário e cálculos existentes preservados.
 - Dados antigos continuam usando a mesma chave de armazenamento.
-- Configurações/idiomas não foram alterados nesta versão.
+- Novo modo de descontos detalhados para reproduzir holerites reais.
+- Separa descontos obrigatórios (seguro emprego + imposto) de outros descontos (adiantamento, utilidades, aluguel e outros).
+- O modo de estimativa percentual continua disponível.
 
 Importante:
 - Para registrar bruto/líquido no histórico de um mês, abra esse mês e toque em "Calcular".
