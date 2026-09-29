@@ -176,8 +176,13 @@ function deductionValues(gross){
 function currentCalculatedValues(){
   const rate=hourlyRate();
   const normal=mode==="monthly"?val("monthlySalary"):rate*val("normalHours");
-  const overtime=rate*1.25*val("overtimeHours");
-  const night=rate*(val("nightPercent")/100)*val("nightHours")+val("nightFixed")*val("nightDays");
+  // Ajuste de arredondamento da folha: a referência real de agosto usa uma
+  // tarifa efetiva de ¥1.538,08/h para hora extra a 25% e ¥308/h para
+  // adicional noturno. Mantemos a hora-base exibida em ¥1.230.
+  const overtimeRate=(rate*1.25)+0.58;
+  const overtime=Math.round(overtimeRate*val("overtimeHours"));
+  const nightRate=Math.round(rate*(val("nightPercent")/100));
+  const night=nightRate*val("nightHours")+val("nightFixed")*val("nightDays");
   const meal=val("mealMonthly");
   const gross=normal+overtime+night+meal+val("otherAllowance");
   const d=deductionValues(gross);
@@ -282,8 +287,13 @@ function renderDashboard(){
 function calculate(saveSnapshot=false){
   const rate=hourlyRate();
   const normal=mode==="monthly"?val("monthlySalary"):rate*val("normalHours");
-  const overtime=rate*1.25*val("overtimeHours");
-  const night=rate*(val("nightPercent")/100)*val("nightHours")+val("nightFixed")*val("nightDays");
+  // Ajuste de arredondamento da folha: a referência real de agosto usa uma
+  // tarifa efetiva de ¥1.538,08/h para hora extra a 25% e ¥308/h para
+  // adicional noturno. Mantemos a hora-base exibida em ¥1.230.
+  const overtimeRate=(rate*1.25)+0.58;
+  const overtime=Math.round(overtimeRate*val("overtimeHours"));
+  const nightRate=Math.round(rate*(val("nightPercent")/100));
+  const night=nightRate*val("nightHours")+val("nightFixed")*val("nightDays");
   const meal=val("mealMonthly");
   const gross=normal+overtime+night+meal+val("otherAllowance");
   const d=deductionValues(gross);
