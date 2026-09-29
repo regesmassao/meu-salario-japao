@@ -27,7 +27,23 @@ function duration(a,b){
   return d;
 }
 function dayData(key){
-  return JSON.parse(localStorage.getItem(STORAGE+"-"+key)||"null");
+  // Mantém compatibilidade com dados gravados pelas versões anteriores.
+  const keys=[
+    STORAGE+"-"+key,
+    "msj-v4-2-days-"+key,
+    "msj-v4-1-days-"+key,
+    "msj-days-"+key
+  ];
+  for(const k of keys){
+    try{
+      const raw=localStorage.getItem(k);
+      if(raw){
+        const data=JSON.parse(raw);
+        if(data && typeof data === "object") return data;
+      }
+    }catch(e){ console.warn("Dados de jornada ignorados:",k,e); }
+  }
+  return null;
 }
 function saveData(key,data){localStorage.setItem(STORAGE+"-"+key,JSON.stringify(data))}
 function deleteData(key){localStorage.removeItem(STORAGE+"-"+key)}
@@ -130,7 +146,9 @@ function renderHistory(){
   for(let d=1;d<=count;d++){
     const key=keyFor(y,m,d),data=dayData(key);
     if(!data)continue;
-    const c=calcDay(data); if(!c.worked)continue;
+    let c;
+    try{ c=calcDay(data); }catch(e){ console.warn("Dia inválido ignorado:",key,e); continue; }
+    if(!c.worked)continue;
     days++;total+=c.hours;normalTotal+=c.normal;overtimeTotal+=c.overtime;nightTotal+=c.night;if(c.nightDay)nightDays++;
     const row=document.createElement("div");row.className="row";
     const date=document.createElement("div");date.textContent=String(d).padStart(2,"0")+"/"+String(m+1).padStart(2,"0");
@@ -158,7 +176,21 @@ function monthName(key){
   return new Date(y,m-1,1).toLocaleDateString("pt-BR",{month:"short",year:"2-digit"}).replace(".", "");
 }
 function monthlySnapshot(key){
-  try{return JSON.parse(localStorage.getItem(MONTHLY_STORAGE+"-"+key)||"null")}catch(e){return null}
+  const keys=[
+    MONTHLY_STORAGE+"-"+key,
+    "msj-v4-3-months-"+key,
+    "msj-v4-2-months-"+key
+  ];
+  for(const k of keys){
+    try{
+      const raw=localStorage.getItem(k);
+      if(raw){
+        const data=JSON.parse(raw);
+        if(data && typeof data === "object") return data;
+      }
+    }catch(e){ console.warn("Snapshot mensal ignorado:",k,e); }
+  }
+  return null;
 }
 function saveMonthlySnapshot(key,data){
   localStorage.setItem(MONTHLY_STORAGE+"-"+key,JSON.stringify(data));
@@ -351,5 +383,7 @@ $("closeEditor").onclick=()=>{$("dayEditor").classList.add("hidden");selectedKey
 $("themeBtn").onclick=()=>{document.body.classList.toggle("dark");localStorage.setItem("msj-theme",document.body.classList.contains("dark")?"dark":"light")};
 if(localStorage.getItem("msj-theme")==="dark")document.body.classList.add("dark");
 calculate();renderCalendar();renderDashboard();
+// Re-render once after startup so legacy localStorage data is picked up safely.
+requestAnimationFrame(()=>{renderCalendar();renderDashboard();});
 
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
