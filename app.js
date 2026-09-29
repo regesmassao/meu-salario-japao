@@ -189,6 +189,7 @@ function currentCalculatedValues(){
   return {gross,net:gross-d.total,mandatory:d.mandatory,otherDeductions:d.other,deductions:d.total};
 }
 function monthStats(key){
+  try {
   const [y,m]=key.split("-").map(Number);
   const count=new Date(y,m,0).getDate();
   let hours=0,overtime=0,night=0,nightDays=0,days=0;
@@ -210,6 +211,10 @@ function monthStats(key){
     if(current.gross>0){gross=current.gross;net=current.net;}
   }
   return {key,days,hours,overtime,night,nightDays,gross,net};
+  } catch(e) {
+    console.error("Erro na evolução mensal:",e);
+    return {key,days:0,hours:0,overtime:0,night:0,nightDays:0,gross:null,net:null};
+  }
 }
 function changeText(current,previous){
   if(current==null||previous==null||previous===0)return "—";
@@ -251,6 +256,7 @@ function renderChart(title,items,format){
 function renderDashboard(){
   const dash=$("monthlyDashboard");
   if(!dash)return;
+  try {
   const months=[];
   // No iPhone, seis meses dão uma leitura muito mais clara sem esconder
   // os valores. O mês selecionado no calendário fica sempre por último.
@@ -283,6 +289,10 @@ function renderDashboard(){
     ${renderChart("🌙 Horas noturnas por mês",make("night","hours"),"hours")}
     ${renderChart("📅 Dias trabalhados por mês",make("days","number"),"number")}
     <div class="dashboardNote">Mostrando os últimos 6 meses até <strong>${monthName(monthlyKey())}</strong>. As horas e dias vêm do calendário. Bruto e líquido usam o valor salvo em cada mês; no mês selecionado, se ainda não houver histórico salvo, o painel usa o cálculo atual da calculadora.</div>`;
+  } catch(e) {
+    console.error("Erro ao renderizar evolução mensal:",e);
+    dash.innerHTML=`<div class="sectionHead dashboardHead"><div><h2>📈 Evolução mensal</h2><p>Não foi possível atualizar o painel agora.</p></div></div><div class="empty">Evolução mensal indisponível. Os dados do calendário continuam preservados.</div>`;
+  }
 }
 function calculate(saveSnapshot=false){
   const rate=hourlyRate();
