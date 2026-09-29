@@ -27,23 +27,7 @@ function duration(a,b){
   return d;
 }
 function dayData(key){
-  // Mantém compatibilidade com dados gravados pelas versões anteriores.
-  const keys=[
-    STORAGE+"-"+key,
-    "msj-v4-2-days-"+key,
-    "msj-v4-1-days-"+key,
-    "msj-days-"+key
-  ];
-  for(const k of keys){
-    try{
-      const raw=localStorage.getItem(k);
-      if(raw){
-        const data=JSON.parse(raw);
-        if(data && typeof data === "object") return data;
-      }
-    }catch(e){ console.warn("Dados de jornada ignorados:",k,e); }
-  }
-  return null;
+  return JSON.parse(localStorage.getItem(STORAGE+"-"+key)||"null");
 }
 function saveData(key,data){localStorage.setItem(STORAGE+"-"+key,JSON.stringify(data))}
 function deleteData(key){localStorage.removeItem(STORAGE+"-"+key)}
@@ -146,9 +130,7 @@ function renderHistory(){
   for(let d=1;d<=count;d++){
     const key=keyFor(y,m,d),data=dayData(key);
     if(!data)continue;
-    let c;
-    try{ c=calcDay(data); }catch(e){ console.warn("Dia inválido ignorado:",key,e); continue; }
-    if(!c.worked)continue;
+    const c=calcDay(data); if(!c.worked)continue;
     days++;total+=c.hours;normalTotal+=c.normal;overtimeTotal+=c.overtime;nightTotal+=c.night;if(c.nightDay)nightDays++;
     const row=document.createElement("div");row.className="row";
     const date=document.createElement("div");date.textContent=String(d).padStart(2,"0")+"/"+String(m+1).padStart(2,"0");
@@ -176,21 +158,7 @@ function monthName(key){
   return new Date(y,m-1,1).toLocaleDateString("pt-BR",{month:"short",year:"2-digit"}).replace(".", "");
 }
 function monthlySnapshot(key){
-  const keys=[
-    MONTHLY_STORAGE+"-"+key,
-    "msj-v4-3-months-"+key,
-    "msj-v4-2-months-"+key
-  ];
-  for(const k of keys){
-    try{
-      const raw=localStorage.getItem(k);
-      if(raw){
-        const data=JSON.parse(raw);
-        if(data && typeof data === "object") return data;
-      }
-    }catch(e){ console.warn("Snapshot mensal ignorado:",k,e); }
-  }
-  return null;
+  try{return JSON.parse(localStorage.getItem(MONTHLY_STORAGE+"-"+key)||"null")}catch(e){return null}
 }
 function saveMonthlySnapshot(key,data){
   localStorage.setItem(MONTHLY_STORAGE+"-"+key,JSON.stringify(data));
@@ -208,20 +176,14 @@ function deductionValues(gross){
 function currentCalculatedValues(){
   const rate=hourlyRate();
   const normal=mode==="monthly"?val("monthlySalary"):rate*val("normalHours");
-  // Ajuste de arredondamento da folha: a referência real de agosto usa uma
-  // tarifa efetiva de ¥1.538,08/h para hora extra a 25% e ¥308/h para
-  // adicional noturno. Mantemos a hora-base exibida em ¥1.230.
-  const overtimeRate=(rate*1.25)+0.58;
-  const overtime=Math.round(overtimeRate*val("overtimeHours"));
-  const nightRate=Math.round(rate*(val("nightPercent")/100));
-  const night=nightRate*val("nightHours")+val("nightFixed")*val("nightDays");
+  const overtime=rate*1.25*val("overtimeHours");
+  const night=rate*(val("nightPercent")/100)*val("nightHours")+val("nightFixed")*val("nightDays");
   const meal=val("mealMonthly");
   const gross=normal+overtime+night+meal+val("otherAllowance");
   const d=deductionValues(gross);
   return {gross,net:gross-d.total,mandatory:d.mandatory,otherDeductions:d.other,deductions:d.total};
 }
 function monthStats(key){
-  try {
   const [y,m]=key.split("-").map(Number);
   const count=new Date(y,m,0).getDate();
   let hours=0,overtime=0,night=0,nightDays=0,days=0;
@@ -243,10 +205,6 @@ function monthStats(key){
     if(current.gross>0){gross=current.gross;net=current.net;}
   }
   return {key,days,hours,overtime,night,nightDays,gross,net};
-  } catch(e) {
-    console.error("Erro na evolução mensal:",e);
-    return {key,days:0,hours:0,overtime:0,night:0,nightDays:0,gross:null,net:null};
-  }
 }
 function changeText(current,previous){
   if(current==null||previous==null||previous===0)return "—";
@@ -288,7 +246,6 @@ function renderChart(title,items,format){
 function renderDashboard(){
   const dash=$("monthlyDashboard");
   if(!dash)return;
-  try {
   const months=[];
   // No iPhone, seis meses dão uma leitura muito mais clara sem esconder
   // os valores. O mês selecionado no calendário fica sempre por último.
@@ -321,21 +278,12 @@ function renderDashboard(){
     ${renderChart("🌙 Horas noturnas por mês",make("night","hours"),"hours")}
     ${renderChart("📅 Dias trabalhados por mês",make("days","number"),"number")}
     <div class="dashboardNote">Mostrando os últimos 6 meses até <strong>${monthName(monthlyKey())}</strong>. As horas e dias vêm do calendário. Bruto e líquido usam o valor salvo em cada mês; no mês selecionado, se ainda não houver histórico salvo, o painel usa o cálculo atual da calculadora.</div>`;
-  } catch(e) {
-    console.error("Erro ao renderizar evolução mensal:",e);
-    dash.innerHTML=`<div class="sectionHead dashboardHead"><div><h2>📈 Evolução mensal</h2><p>Não foi possível atualizar o painel agora.</p></div></div><div class="empty">Evolução mensal indisponível. Os dados do calendário continuam preservados.</div>`;
-  }
 }
 function calculate(saveSnapshot=false){
   const rate=hourlyRate();
   const normal=mode==="monthly"?val("monthlySalary"):rate*val("normalHours");
-  // Ajuste de arredondamento da folha: a referência real de agosto usa uma
-  // tarifa efetiva de ¥1.538,08/h para hora extra a 25% e ¥308/h para
-  // adicional noturno. Mantemos a hora-base exibida em ¥1.230.
-  const overtimeRate=(rate*1.25)+0.58;
-  const overtime=Math.round(overtimeRate*val("overtimeHours"));
-  const nightRate=Math.round(rate*(val("nightPercent")/100));
-  const night=nightRate*val("nightHours")+val("nightFixed")*val("nightDays");
+  const overtime=rate*1.25*val("overtimeHours");
+  const night=rate*(val("nightPercent")/100)*val("nightHours")+val("nightFixed")*val("nightDays");
   const meal=val("mealMonthly");
   const gross=normal+overtime+night+meal+val("otherAllowance");
   const d=deductionValues(gross);
@@ -383,7 +331,5 @@ $("closeEditor").onclick=()=>{$("dayEditor").classList.add("hidden");selectedKey
 $("themeBtn").onclick=()=>{document.body.classList.toggle("dark");localStorage.setItem("msj-theme",document.body.classList.contains("dark")?"dark":"light")};
 if(localStorage.getItem("msj-theme")==="dark")document.body.classList.add("dark");
 calculate();renderCalendar();renderDashboard();
-// Re-render once after startup so legacy localStorage data is picked up safely.
-requestAnimationFrame(()=>{renderCalendar();renderDashboard();});
 
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
