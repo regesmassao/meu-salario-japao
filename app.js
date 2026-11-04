@@ -1,11 +1,14 @@
 const $=id=>document.getElementById(id);
 const val=id=>{
-  const raw=String($(id).value||"").trim();
+  const el=$(id);
+  if(!el)return 0;
+  const raw=String(el.value||"").trim();
   if(id==="overtimeHours" && /h/i.test(raw)){
     const m=raw.match(/^(\d+)h(?:\s*(\d+)min)?$/i);
     if(m)return Number(m[1])+(Number(m[2]||0)/60);
   }
-  return Number(raw||0);
+  const n=Number(raw||0);
+  return Number.isFinite(n)?n:0;
 };
 let mode="hourly";
 let viewDate=new Date();
