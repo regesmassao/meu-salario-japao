@@ -14,8 +14,33 @@ let mode="hourly";
 let viewDate=new Date();
 viewDate.setDate(1);
 let selectedKey=null;
-const STORAGE="msj-v4-2-days";
-const MONTHLY_STORAGE="msj-v4-3-months";
+// ---------- Funcionários ----------
+// Cada funcionário tem seus próprios dias, meses e configurações.
+// O funcionário "principal" usa as chaves históricas do app, então
+// nenhum dado já salvo muda de lugar. Funcionários novos ganham um
+// prefixo próprio (msj-func-<id>-...).
+const EMPLOYEES_KEY="msj-employees";
+const ACTIVE_EMPLOYEE_KEY="msj-activeEmployee";
+const EMPLOYEE_COLORS=["#2563eb","#db2777","#059669","#d97706","#7c3aed","#0891b2"];
+function loadEmployees(){
+  try{
+    const list=JSON.parse(localStorage.getItem(EMPLOYEES_KEY)||"null");
+    if(Array.isArray(list)&&list.length&&list.every(e=>e&&e.id&&e.name))return list;
+  }catch(e){}
+  return [{id:"principal",name:"Reges",color:EMPLOYEE_COLORS[0]}];
+}
+const employees=loadEmployees();
+function saveEmployees(){localStorage.setItem(EMPLOYEES_KEY,JSON.stringify(employees))}
+let activeEmployee=employees.find(e=>e.id===localStorage.getItem(ACTIVE_EMPLOYEE_KEY))||employees[0];
+function employeeBases(emp){
+  if(emp.id==="principal")return {days:"msj-v4-2-days",months:"msj-v4-3-months",settings:"msj-"};
+  return {days:`msj-func-${emp.id}-days`,months:`msj-func-${emp.id}-months`,settings:`msj-func-${emp.id}-`};
+}
+const ACTIVE_BASES=employeeBases(activeEmployee);
+const STORAGE=ACTIVE_BASES.days;
+const MONTHLY_STORAGE=ACTIVE_BASES.months;
+const SETTINGS_PREFIX=ACTIVE_BASES.settings;
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 
 function money(n){return "¥"+Math.round(n).toLocaleString("ja-JP")}
 function timeMinutes(t){
@@ -29,9 +54,10 @@ function duration(a,b){
   if(d<0)d+=1440;
   return d;
 }
-function dayData(key){
-  return JSON.parse(localStorage.getItem(STORAGE+"-"+key)||"null");
+function dayDataFor(bases,key){
+  try{return JSON.parse(localStorage.getItem(bases.days+"-"+key)||"null")}catch(e){return null}
 }
+function dayData(key){return dayDataFor(ACTIVE_BASES,key)}
 function saveData(key,data){localStorage.setItem(STORAGE+"-"+key,JSON.stringify(data))}
 function deleteData(key){localStorage.removeItem(STORAGE+"-"+key)}
 // ---------- Backup (exportar/importar) ----------
@@ -49,7 +75,8 @@ function collectBackup(){
   return {app:"meu-salario-japao",version:1,exportedAt:new Date().toISOString(),data};
 }
 function countBackupDays(data){
-  return Object.keys(data||{}).filter(k=>k.startsWith(STORAGE+"-")).length;
+  // Conta os dias de TODOS os funcionários (cada um no seu prefixo).
+  return Object.keys(data||{}).filter(k=>k.includes("-days-")).length;
 }
 function applyBackup(backup){
   if(!backup||typeof backup!=="object"||!backup.data||typeof backup.data!=="object"){
@@ -264,9 +291,10 @@ function monthName(key){
   const [y,m]=key.split("-").map(Number);
   return new Date(y,m-1,1).toLocaleDateString("pt-BR",{month:"short",year:"2-digit"}).replace(".", "");
 }
-function monthlySnapshot(key){
-  try{return JSON.parse(localStorage.getItem(MONTHLY_STORAGE+"-"+key)||"null")}catch(e){return null}
+function snapshotFor(bases,key){
+  try{return JSON.parse(localStorage.getItem(bases.months+"-"+key)||"null")}catch(e){return null}
 }
+function monthlySnapshot(key){return snapshotFor(ACTIVE_BASES,key)}
 function saveMonthlySnapshot(key,data){
   localStorage.setItem(MONTHLY_STORAGE+"-"+key,JSON.stringify(data));
 }
@@ -326,6 +354,65 @@ function monthStats(key){
   if(gross==null && key===monthlyKey() && days>0){
     const current=currentCalculatedValues();
     if(current.gross>0){gross=current.gross;net=current.net;}
+  }
+  return {key,days,hours,overtime,night,nightDays,gross,net};
+}
+// Estatísticas de um mês para um funcionário qualquer (usado no painel
+// do casal). As horas vêm dos dias dele; bruto/líquido vêm do snapshot
+// salvo ou de uma estimativa com as configurações salvas dele.
+function storedNum(prefix,id){
+  const raw=String(localStorage.getItem(prefix+id)??"").trim();
+  if(id==="overtimeHours"&&/h/i.test(raw)){
+    const m=raw.match(/^(\d+)h(?:\s*(\d+)min)?$/i);
+    if(m)return Number(m[1])+(Number(m[2]||0)/60);
+  }
+  const n=Number(raw||0);
+  return Number.isFinite(n)?n:0;
+}
+function estimateFor(emp,agg,date){
+  const p=employeeBases(emp).settings;
+  const modeE=localStorage.getItem(p+"mode")==="monthly"?"monthly":"hourly";
+  const rate=modeE==="monthly"
+    ? storedNum(p,"monthlySalary")/Math.max(1,storedNum(p,"baseHours"))
+    : storedNum(p,"hourlyRate");
+  const normal=modeE==="monthly"?storedNum(p,"monthlySalary"):rate*agg.normal;
+  const overtime=rate*1.25*agg.overtime;
+  const night=rate*(storedNum(p,"nightPercent")/100)*agg.night+storedNum(p,"nightFixed")*agg.nightDays;
+  const sm=Number(localStorage.getItem(p+"bonusSummerMonth")||7);
+  const wm=Number(localStorage.getItem(p+"bonusWinterMonth")||12);
+  let bonus=0;
+  const mm=date.getMonth()+1;
+  if(mm===sm)bonus+=storedNum(p,"summerBonus");
+  if(mm===wm)bonus+=storedNum(p,"winterBonus");
+  const gross=normal+overtime+night+storedNum(p,"mealMonthly")+storedNum(p,"otherAllowance")+bonus;
+  if(gross<=0)return null;
+  let deductions;
+  if(localStorage.getItem(p+"deductionMode")==="detailed"){
+    deductions=storedNum(p,"employmentInsurance")+storedNum(p,"incomeTax")+storedNum(p,"advanceSalary")+storedNum(p,"utilities")+storedNum(p,"rentDeduction")+storedNum(p,"otherDeduction");
+  }else{
+    deductions=gross*(storedNum(p,"deduction")/100);
+  }
+  return {gross,net:gross-deductions,fromMonthly:modeE==="monthly"};
+}
+function monthStatsFor(emp,key){
+  const bases=employeeBases(emp);
+  const [y,m]=key.split("-").map(Number);
+  const count=new Date(y,m,0).getDate();
+  let hours=0,normal=0,overtime=0,night=0,nightDays=0,days=0;
+  for(let d=1;d<=count;d++){
+    const data=dayDataFor(bases,`${key}-${String(d).padStart(2,"0")}`);
+    if(!data)continue;
+    const c=calcDay(data);
+    if(!c.worked)continue;
+    days++; hours+=c.hours; normal+=c.normal; overtime+=c.overtime; night+=c.night;
+    if(c.nightDay)nightDays++;
+  }
+  let gross=null,net=null;
+  const snap=snapshotFor(bases,key);
+  if(snap){gross=snap.gross??null;net=snap.net??null;}
+  else{
+    const est=estimateFor(emp,{normal,overtime,night,nightDays},new Date(y,m-1,1));
+    if(est&&(days>0||est.fromMonthly)){gross=est.gross;net=est.net;}
   }
   return {key,days,hours,overtime,night,nightDays,gross,net};
 }
@@ -413,6 +500,128 @@ function renderDashboard(){
   dash.querySelectorAll("[data-month]").forEach(el=>{
     el.onclick=()=>openMonth(el.dataset.month);
   });
+  renderCouple();
+}
+function renderPairChart(title,labels,series,format){
+  const all=series.flatMap(s=>s.values).filter(v=>typeof v==="number");
+  const max=Math.max(...all,1);
+  const groups=labels.map((lab,i)=>{
+    const cols=series.map(s=>{
+      const v=s.values[i];
+      const h=v==null?0:Math.max(5,(v/max)*100);
+      return `<div class="pairCol"><div class="barValue">${metricValue(v,format)}</div><div class="pairTrack"><div class="pairFill" style="height:${h}%;background:${s.color}"></div></div></div>`;
+    }).join("");
+    return `<div class="barItem" data-month="${series[0].keys[i]}" title="Ver os dias deste mês"><div class="pairWrap">${cols}</div><div class="barLabel">${lab}</div></div>`;
+  }).join("");
+  const legend=series.map(s=>`<span class="legendItem"><span class="dot" style="background:${s.color}"></span>${esc(s.name)}</span>`).join("");
+  return `<div class="chartBox"><h4>${title}</h4><div class="legend">${legend}</div><div class="bars">${groups}</div></div>`;
+}
+function renderCouple(){
+  const box=$("coupleDashboard");
+  if(!box)return;
+  const months=[];
+  for(let i=5;i>=0;i--){
+    const d=new Date(viewDate.getFullYear(),viewDate.getMonth()-i,1);
+    months.push(monthlyKey(d));
+  }
+  const labels=months.map(monthName);
+  const perEmp=employees.map(emp=>({
+    emp,
+    stats:months.map(k=>emp.id===activeEmployee.id?monthStats(k):monthStatsFor(emp,k))
+  }));
+  const sel=perEmp.map(({emp,stats})=>({emp,s:stats[stats.length-1]}));
+  const totalNet=sel.reduce((a,{s})=>a+(s.net||0),0);
+  const missing=sel.filter(({s})=>s.net==null).map(({emp})=>emp.name);
+  const cards=sel.map(({emp,s})=>`<div class="metricCard">
+      <div class="metricTitle"><span class="dot" style="background:${emp.color}"></span> ${esc(emp.name)}${emp.id===activeEmployee.id?" (ativo)":""}</div>
+      <strong>${s.net==null?"—":money(s.net)}</strong>
+      <span>bruto ${s.gross==null?"—":money(s.gross)} · ${s.days} dia(s) no mês</span>
+    </div>`).join("");
+  const series=field=>perEmp.map(({emp,stats})=>({
+    name:emp.name,color:emp.color,values:stats.map(s=>s[field]),keys:months
+  }));
+  const manage=employees.map(e=>`<div class="empRow">
+      <span class="dot" style="background:${e.color}"></span>
+      <strong>${esc(e.name)}</strong>${e.id===activeEmployee.id?'<span class="empBadge">ativo</span>':""}
+      <span class="empBtns"><button type="button" class="smallBtn" data-act="rename" data-id="${e.id}">Renomear</button>${e.id!=="principal"?`<button type="button" class="smallBtn" data-act="delete" data-id="${e.id}">Excluir</button>`:""}</span>
+    </div>`).join("");
+  box.innerHTML=`
+    <div class="sectionHead dashboardHead">
+      <div><h2>👥 Funcionários — visão do casal</h2><p>Líquido de cada funcionário no mês selecionado e o total dos dois juntos.</p></div>
+    </div>
+    <div class="metricGrid">
+      ${cards}
+      <div class="metricCard totalCard">
+        <div class="metricTitle">💑 Total do casal — ${monthName(monthlyKey())}</div>
+        <strong>${money(totalNet)}</strong>
+        <span>${missing.length?"sem dados de "+missing.map(esc).join(", "):"soma dos líquidos do mês selecionado"}</span>
+      </div>
+    </div>
+    ${renderPairChart("💴 Bruto por mês",labels,series("gross"),"money")}
+    ${renderPairChart("💰 Líquido por mês",labels,series("net"),"money")}
+    <div class="dashboardNote">Últimos 6 meses até <strong>${monthName(monthlyKey())}</strong>, cada funcionário na sua cor. Meses passados usam o valor salvo ao tocar em <strong>Calcular</strong>; sem valor salvo, o painel estima pelas configurações e dias de cada funcionário. Toque num mês para abrir os dias do funcionário ativo.</div>
+    <h4 class="empManageTitle">⚙️ Gerenciar funcionários</h4>
+    ${manage}
+    <button id="addEmployee" type="button" class="smallBtn">＋ Adicionar funcionário</button>`;
+  box.querySelectorAll("[data-month]").forEach(el=>{
+    el.onclick=()=>openMonth(el.dataset.month);
+  });
+  box.querySelectorAll("[data-act]").forEach(btn=>{
+    btn.onclick=()=>{
+      if(btn.dataset.act==="rename")renameEmployee(btn.dataset.id);
+      else deleteEmployee(btn.dataset.id);
+    };
+  });
+  const add=$("addEmployee");
+  if(add)add.onclick=addEmployee;
+}
+function renderEmployeeSelect(){
+  const sel=$("employeeSelect");
+  if(!sel)return;
+  sel.innerHTML=employees.map(e=>`<option value="${e.id}"${e.id===activeEmployee.id?" selected":""}>${esc(e.name)}</option>`).join("");
+}
+function setActiveEmployee(id){
+  if(!employees.some(e=>e.id===id))return;
+  localStorage.setItem(ACTIVE_EMPLOYEE_KEY,id);
+  location.reload();
+}
+function addEmployee(){
+  const name=(prompt("Nome do funcionário:")||"").trim();
+  if(!name)return;
+  const id="f"+Date.now().toString(36);
+  employees.push({id,name,color:EMPLOYEE_COLORS[employees.length%EMPLOYEE_COLORS.length]});
+  saveEmployees();
+  renderEmployeeSelect();
+  renderDashboard();
+}
+function renameEmployee(id){
+  const emp=employees.find(e=>e.id===id);
+  if(!emp)return;
+  const name=(prompt("Novo nome:",emp.name)||"").trim();
+  if(!name)return;
+  emp.name=name;
+  saveEmployees();
+  renderEmployeeSelect();
+  renderDashboard();
+}
+function deleteEmployee(id){
+  const emp=employees.find(e=>e.id===id);
+  if(!emp)return;
+  if(emp.id==="principal"){alert("O funcionário principal não pode ser excluído.");return;}
+  if(emp.id===activeEmployee.id){alert("Troque o funcionário ativo antes de excluir este.");return;}
+  if(!confirm(`Excluir ${emp.name} e todos os dados dele(a)? Não tem volta — exporte um backup antes, se precisar.`))return;
+  const bases=employeeBases(emp);
+  const prefixes=[bases.settings,bases.days+"-",bases.months+"-"];
+  const doomed=[];
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k&&prefixes.some(p=>k.startsWith(p)))doomed.push(k);
+  }
+  doomed.forEach(k=>localStorage.removeItem(k));
+  employees.splice(employees.findIndex(e=>e.id===id),1);
+  saveEmployees();
+  renderEmployeeSelect();
+  renderDashboard();
 }
 function calculate(saveSnapshot=false){
   const rate=hourlyRate();
@@ -447,6 +656,7 @@ function calculate(saveSnapshot=false){
 }
 document.querySelectorAll(".tab").forEach(btn=>btn.onclick=()=>{
   mode=btn.dataset.mode;
+  localStorage.setItem(SETTINGS_PREFIX+"mode",mode);
   document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===btn));
   $("hourlyBox").classList.toggle("hidden",mode!=="hourly");
   $("monthlyBox").classList.toggle("hidden",mode!=="monthly");
@@ -456,20 +666,38 @@ $("deductionMode").onchange=()=>{
   $("detailedDeductions").classList.toggle("hidden",$("deductionMode").value!=="detailed");
   calculate();
 };
+// Configurações da calculadora salvas por funcionário. Para o
+// funcionário principal o prefixo é o histórico "msj-", então os
+// valores já salvos (bônus etc.) continuam valendo sem migração.
+const SETTINGS_FIELDS=["hourlyRate","monthlySalary","baseHours","nightPercent","nightFixed","mealMonthly","otherAllowance","summerBonus","winterBonus","deduction","employmentInsurance","incomeTax","advanceSalary","utilities","rentDeduction","otherDeduction"];
+SETTINGS_FIELDS.forEach(id=>{
+  const el=$(id); if(!el)return;
+  const saved=localStorage.getItem(SETTINGS_PREFIX+id);
+  if(saved!=null)el.value=saved;
+  el.addEventListener("input",()=>localStorage.setItem(SETTINGS_PREFIX+id,el.value));
+});
 ["bonusSummerMonth","bonusWinterMonth"].forEach(id=>{
   const el=$(id); if(!el)return;
-  const saved=localStorage.getItem("msj-"+id);
+  const saved=localStorage.getItem(SETTINGS_PREFIX+id);
   if(saved)el.value=saved;
-  el.onchange=()=>{localStorage.setItem("msj-"+id,el.value);calculate()};
+  el.onchange=()=>{localStorage.setItem(SETTINGS_PREFIX+id,el.value);calculate()};
 });
-["summerBonus","winterBonus"].forEach(id=>{
-  // Os valores das parcelas ficam salvos no aparelho: como o bônus é
-  // variável, ele preenche uma vez por estação e o app lembra.
-  const el=$(id); if(!el)return;
-  const saved=localStorage.getItem("msj-"+id);
-  if(saved!=null)el.value=saved;
-  el.addEventListener("input",()=>localStorage.setItem("msj-"+id,el.value));
-});
+(()=>{
+  const el=$("deductionMode");
+  if(el){
+    const saved=localStorage.getItem(SETTINGS_PREFIX+"deductionMode");
+    if(saved)el.value=saved;
+    $("detailedDeductions").classList.toggle("hidden",el.value!=="detailed");
+    el.addEventListener("change",()=>localStorage.setItem(SETTINGS_PREFIX+"deductionMode",el.value));
+  }
+  const savedMode=localStorage.getItem(SETTINGS_PREFIX+"mode");
+  if(savedMode==="monthly"||savedMode==="hourly"){
+    mode=savedMode;
+    document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x.dataset.mode===mode));
+    $("hourlyBox").classList.toggle("hidden",mode!=="hourly");
+    $("monthlyBox").classList.toggle("hidden",mode!=="monthly");
+  }
+})();
 $("calcBtn").onclick=()=>calculate(true);
 document.querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{if(i.closest(".card")&&i.id!=="dayNote")calculate();if(i.id.startsWith("time"))updateDaySummary()}));
 $("addBreak").onclick=()=>addBreakRow();
@@ -480,6 +708,8 @@ $("deleteDay").onclick=()=>{
   if(selectedKey&&dayData(selectedKey)){deleteData(selectedKey);renderCalendar();renderDashboard();openDay(selectedKey)}
 };
 $("closeEditor").onclick=()=>{$("dayEditor").classList.add("hidden");selectedKey=null};
+renderEmployeeSelect();
+$("employeeSelect").onchange=e=>setActiveEmployee(e.target.value);
 $("exportBackup").onclick=exportBackup;
 $("importBackup").onclick=()=>$("importFile").click();
 $("importFile").addEventListener("change",e=>{
