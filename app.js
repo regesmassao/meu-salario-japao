@@ -296,7 +296,7 @@ function renderChart(title,items,format){
     const h=x.value==null?0:Math.max(5,(x.value/max)*100);
     const display=metricValue(x.value,format);
     const change=x.change;
-    return `<div class="barItem">
+    return `<div class="barItem" data-month="${x.key}" title="Ver os dias deste mês">
       <div class="barValue">${display}</div>
       <div class="barTrack"><div class="barFill" style="height:${h}%"></div></div>
       <div class="barLabel">${x.label}</div>
@@ -304,6 +304,15 @@ function renderChart(title,items,format){
     </div>`;
   }).join("");
   return `<div class="chartBox"><h4>${title}</h4><div class="bars">${bars}</div></div>`;
+}
+function openMonth(key){
+  // Toque num mês dos gráficos: o calendário e o histórico de jornada
+  // passam a mostrar esse mês (dias, entrada/saída e intervalos).
+  const [y,m]=key.split("-").map(Number);
+  viewDate=new Date(y,m-1,1);
+  renderCalendar();
+  renderDashboard();
+  $("calendarGrid").scrollIntoView({behavior:"smooth",block:"start"});
 }
 function renderDashboard(){
   const dash=$("monthlyDashboard");
@@ -317,7 +326,7 @@ function renderDashboard(){
   }
   const labels=months.map(x=>monthName(x.key));
   const make=(field,format)=>months.map((x,i)=>({
-    label:labels[i],value:x[field],
+    label:labels[i],value:x[field],key:x.key,
     change:i===0?"—":changeText(x[field],months[i-1][field])
   }));
   const latest=months[months.length-1];
@@ -339,7 +348,10 @@ function renderDashboard(){
     ${renderChart("➕ Horas extras por mês",make("overtime","hours"),"hours")}
     ${renderChart("🌙 Horas noturnas por mês",make("night","hours"),"hours")}
     ${renderChart("📅 Dias trabalhados por mês",make("days","number"),"number")}
-    <div class="dashboardNote">Mostrando os últimos 6 meses até <strong>${monthName(monthlyKey())}</strong>. As horas e dias vêm do calendário. Bruto e líquido usam o valor salvo em cada mês; no mês selecionado, se ainda não houver histórico salvo, o painel usa o cálculo atual da calculadora.</div>`;
+    <div class="dashboardNote">Mostrando os últimos 6 meses até <strong>${monthName(monthlyKey())}</strong>. As horas e dias vêm do calendário. Bruto e líquido usam o valor salvo em cada mês; no mês selecionado, se ainda não houver histórico salvo, o painel usa o cálculo atual da calculadora. <strong>Toque em um mês em qualquer gráfico</strong> para abrir os dias dele no controle de jornada (entrada, saída e intervalos).</div>`;
+  dash.querySelectorAll("[data-month]").forEach(el=>{
+    el.onclick=()=>openMonth(el.dataset.month);
+  });
 }
 function calculate(saveSnapshot=false){
   const rate=hourlyRate();
