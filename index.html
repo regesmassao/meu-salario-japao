@@ -45,7 +45,10 @@
     <label>Dias de trabalho noturno<input id="nightDays" type="number" inputmode="decimal" value="0" min="0"></label>
     <label>Refeição / benefício mensal (¥)<input id="mealMonthly" type="number" inputmode="decimal" value="3500" min="0"></label>
     <label>Outros adicionais (¥)<input id="otherAllowance" type="number" inputmode="decimal" value="0" min="0"></label>
-    <label>Bônus anual (¥)<input id="annualBonus" type="number" inputmode="decimal" value="960000" min="0"></label>
+    <label>Bônus de verão (¥)<input id="summerBonus" type="number" inputmode="decimal" value="0" min="0"></label>
+    <label>Bônus de verão cai em<select id="bonusSummerMonth"><option value="1">janeiro</option><option value="2">fevereiro</option><option value="3">março</option><option value="4">abril</option><option value="5">maio</option><option value="6">junho</option><option value="7" selected>julho</option><option value="8">agosto</option><option value="9">setembro</option><option value="10">outubro</option><option value="11">novembro</option><option value="12">dezembro</option></select></label>
+    <label>Bônus de inverno (¥)<input id="winterBonus" type="number" inputmode="decimal" value="0" min="0"></label>
+    <label>Bônus de inverno cai em<select id="bonusWinterMonth"><option value="1">janeiro</option><option value="2">fevereiro</option><option value="3">março</option><option value="4">abril</option><option value="5">maio</option><option value="6">junho</option><option value="7">julho</option><option value="8">agosto</option><option value="9">setembro</option><option value="10">outubro</option><option value="11">novembro</option><option value="12" selected>dezembro</option></select></label>
     <label>Modo de descontos<select id="deductionMode"><option value="percent">Estimativa (%)</option><option value="detailed">Detalhado (¥)</option></select></label>
     <label>Descontos estimados (%)<input id="deduction" type="number" inputmode="decimal" value="18" min="0" max="100" step="0.1"></label>
   </div>
@@ -61,6 +64,7 @@
   </div>
 
   <div class="result">
+    <div><span>Bônus do mês (parcela)</span><strong id="bonusOut">¥0</strong></div>
     <div><span>Bruto mensal</span><strong id="gross">¥0</strong></div>
     <div><span id="mandatoryLabel">Descontos obrigatórios</span><strong id="mandatoryDeductions">¥0</strong></div>
     <div><span>Outros descontos</span><strong id="otherDeductions">¥0</strong></div>
@@ -129,7 +133,7 @@
 </section>
 </main>
 
-<footer>Meu Salário Japão 🇯🇵 — V4.4</footer>
+<footer>Meu Salário Japão 🇯🇵 — V4.5</footer>
 <script src="app.js"></script>
 </body>
 </html>
