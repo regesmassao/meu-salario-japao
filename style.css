@@ -128,6 +128,25 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:6px 0 calc(24
 .dashboardNote{margin-top:12px;padding:11px 12px;border-radius:12px;background:#e0e7ff;font-size:12px;color:#312e81;font-weight:600}
 .dark .dashboardNote{background:#1e293b;color:#c7d2fe}
 
+/* ---------- Funcionários ---------- */
+.employeeLabel{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700}
+.employeeLabel select{padding:11px 12px;border:1.5px solid var(--line);border-radius:12px;font-size:16px;background:var(--field);color:var(--ink);outline:none}
+.employeeNote{margin:10px 0 0;font-size:12px;color:var(--muted);font-weight:600}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:middle;flex:none}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin:-2px 0 10px;font-size:12px;font-weight:700}
+.legendItem{display:inline-flex;align-items:center;gap:6px}
+.pairWrap{display:flex;gap:4px;align-items:flex-end}
+.pairCol{display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+.pairTrack{height:110px;width:15px;background:#e2e8f0;border-radius:8px 8px 4px 4px;display:flex;align-items:flex-end;overflow:hidden}
+.dark .pairTrack{background:#26334f}
+.pairFill{width:100%;min-height:0;border-radius:8px 8px 3px 3px}
+.totalCard{border-color:#6366f1;background:linear-gradient(135deg,rgba(99,102,241,.14),rgba(37,99,235,.10))}
+.empRow{display:flex;align-items:center;gap:8px;padding:9px 2px;border-bottom:1px solid var(--line);font-size:14px}
+.empBtns{margin-left:auto;display:flex;gap:6px}
+.empBadge{font-size:10px;font-weight:800;background:#e0e7ff;color:#3730a3;border-radius:99px;padding:2px 8px}
+.dark .empBadge{background:#1e293b;color:#c7d2fe}
+.empManageTitle{margin:16px 0 6px;font-size:14px}
+
 /* ---------- Descontos detalhados ---------- */
 .deductionBox{margin-top:12px;padding:14px;border:1.5px dashed #c7d2fe;border-radius:17px;background:rgba(99,102,241,.06)}
 .deductionBox .fullWidth{grid-column:1/-1;display:flex;flex-direction:column;gap:3px}
