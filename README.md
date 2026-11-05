@@ -1,6 +1,6 @@
 # Meu Salário Japão 🇯🇵
 
-**Versão atual: 4.6**
+**Versão atual: 4.7**
 
 Aplicativo web (PWA) para calcular o salário no Japão e controlar a jornada de trabalho. Feito para uso pessoal, em português, com valores em iene (¥).
 
@@ -33,8 +33,10 @@ Aplicativo web (PWA) para calcular o salário no Japão e controlar a jornada de
 ## Dados e privacidade
 - Todos os dados (dias registrados, valores da calculadora) ficam salvos **somente no aparelho** (localStorage do navegador)
 - Funciona offline depois de instalado, como um aplicativo
+- **Backup (desde a V4.7):** botão para exportar todos os dados num arquivo JSON e importar de volta — guarde o arquivo fora do aparelho (Arquivos, e-mail ou nuvem), porque é a única cópia que existe
 
 ## Histórico de versões
+- **4.7** — Backup dos dados: exportar e importar todos os registros num arquivo
 - **4.6** — Gráficos interativos: tocar num mês abre os dias dele na jornada
 - **4.5** — Bônus de verão e inverno, com valor manual por estação
 - **4.4** — Visual novo, com cara de aplicativo (cartão de saldo, abas segmentadas, modo escuro)
