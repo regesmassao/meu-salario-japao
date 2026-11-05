@@ -219,15 +219,31 @@ function deductionValues(gross){
   const other=val("advanceSalary")+val("utilities")+val("rentDeduction")+val("otherDeduction");
   return {mandatory,other,total:mandatory+other};
 }
+function bonusMonths(){
+  const s=Number($("bonusSummerMonth")?.value||7);
+  const w=Number($("bonusWinterMonth")?.value||12);
+  return [s,w];
+}
+function bonusForMonth(date=viewDate){
+  // O bônus é variável: 2 parcelas ao ano (verão e inverno), cada uma com
+  // valor próprio preenchido à mão. Só entra no bruto do mês em que cai.
+  const m=date.getMonth()+1;
+  const [s,w]=bonusMonths();
+  let total=0;
+  if(m===s)total+=val("summerBonus");
+  if(m===w)total+=val("winterBonus");
+  return total;
+}
 function currentCalculatedValues(){
   const rate=hourlyRate();
   const normal=mode==="monthly"?val("monthlySalary"):rate*val("normalHours");
   const overtime=rate*1.25*val("overtimeHours");
   const night=rate*(val("nightPercent")/100)*val("nightHours")+val("nightFixed")*val("nightDays");
   const meal=val("mealMonthly");
-  const gross=normal+overtime+night+meal+val("otherAllowance");
+  const bonus=bonusForMonth();
+  const gross=normal+overtime+night+meal+val("otherAllowance")+bonus;
   const d=deductionValues(gross);
-  return {gross,net:gross-d.total,mandatory:d.mandatory,otherDeductions:d.other,deductions:d.total};
+  return {gross,net:gross-d.total,mandatory:d.mandatory,otherDeductions:d.other,deductions:d.total,bonus};
 }
 function monthStats(key){
   const [y,m]=key.split("-").map(Number);
@@ -331,9 +347,11 @@ function calculate(saveSnapshot=false){
   const overtime=rate*1.25*val("overtimeHours");
   const night=rate*(val("nightPercent")/100)*val("nightHours")+val("nightFixed")*val("nightDays");
   const meal=val("mealMonthly");
-  const gross=normal+overtime+night+meal+val("otherAllowance");
+  const bonus=bonusForMonth();
+  const gross=normal+overtime+night+meal+val("otherAllowance")+bonus;
   const d=deductionValues(gross);
   const net=gross-d.total;
+  $("bonusOut").textContent=money(bonus);
   $("gross").textContent=money(gross);
   const detailed=$("deductionMode")?.value==="detailed";
   $("mandatoryLabel").textContent=detailed?"Descontos obrigatórios":"Descontos estimados";
@@ -344,7 +362,7 @@ function calculate(saveSnapshot=false){
   $("rateOut").textContent=money(rate);
   if(saveSnapshot){
     saveMonthlySnapshot(monthlyKey(),{
-      gross,net,mandatoryDeductions:d.mandatory,otherDeductions:d.other,deductions:d.total,updatedAt:Date.now(),
+      gross,net,bonus,mandatoryDeductions:d.mandatory,otherDeductions:d.other,deductions:d.total,updatedAt:Date.now(),
       mode,deductionMode:$("deductionMode")?.value||"percent",
       normalHours:val("normalHours"),
       overtimeHours:val("overtimeHours"),
@@ -365,6 +383,20 @@ $("deductionMode").onchange=()=>{
   $("detailedDeductions").classList.toggle("hidden",$("deductionMode").value!=="detailed");
   calculate();
 };
+["bonusSummerMonth","bonusWinterMonth"].forEach(id=>{
+  const el=$(id); if(!el)return;
+  const saved=localStorage.getItem("msj-"+id);
+  if(saved)el.value=saved;
+  el.onchange=()=>{localStorage.setItem("msj-"+id,el.value);calculate()};
+});
+["summerBonus","winterBonus"].forEach(id=>{
+  // Os valores das parcelas ficam salvos no aparelho: como o bônus é
+  // variável, ele preenche uma vez por estação e o app lembra.
+  const el=$(id); if(!el)return;
+  const saved=localStorage.getItem("msj-"+id);
+  if(saved!=null)el.value=saved;
+  el.addEventListener("input",()=>localStorage.setItem("msj-"+id,el.value));
+});
 $("calcBtn").onclick=()=>calculate(true);
 document.querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{if(i.closest(".card")&&i.id!=="dayNote")calculate();if(i.id.startsWith("time"))updateDaySummary()}));
 $("addBreak").onclick=()=>addBreakRow();
