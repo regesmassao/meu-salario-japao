@@ -131,9 +131,24 @@
   </div>
   <div id="history" class="history"></div>
 </section>
+
+<section class="card">
+  <div class="sectionHead">
+    <div>
+      <h2>💾 Backup dos dados</h2>
+      <p>Seus dias registrados e configurações ficam salvos só neste aparelho. Exporte um arquivo de backup e guarde em local seguro (Arquivos, e-mail ou nuvem). Se um dia precisar, importe o arquivo e tudo volta como estava.</p>
+    </div>
+  </div>
+  <div class="actions">
+    <button id="exportBackup" class="primary" type="button">⬇️ Exportar backup</button>
+    <button id="importBackup" type="button">⬆️ Importar backup</button>
+  </div>
+  <input id="importFile" type="file" accept="application/json,.json" class="hidden">
+  <p id="backupStatus"></p>
+</section>
 </main>
 
-<footer>Meu Salário Japão 🇯🇵 — V4.6</footer>
+<footer>Meu Salário Japão 🇯🇵 — V4.7</footer>
 <script src="app.js"></script>
 </body>
 </html>
