@@ -34,6 +34,67 @@ function dayData(key){
 }
 function saveData(key,data){localStorage.setItem(STORAGE+"-"+key,JSON.stringify(data))}
 function deleteData(key){localStorage.removeItem(STORAGE+"-"+key)}
+// ---------- Backup (exportar/importar) ----------
+// Todos os dados do app vivem no localStorage com o prefixo "msj-":
+// dias (msj-v4-2-days-*), meses (msj-v4-3-months-*) e configurações.
+// O backup guarda as chaves e valores exatamente como estão, para a
+// restauração ser fiel ao original.
+const BACKUP_PREFIX="msj-";
+function collectBackup(){
+  const data={};
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k&&k.startsWith(BACKUP_PREFIX))data[k]=localStorage.getItem(k);
+  }
+  return {app:"meu-salario-japao",version:1,exportedAt:new Date().toISOString(),data};
+}
+function countBackupDays(data){
+  return Object.keys(data||{}).filter(k=>k.startsWith(STORAGE+"-")).length;
+}
+function applyBackup(backup){
+  if(!backup||typeof backup!=="object"||!backup.data||typeof backup.data!=="object"){
+    throw new Error("invalid backup");
+  }
+  const keys=Object.keys(backup.data).filter(k=>k.startsWith(BACKUP_PREFIX));
+  const current=[];
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k&&k.startsWith(BACKUP_PREFIX))current.push(k);
+  }
+  current.forEach(k=>localStorage.removeItem(k));
+  keys.forEach(k=>localStorage.setItem(k,String(backup.data[k])));
+  return keys.length;
+}
+function exportBackup(){
+  const backup=collectBackup();
+  const days=countBackupDays(backup.data);
+  const blob=new Blob([JSON.stringify(backup,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="meu-salario-japao-backup-"+new Date().toISOString().slice(0,10)+".json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  $("backupStatus").textContent=`Backup exportado com ${days} dia(s) registrados. Guarde o arquivo em local seguro.`;
+}
+function importBackupFile(file){
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const backup=JSON.parse(String(reader.result||""));
+      const days=countBackupDays(backup.data);
+      const when=backup.exportedAt?new Date(backup.exportedAt).toLocaleDateString("pt-BR"):"data desconhecida";
+      if(!confirm(`Importar o backup de ${when}, com ${days} dia(s) registrados? Os dados atuais serão substituídos pelos do arquivo.`))return;
+      applyBackup(backup);
+      $("backupStatus").textContent="Backup importado com sucesso. Recarregando o app…";
+      setTimeout(()=>location.reload(),600);
+    }catch(e){
+      alert("Arquivo de backup inválido. Nada foi alterado.");
+    }
+  };
+  reader.readAsText(file);
+}
 function keyFor(y,m,d){return `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`}
 function parseKey(key){const [y,m,d]=key.split("-").map(Number);return {y,m:m-1,d}}
 
@@ -419,6 +480,13 @@ $("deleteDay").onclick=()=>{
   if(selectedKey&&dayData(selectedKey)){deleteData(selectedKey);renderCalendar();renderDashboard();openDay(selectedKey)}
 };
 $("closeEditor").onclick=()=>{$("dayEditor").classList.add("hidden");selectedKey=null};
+$("exportBackup").onclick=exportBackup;
+$("importBackup").onclick=()=>$("importFile").click();
+$("importFile").addEventListener("change",e=>{
+  const f=e.target.files&&e.target.files[0];
+  if(f)importBackupFile(f);
+  e.target.value="";
+});
 $("themeBtn").onclick=()=>{document.body.classList.toggle("dark");localStorage.setItem("msj-theme",document.body.classList.contains("dark")?"dark":"light")};
 if(localStorage.getItem("msj-theme")==="dark")document.body.classList.add("dark");
 calculate();renderCalendar();renderDashboard();
