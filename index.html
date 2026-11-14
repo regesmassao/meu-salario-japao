@@ -30,8 +30,12 @@
     <strong id="homeNet">—</strong>
     <span id="homeNetChange" class="heroChange"></span>
   </div>
-  <button id="quickToday" class="primary quickToday" type="button">⏱️ Registrar hoje</button>
-  <p id="quickTodayInfo" class="quickTodayInfo"></p>
+  <div class="card punchCard">
+    <div class="punchHead"><span>⏰ Ponto de hoje</span><span id="punchClock" class="punchClock">--:--:--</span></div>
+    <p id="punchStatus" class="punchStatus"></p>
+    <button id="punchBtn" class="primary punchBtn" type="button">🟢 Registrar entrada</button>
+    <button id="punchStd" class="punchStdBtn hidden" type="button">Lançar o dia pelo horário padrão</button>
+  </div>
   <div class="metricGrid homeStats">
     <div class="metricCard">
       <div class="metricTitle">💴 Bruto</div>
@@ -157,7 +161,7 @@
       <button id="addStdBreak" type="button" class="smallBtn">+ Adicionar intervalo</button>
     </div>
     <div id="stdBreaksList"></div>
-    <p class="yukiuNote">Salvo automaticamente. Com o horário padrão definido, o botão "Registrar hoje" na tela Início lança o dia de hoje com esses horários, sem digitar nada. Cada funcionário tem o seu.</p>
+    <p class="yukiuNote">Salvo automaticamente. Estes horários e intervalos entram sozinhos quando você bate o ponto (entrada/saída pelo relógio) ou lança o dia pelo horário padrão na tela Início. Cada funcionário tem o seu.</p>
   </div>
 
   <div class="calendar">
@@ -231,7 +235,7 @@
   <p id="backupStatus"></p>
 </section>
 
-<footer>Meu Salário Japão 🇯🇵 — V5.1</footer>
+<footer>Meu Salário Japão 🇯🇵 — V5.2</footer>
 </section>
 </main>
 

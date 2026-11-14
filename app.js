@@ -129,7 +129,7 @@ function renderHome(){
     ? `${fmtDays(used)} usado(s) de ${fmtDays(total)} dia(s) cadastrados`
     : "Cadastre o total de dias de yukiu na aba Jornada.";
   $("homeYukiuBar").style.width=total>0?`${Math.min(100,(used/total)*100)}%`:"0%";
-  renderQuickToday();
+  renderPunch();
 }
 // ---------- Registro rápido de hoje (V5.1) ----------
 // Horário padrão por funcionário (entrada, saída e intervalos),
@@ -150,37 +150,125 @@ function todayKey(){
   const n=new Date();
   return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}-${String(n.getDate()).padStart(2,"0")}`;
 }
-function renderQuickToday(){
-  const btn=$("quickToday"),info=$("quickTodayInfo");
-  if(!btn||!info)return;
-  const d=dayData(todayKey());
-  if(d){
-    const yk=Number(d.yukiu||0);
-    if(yk>0){
-      btn.textContent="✏️ Hoje é yukiu — tocar pra ver";
-      info.textContent=`Yukiu de ${fmtDays(yk)} dia já lançado hoje.`;
-    }else{
-      const c=calcDay(d);
-      btn.textContent="✏️ Hoje já registrado — tocar pra editar";
-      info.textContent=`Hoje: ${d.in} → ${d.out} · ${fmtHours(c.hours)} trabalhadas.`;
-    }
+// ---------- Ponto eletrônico (V5.2) ----------
+// Entrada e saída registradas pelo relógio do aparelho (que fica
+// sincronizado pela rede), com um toque na tela Início. Os
+// intervalos são os fixos do horário padrão: entram sozinhos no
+// registro e são descontados no cálculo. Depois de fechado, o dia
+// pode ser editado normalmente no editor da Jornada.
+function rawDay(key){
+  // Registro bruto do dia, mesmo incompleto (ex.: entrada batida
+  // e saída ainda em aberto) — dayData() só enxerga dias fechados.
+  try{return JSON.parse(localStorage.getItem(STORAGE+"-"+key)||"null")}catch(e){return null}
+}
+function keyDaysAgo(n){
+  const d=new Date();
+  d.setDate(d.getDate()-n);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+function nowTime(){
+  const n=new Date();
+  return `${String(n.getHours()).padStart(2,"0")}:${String(n.getMinutes()).padStart(2,"0")}`;
+}
+function openEntry(){
+  // Dia com entrada batida e saída em aberto (hoje, ou ontem no
+  // caso de virada de turno): é esse dia que a saída vai fechar.
+  for(const key of [todayKey(),keyDaysAgo(1)]){
+    const rec=rawDay(key);
+    if(rec&&rec.in&&!rec.out&&!(Number(rec.yukiu||0)>0))return {key,rec};
+  }
+  return null;
+}
+function renderPunch(){
+  const btn=$("punchBtn"),std=$("punchStd"),st=$("punchStatus");
+  if(!btn||!st)return;
+  if(std)std.classList.add("hidden");
+  const open=openEntry();
+  if(open){
+    btn.textContent=`🔴 Registrar saída · agora ${nowTime()}`;
+    st.textContent=open.key===todayKey()
+      ? `🟢 Entrada registrada às ${open.rec.in} — você está trabalhando. Os intervalos do padrão entram sozinhos quando você bater a saída.`
+      : `🟢 Entrada de ontem às ${open.rec.in} ainda em aberto — bata a saída pra fechar aquele dia.`;
     return;
   }
-  const std=loadStd();
-  if(std.in&&std.out){
-    btn.textContent=`⏱️ Registrar hoje · ${std.in} → ${std.out}`;
-    info.textContent="Um toque lança o dia de hoje com seu horário padrão.";
-  }else{
-    btn.textContent="⏱️ Registrar hoje";
-    info.textContent="Defina seu horário padrão na aba Jornada pra registrar com um toque.";
+  const d=dayData(todayKey());
+  if(d&&Number(d.yukiu||0)>0){
+    btn.textContent="✏️ Hoje é yukiu — tocar pra ver";
+    st.textContent=`Yukiu de ${fmtDays(Number(d.yukiu))} dia já lançado hoje.`;
+    return;
   }
+  if(d){
+    const c=calcDay(d);
+    btn.textContent="✏️ Hoje fechado — tocar pra editar";
+    st.textContent=`✔️ ${d.in} → ${d.out} · ${fmtHours(c.hours)} trabalhadas${c.overtime?` · ${fmtHours(c.overtime)} de hora extra`:""}.`;
+    return;
+  }
+  const stdCfg=loadStd();
+  btn.textContent=`🟢 Registrar entrada · agora ${nowTime()}`;
+  st.textContent="Toque ao chegar: a entrada fica gravada com a hora do relógio e os intervalos do padrão entram automaticamente.";
+  if(std&&stdCfg.in&&stdCfg.out)std.classList.remove("hidden");
+}
+function punchIn(){
+  const key=todayKey();
+  if(rawDay(key))return;
+  const std=loadStd();
+  localStorage.setItem(STORAGE+"-"+key,JSON.stringify({
+    in:nowTime(),
+    out:"",
+    breaks:std.breaks,
+    lunchOut:std.breaks.length?std.breaks[0].out:"",
+    lunchIn:std.breaks.length?std.breaks[0].in:"",
+    note:"",
+    yukiu:0
+  }));
+  renderCalendar();
+  renderDashboard();
+  renderPunch();
+}
+function punchOut(){
+  const open=openEntry();
+  if(!open)return;
+  const rec=open.rec;
+  rec.out=nowTime();
+  // Intervalo do padrão que só começaria depois da saída não
+  // aconteceu (ex.: saiu mais cedo) — fica fora do dia fechado.
+  const start=timeMinutes(rec.in),out=timeMinutes(rec.out);
+  if(start!=null&&out!=null){
+    const span=duration(start,out);
+    rec.breaks=dayBreaks(rec).filter(b=>{
+      const bOut=timeMinutes(b.out);
+      return bOut!=null&&duration(start,bOut)<span;
+    });
+    rec.lunchOut=rec.breaks.length?rec.breaks[0].out:"";
+    rec.lunchIn=rec.breaks.length?rec.breaks[0].in:"";
+  }
+  localStorage.setItem(STORAGE+"-"+open.key,JSON.stringify(rec));
+  renderCalendar();
+  renderDashboard();
+  renderPunch();
+}
+function punchMain(){
+  if(openEntry()){punchOut();return;}
+  const key=todayKey();
+  if(dayData(key)){
+    // Dia já fechado (ou yukiu): abre no editor pra ajustar.
+    const now=new Date();
+    viewDate=new Date(now.getFullYear(),now.getMonth(),1);
+    renderCalendar();
+    renderDashboard();
+    showScreen("jornada");
+    openDay(key);
+    return;
+  }
+  punchIn();
 }
 function quickToday(){
   const key=todayKey();
   const now=new Date();
   const std=loadStd();
-  // Já registrado, ou ainda sem horário padrão: abre o dia no editor.
-  if(dayData(key)||!std.in||!std.out){
+  // Já registrado (fechado ou com o ponto em aberto), ou ainda sem
+  // horário padrão: abre o dia no editor — nunca sobrescreve.
+  if(dayData(key)||rawDay(key)||!std.in||!std.out){
     viewDate=new Date(now.getFullYear(),now.getMonth(),1);
     renderCalendar();
     renderDashboard();
@@ -198,7 +286,7 @@ function quickToday(){
   }));
   renderCalendar();
   renderDashboard();
-  renderQuickToday();
+  renderPunch();
 }
 // Editor do horário padrão (aba Jornada): mesmos cartões de
 // intervalo do editor do dia; salva automaticamente a cada mudança.
@@ -222,7 +310,7 @@ function saveStdSchedule(){
     if(o&&i)breaks.push({out:o,in:i});
   });
   localStorage.setItem(SETTINGS_PREFIX+"stdBreaks",JSON.stringify(breaks));
-  renderQuickToday();
+  renderPunch();
 }
 function loadStdScheduleUI(){
   const std=loadStd();
@@ -362,6 +450,7 @@ function renderCalendar(){
     const today=new Date();
     if(yy===today.getFullYear()&&mm===today.getMonth()&&d===today.getDate())b.classList.add("today");
     if(data)b.classList.add("hasData");
+    else{const r=rawDay(key);if(r&&r.in)b.classList.add("hasData")}
     if(data&&Number(data.yukiu)>0)b.classList.add("yukiuDay");
     b.onclick=()=>openDay(key);
     grid.appendChild(b);
@@ -398,7 +487,7 @@ function collectBreaks(){
 function openDay(key){
   selectedKey=key;
   const {y,m,d}=parseKey(key);
-  const data=dayData(key)||{};
+  const data=dayData(key)||rawDay(key)||{};
   $("editorDate").textContent=new Date(y,m,d).toLocaleDateString("pt-BR",{weekday:"long",day:"2-digit",month:"2-digit",year:"numeric"});
   $("timeIn").value=data.in||"";
   $("timeOut").value=data.out||"";
@@ -925,7 +1014,15 @@ $("themeBtn").onclick=()=>{document.body.classList.toggle("dark");localStorage.s
 if(localStorage.getItem("msj-theme")==="dark")document.body.classList.add("dark");
 document.querySelectorAll(".navTab").forEach(b=>b.onclick=()=>showScreen(b.dataset.screen));
 $("empChip").onclick=()=>showScreen("ajustes");
-$("quickToday").onclick=quickToday;
+$("punchBtn").onclick=punchMain;
+$("punchStd").onclick=quickToday;
+let lastPunchMinute=-1;
+setInterval(()=>{
+  const clock=$("punchClock");
+  const n=new Date();
+  if(clock)clock.textContent=`${String(n.getHours()).padStart(2,"0")}:${String(n.getMinutes()).padStart(2,"0")}:${String(n.getSeconds()).padStart(2,"0")}`;
+  if(n.getMinutes()!==lastPunchMinute){lastPunchMinute=n.getMinutes();renderPunch();}
+},1000);
 $("addStdBreak").onclick=()=>addStdBreakRow();
 $("stdIn").addEventListener("change",saveStdSchedule);
 $("stdOut").addEventListener("change",saveStdSchedule);
