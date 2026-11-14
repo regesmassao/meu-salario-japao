@@ -581,13 +581,22 @@ function calcDay(data){
   const start=timeMinutes(data.in), out=timeMinutes(data.out);
   if(start==null||out==null)return {hours:0,worked:0,break:0,normal:0,overtime:0,night:0,nightDay:false,off:0,offRate:null};
   const total=duration(start,out);
+  const end=start+total; // pode passar de 1440 (turno que vira a noite)
   let breakM=0;
   let nightM=nightOverlap(start,out);
   for(const b of dayBreaks(data)){
     const bOut=timeMinutes(b.out), bIn=timeMinutes(b.in);
     if(bOut==null||bIn==null)continue;
-    breakM+=duration(bOut,bIn);
-    nightM-=nightOverlap(bOut,bIn);
+    // V5.5.1: só desconta a parte do intervalo que cai DENTRO do
+    // horário do dia. Intervalo que começa depois da saída (ex.:
+    // intervalos de hora extra do padrão, num dia sem hora extra)
+    // não desconta nada; o que passa da saída desconta só até ela.
+    const bStart=start+duration(start,bOut);
+    const bEnd=bStart+duration(bOut,bIn);
+    const segStart=Math.max(bStart,start), segEnd=Math.min(bEnd,end);
+    if(segEnd<=segStart)continue;
+    breakM+=segEnd-segStart;
+    nightM-=nightOverlap(segStart%1440,segEnd%1440);
   }
   const worked=Math.max(0,total-breakM);
   nightM=Math.max(0,nightM);
