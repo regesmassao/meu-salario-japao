@@ -996,11 +996,7 @@ function renderCouple(){
   const series=field=>perEmp.map(({emp,stats})=>({
     name:emp.name,color:emp.color,values:stats.map(s=>s[field]),keys:months
   }));
-  const manage=employees.map(e=>`<div class="empRow">
-      <span class="dot" style="background:${e.color}"></span>
-      <strong>${esc(e.name)}</strong>${e.id===activeEmployee.id?'<span class="empBadge">ativo</span>':""}
-      <span class="empBtns"><button type="button" class="smallBtn" data-act="rename" data-id="${e.id}">Renomear</button>${e.id!=="principal"?`<button type="button" class="smallBtn" data-act="delete" data-id="${e.id}">Excluir</button>`:""}</span>
-    </div>`).join("");
+  const manage=employeeManageHTML();
   const hc=$("homeCouple");
   if(hc){
     hc.innerHTML=`
@@ -1024,19 +1020,38 @@ function renderCouple(){
     ${renderPairChart("💰 Líquido por mês",labels,series("net"),"money")}
     <div class="dashboardNote">Últimos 6 meses até <strong>${monthName(monthlyKey())}</strong>, cada funcionário na sua cor. Meses passados usam o valor salvo ao tocar em <strong>Calcular</strong>; sem valor salvo, o painel estima pelas configurações e dias de cada funcionário. Toque num mês para abrir os dias do funcionário ativo.</div>
     <h4 class="empManageTitle">⚙️ Gerenciar funcionários</h4>
-    ${manage}
-    <button id="addEmployee" type="button" class="smallBtn">＋ Adicionar funcionário</button>`;
+    ${manage}`;
   box.querySelectorAll("[data-month]").forEach(el=>{
     el.onclick=()=>openMonth(el.dataset.month);
   });
-  box.querySelectorAll("[data-act]").forEach(btn=>{
+  wireEmployeeManage(box);
+}
+function employeeManageHTML(){
+  // Lista de funcionários com Renomear/Excluir + botão Adicionar.
+  // Usada na aba Casal e nos Ajustes (V5.4.1). O botão de adicionar
+  // NÃO tem id fixo (usa data-act) pra não duplicar id entre telas.
+  const rows=employees.map(e=>`<div class="empRow">
+      <span class="dot" style="background:${e.color}"></span>
+      <strong>${esc(e.name)}</strong>${e.id===activeEmployee.id?'<span class="empBadge">ativo</span>':""}
+      <span class="empBtns"><button type="button" class="smallBtn" data-act="rename" data-id="${e.id}">Renomear</button>${e.id!=="principal"?`<button type="button" class="smallBtn" data-act="delete" data-id="${e.id}">Excluir</button>`:""}</span>
+    </div>`).join("");
+  return rows+`<button type="button" class="smallBtn" data-act="add">＋ Adicionar funcionário</button>`;
+}
+function wireEmployeeManage(root){
+  if(!root||!root.querySelectorAll)return;
+  root.querySelectorAll("[data-act]").forEach(btn=>{
     btn.onclick=()=>{
       if(btn.dataset.act==="rename")renameEmployee(btn.dataset.id);
-      else deleteEmployee(btn.dataset.id);
+      else if(btn.dataset.act==="delete")deleteEmployee(btn.dataset.id);
+      else if(btn.dataset.act==="add")addEmployee();
     };
   });
-  const add=$("addEmployee");
-  if(add)add.onclick=addEmployee;
+}
+function renderEmployeeManage(){
+  const box=$("employeeManage");
+  if(!box)return;
+  box.innerHTML=employeeManageHTML();
+  wireEmployeeManage(box);
 }
 function renderEmployeeSelect(){
   const sel=$("employeeSelect");
@@ -1044,6 +1059,7 @@ function renderEmployeeSelect(){
   sel.innerHTML=employees.map(e=>`<option value="${e.id}"${e.id===activeEmployee.id?" selected":""}>${esc(e.name)}</option>`).join("");
   const chip=$("empChipName");
   if(chip)chip.textContent=activeEmployee.name;
+  renderEmployeeManage();
 }
 function setActiveEmployee(id){
   if(!employees.some(e=>e.id===id))return;
