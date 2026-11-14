@@ -16,17 +16,58 @@
     <h1>Meu Salário Japão 🇯🇵</h1>
     <p>Calculadora e controle de jornada</p>
   </div>
-  <button id="themeBtn" class="iconBtn" aria-label="Alternar tema">🌙</button>
+  <div class="topBtns">
+    <button id="empChip" class="empChip" type="button">👤 <span id="empChipName">Reges</span> ▾</button>
+    <button id="themeBtn" class="iconBtn" aria-label="Alternar tema">🌙</button>
+  </div>
 </header>
 
 <main>
-<section class="card employeeBar">
-  <label class="employeeLabel">👤 Funcionário ativo
-    <select id="employeeSelect"></select>
-  </label>
-  <p class="employeeNote">Tudo o que você preencher — calculadora e controle de jornada — fica salvo para este funcionário. Para lançar os dados da outra pessoa, troque o funcionário aqui.</p>
+<section class="screen active" data-screen="inicio" id="screen-inicio">
+  <div class="homeHead"><span id="homeMonth"></span></div>
+  <div class="heroNet">
+    <span>Líquido do mês</span>
+    <strong id="homeNet">—</strong>
+    <span id="homeNetChange" class="heroChange"></span>
+  </div>
+  <div class="metricGrid homeStats">
+    <div class="metricCard">
+      <div class="metricTitle">💴 Bruto</div>
+      <strong id="homeGross">—</strong>
+    </div>
+    <div class="metricCard">
+      <div class="metricTitle">📅 Dias trabalhados</div>
+      <strong id="homeDays">—</strong>
+    </div>
+    <div class="metricCard">
+      <div class="metricTitle">⏱️ Horas</div>
+      <strong id="homeHours">—</strong>
+    </div>
+    <div class="metricCard">
+      <div class="metricTitle">➕ Extras</div>
+      <strong id="homeOvertime">—</strong>
+    </div>
+  </div>
+  <div class="card yukiuHome">
+    <div class="yukiuHomeHead"><span>🏖️ Yukiu</span><span class="yukiuHomeLeft">restam <strong id="homeYukiuLeft">—</strong></span></div>
+    <div class="yukiuProgress"><div id="homeYukiuBar"></div></div>
+    <p id="homeYukiuText" class="yukiuHomeText"></p>
+  </div>
+
+  <section id="monthlyDashboard" class="card dashboard">
+    <div class="sectionHead dashboardHead">
+      <div>
+        <h2>📈 Evolução mensal</h2>
+        <p>Comparação automática com o mês anterior.</p>
+      </div>
+    </div>
+    <div class="empty">Carregando evolução mensal…</div>
+  </section>
+
+  <div class="card homeCouple" id="homeCouple"></div>
 </section>
 
+<section class="screen" data-screen="calculadora" id="screen-calculadora">
 <section class="card">
   <h2>💴 Calculadora salarial</h2>
   <div class="tabs">
@@ -81,21 +122,9 @@
   </div>
   <button id="calcBtn" class="primary">Calcular</button>
 </section>
-
-<section id="monthlyDashboard" class="card dashboard">
-  <div class="sectionHead dashboardHead">
-    <div>
-      <h2>📈 Evolução mensal</h2>
-      <p>Comparação automática com o mês anterior.</p>
-    </div>
-  </div>
-  <div class="empty">Carregando evolução mensal…</div>
 </section>
 
-<section id="coupleDashboard" class="card dashboard">
-  <div class="empty">Carregando funcionários…</div>
-</section>
-
+<section class="screen" data-screen="jornada" id="screen-jornada">
 <section class="card">
   <div class="sectionHead">
     <div>
@@ -155,6 +184,21 @@
   </div>
   <div id="history" class="history"></div>
 </section>
+</section>
+
+<section class="screen" data-screen="casal" id="screen-casal">
+<section id="coupleDashboard" class="card dashboard">
+  <div class="empty">Carregando funcionários…</div>
+</section>
+</section>
+
+<section class="screen" data-screen="ajustes" id="screen-ajustes">
+<section class="card employeeBar">
+  <label class="employeeLabel">👤 Funcionário ativo
+    <select id="employeeSelect"></select>
+  </label>
+  <p class="employeeNote">Tudo o que você preencher — calculadora e controle de jornada — fica salvo para este funcionário. Para lançar os dados da outra pessoa, troque o funcionário aqui.</p>
+</section>
 
 <section class="card">
   <div class="sectionHead">
@@ -170,9 +214,19 @@
   <input id="importFile" type="file" accept="application/json,.json" class="hidden">
   <p id="backupStatus"></p>
 </section>
+
+<footer>Meu Salário Japão 🇯🇵 — V5.0</footer>
+</section>
 </main>
 
-<footer>Meu Salário Japão 🇯🇵 — V4.9</footer>
+<nav class="tabbar" aria-label="Navegação principal">
+  <button type="button" class="navTab active" data-screen="inicio"><span class="navIcon">🏠</span><span>Início</span></button>
+  <button type="button" class="navTab" data-screen="calculadora"><span class="navIcon">💴</span><span>Calculadora</span></button>
+  <button type="button" class="navTab" data-screen="jornada"><span class="navIcon">📅</span><span>Jornada</span></button>
+  <button type="button" class="navTab" data-screen="casal"><span class="navIcon">👥</span><span>Casal</span></button>
+  <button type="button" class="navTab" data-screen="ajustes"><span class="navIcon">⚙️</span><span>Ajustes</span></button>
+</nav>
+
 <script src="app.js"></script>
 </body>
 </html>
