@@ -71,6 +71,11 @@
   </section>
 
   <div class="card homeCouple" id="homeCouple"></div>
+
+  <div id="homeBackupAlert" class="backupAlert hidden">
+    <span id="homeBackupText"></span>
+    <button id="homeBackupBtn" type="button">Fazer backup agora</button>
+  </div>
 </section>
 
 <section class="screen" data-screen="calculadora" id="screen-calculadora">
@@ -210,6 +215,21 @@
 <section id="coupleDashboard" class="card dashboard">
   <div class="empty">Carregando funcionários…</div>
 </section>
+
+<section class="card dashboard" id="annualCard">
+  <div class="sectionHead dashboardHead">
+    <div>
+      <h2>📆 Resumo anual</h2>
+      <p>Totais do ano por funcionário — útil na declaração de fim de ano.</p>
+    </div>
+    <div class="monthNav">
+      <button id="prevYear" class="smallBtn">‹</button>
+      <span id="annualYearLabel"></span>
+      <button id="nextYear" class="smallBtn">›</button>
+    </div>
+  </div>
+  <div id="annualSummary"></div>
+</section>
 </section>
 
 <section class="screen" data-screen="ajustes" id="screen-ajustes">
@@ -233,9 +253,10 @@
   </div>
   <input id="importFile" type="file" accept="application/json,.json" class="hidden">
   <p id="backupStatus"></p>
+  <p id="backupReminder" class="backupReminder"></p>
 </section>
 
-<footer>Meu Salário Japão 🇯🇵 — V5.2</footer>
+<footer>Meu Salário Japão 🇯🇵 — V5.3</footer>
 </section>
 </main>
 

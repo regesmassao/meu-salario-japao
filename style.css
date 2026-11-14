@@ -49,6 +49,15 @@ main{max-width:760px;margin:auto;padding:16px 14px calc(104px + env(safe-area-in
 .punchBtn{margin-top:12px}
 .punchStdBtn{width:100%;margin-top:9px;border:0;border-radius:13px;padding:12px;background:var(--chip);color:var(--ink);font-size:14px;font-weight:700;cursor:pointer;transition:transform .15s ease}
 .punchStdBtn:active{transform:scale(.98)}
+.backupAlert{margin-top:12px;background:#fef3c7;border:1.5px solid #f59e0b;color:#92400e;border-radius:16px;padding:13px 14px;font-size:13px;font-weight:600;display:flex;flex-direction:column;gap:9px}
+.dark .backupAlert{background:#3a2a08;color:#fde68a;border-color:#92600a}
+.backupAlert button{border:0;border-radius:11px;padding:10px;background:#f59e0b;color:#fff;font-weight:800;font-size:14px;cursor:pointer}
+.backupAlert button:active{transform:scale(.98)}
+.backupReminder{margin:12px 0 0;font-size:13px;font-weight:600;color:var(--muted)}
+.annualEmp{margin-bottom:16px}
+.annualEmpHead{display:flex;align-items:center;gap:7px;margin-bottom:9px;font-size:15px}
+.annualTotal{margin-top:2px}
+.annualTotal strong{font-size:23px}
 .stdBox{margin-top:14px}
 .stdHead{margin-top:0}
 .stdBox .grid input{margin-top:6px}
