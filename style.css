@@ -36,7 +36,7 @@ h2{letter-spacing:-.01em}
 /* ---------- Campos ---------- */
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .grid label{font-size:13px;font-weight:600;color:var(--ink)}
-.grid input,.grid select,.editor>label input{display:block;width:100%;margin-top:6px;padding:12px 13px;border:1.5px solid var(--line);border-radius:13px;font-size:16px;background:var(--field);color:var(--ink);outline:none;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;appearance:none}
+.grid input,.grid select,.editor>label input,.editor>label select,.yukiuBox input{display:block;width:100%;margin-top:6px;padding:12px 13px;border:1.5px solid var(--line);border-radius:13px;font-size:16px;background:var(--field);color:var(--ink);outline:none;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;appearance:none}
 .grid input:focus,.grid select:focus,.editor>label input:focus,.breakRow input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(79,70,229,.16);background:var(--card)}
 .hidden{display:none!important}
 
@@ -73,6 +73,14 @@ h2{letter-spacing:-.01em}
 .days button.today{background:var(--gradBtn);color:#fff;box-shadow:0 6px 16px rgba(79,70,229,.4)}
 .days button.hasData:after{content:"";position:absolute;bottom:6px;left:50%;width:6px;height:6px;border-radius:50%;background:var(--accent);transform:translateX(-50%)}
 .days button.today.hasData:after{background:#fff}
+.days button.yukiuDay{background:#dcfce7;color:#166534}
+.dark .days button.yukiuDay{background:#14532d;color:#bbf7d0}
+.days button.yukiuDay:after{background:#16a34a}
+.yukiuBox{margin-bottom:14px;padding:14px 16px;background:linear-gradient(180deg,#f0fdf4,#f8fafc);border:1.5px solid var(--line);border-radius:18px}
+.dark .yukiuBox{background:linear-gradient(180deg,#0c231a,#0f172a)}
+.yukiuBox label{display:block;font-size:13px;font-weight:600}
+.yukiuStatus{margin:10px 0 0;font-size:15px;font-weight:700}
+.yukiuNote{margin:6px 0 0;font-size:12.5px;opacity:.75}
 
 /* ---------- Editor do dia ---------- */
 .editor{margin-top:16px;padding:16px;background:linear-gradient(180deg,#f6f8ff,#f8fafc);border:1.5px solid var(--line);border-radius:20px}
