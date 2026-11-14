@@ -1135,4 +1135,4 @@ loadStdScheduleUI();
 showScreen(localStorage.getItem(SCREEN_KEY)||"inicio");
 calculate();renderCalendar();renderDashboard();
 
-if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
+if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").then(r=>r.update()).catch(()=>{}));
