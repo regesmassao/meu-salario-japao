@@ -484,6 +484,79 @@ function importBackupFile(file){
   };
   reader.readAsText(file);
 }
+// ---------- Juntar backup de outro celular (V5.4) ----------
+// Cada celular guarda os dados de quem usa. Este recurso incorpora
+// o backup de OUTRO aparelho sem apagar nada do atual: os dias de
+// cada funcionário do arquivo entram no funcionário de MESMO NOME
+// deste aparelho (criado se ainda não existir), remapeando os
+// prefixos — no celular da outra pessoa, ela é a funcionária
+// principal; aqui, os dias dela vão para o prefixo próprio dela.
+const MERGE_SETTING_FIELDS=["hourlyRate","monthlySalary","baseHours","nightPercent","nightFixed","mealMonthly","otherAllowance","summerBonus","winterBonus","deduction","employmentInsurance","incomeTax","advanceSalary","utilities","rentDeduction","otherDeduction","yukiuTotal","mode","deductionMode","bonusSummerMonth","bonusWinterMonth","stdIn","stdOut","stdBreaks"];
+function mergeNormName(s){return String(s||"").trim().toLocaleLowerCase("pt-BR")}
+function planMerge(backup){
+  if(!backup||typeof backup!=="object"||!backup.data||typeof backup.data!=="object")throw new Error("invalid backup");
+  const data=backup.data;
+  let srcList=null;
+  try{
+    const l=JSON.parse(data[EMPLOYEES_KEY]||"null");
+    if(Array.isArray(l)&&l.length&&l.every(e=>e&&e.id&&e.name))srcList=l;
+  }catch(e){}
+  if(!srcList)srcList=[{id:"principal",name:"Reges",color:EMPLOYEE_COLORS[0]}];
+  const plan=[];
+  for(const emp of srcList){
+    const bases=employeeBases(emp);
+    const days=Object.keys(data).filter(k=>k.startsWith(bases.days+"-"));
+    const months=Object.keys(data).filter(k=>k.startsWith(bases.months+"-"));
+    const hasSettings=MERGE_SETTING_FIELDS.some(f=>data[bases.settings+f]!=null);
+    if(days.length||months.length||hasSettings)plan.push({emp,bases,days,months});
+  }
+  return plan;
+}
+function applyMerge(backup){
+  const data=backup.data;
+  const plan=planMerge(backup);
+  let created=0,totalDays=0;
+  for(const item of plan){
+    let target=employees.find(e=>mergeNormName(e.name)===mergeNormName(item.emp.name));
+    if(!target){
+      target={id:"f"+Date.now().toString(36)+"m"+created,name:item.emp.name,color:EMPLOYEE_COLORS[employees.length%EMPLOYEE_COLORS.length]};
+      employees.push(target);
+      created++;
+    }
+    const tb=employeeBases(target);
+    item.days.forEach(k=>localStorage.setItem(tb.days+k.slice(item.bases.days.length),String(data[k])));
+    item.months.forEach(k=>localStorage.setItem(tb.months+k.slice(item.bases.months.length),String(data[k])));
+    MERGE_SETTING_FIELDS.forEach(f=>{
+      const v=data[item.bases.settings+f];
+      if(v!=null)localStorage.setItem(tb.settings+f,String(v));
+    });
+    totalDays+=item.days.length;
+  }
+  if(created)saveEmployees();
+  return {totalDays,created};
+}
+function importMergeFile(file){
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const backup=JSON.parse(String(reader.result||""));
+      const plan=planMerge(backup);
+      if(!plan.length){alert("Este arquivo não tem dados de funcionário para juntar.");return;}
+      const when=backup.exportedAt?new Date(backup.exportedAt).toLocaleDateString("pt-BR"):"data desconhecida";
+      const desc=plan.map(p=>{
+        const found=employees.some(e=>mergeNormName(e.name)===mergeNormName(p.emp.name));
+        return `• ${p.emp.name}: ${p.days.length} dia(s)`+(found?"":" (novo — será criado)");
+      }).join("\n");
+      if(!confirm(`Juntar o backup de ${when} com os dados deste aparelho?\n\n${desc}\n\nOs dias entram no funcionário de mesmo nome. Se o mesmo dia existir nos dois aparelhos, vale a cópia do arquivo. Nenhum dado atual é apagado.`))return;
+      const res=applyMerge(backup);
+      $("backupStatus").textContent=`Backup juntado com sucesso: ${res.totalDays} dia(s) incorporados. Recarregando o app…`;
+      setTimeout(()=>location.reload(),600);
+    }catch(e){
+      alert("Arquivo de backup inválido. Nada foi alterado.");
+    }
+  };
+  reader.readAsText(file);
+}
 function keyFor(y,m,d){return `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`}
 function parseKey(key){const [y,m,d]=key.split("-").map(Number);return {y,m:m-1,d}}
 
@@ -1110,6 +1183,12 @@ $("importBackup").onclick=()=>$("importFile").click();
 $("importFile").addEventListener("change",e=>{
   const f=e.target.files&&e.target.files[0];
   if(f)importBackupFile(f);
+  e.target.value="";
+});
+$("mergeBackup").onclick=()=>$("mergeFile").click();
+$("mergeFile").addEventListener("change",e=>{
+  const f=e.target.files&&e.target.files[0];
+  if(f)importMergeFile(f);
   e.target.value="";
 });
 $("themeBtn").onclick=()=>{document.body.classList.toggle("dark");localStorage.setItem("msj-theme",document.body.classList.contains("dark")?"dark":"light")};
