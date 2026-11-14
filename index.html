@@ -30,6 +30,8 @@
     <strong id="homeNet">—</strong>
     <span id="homeNetChange" class="heroChange"></span>
   </div>
+  <button id="quickToday" class="primary quickToday" type="button">⏱️ Registrar hoje</button>
+  <p id="quickTodayInfo" class="quickTodayInfo"></p>
   <div class="metricGrid homeStats">
     <div class="metricCard">
       <div class="metricTitle">💴 Bruto</div>
@@ -144,6 +146,20 @@
     <p class="yukiuNote">Marque o yukiu no editor do dia (toque no dia no calendário): o saldo diminui sozinho. Se apagar ou desmarcar o dia, o saldo volta.</p>
   </div>
 
+  <div class="yukiuBox stdBox">
+    <div class="breaksHead stdHead"><strong>⏰ Horário padrão — registro rápido</strong></div>
+    <div class="grid">
+      <label>Entrada<input id="stdIn" type="time"></label>
+      <label>Saída<input id="stdOut" type="time"></label>
+    </div>
+    <div class="breaksHead">
+      <strong>Intervalos padrão</strong>
+      <button id="addStdBreak" type="button" class="smallBtn">+ Adicionar intervalo</button>
+    </div>
+    <div id="stdBreaksList"></div>
+    <p class="yukiuNote">Salvo automaticamente. Com o horário padrão definido, o botão "Registrar hoje" na tela Início lança o dia de hoje com esses horários, sem digitar nada. Cada funcionário tem o seu.</p>
+  </div>
+
   <div class="calendar">
     <div class="week"><span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span></div>
     <div id="calendarGrid" class="days"></div>
@@ -215,7 +231,7 @@
   <p id="backupStatus"></p>
 </section>
 
-<footer>Meu Salário Japão 🇯🇵 — V5.0</footer>
+<footer>Meu Salário Japão 🇯🇵 — V5.1</footer>
 </section>
 </main>
 

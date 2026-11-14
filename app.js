@@ -129,6 +129,109 @@ function renderHome(){
     ? `${fmtDays(used)} usado(s) de ${fmtDays(total)} dia(s) cadastrados`
     : "Cadastre o total de dias de yukiu na aba Jornada.";
   $("homeYukiuBar").style.width=total>0?`${Math.min(100,(used/total)*100)}%`:"0%";
+  renderQuickToday();
+}
+// ---------- Registro rápido de hoje (V5.1) ----------
+// Horário padrão por funcionário (entrada, saída e intervalos),
+// salvo nas chaves stdIn/stdOut/stdBreaks do prefixo do funcionário
+// e editado na aba Jornada. Com ele definido, o botão da tela
+// Início lança o dia de hoje com um toque, sem abrir o editor.
+function loadStd(){
+  try{
+    const breaks=JSON.parse(localStorage.getItem(SETTINGS_PREFIX+"stdBreaks")||"[]");
+    return {
+      in:localStorage.getItem(SETTINGS_PREFIX+"stdIn")||"",
+      out:localStorage.getItem(SETTINGS_PREFIX+"stdOut")||"",
+      breaks:Array.isArray(breaks)?breaks:[]
+    };
+  }catch(e){ return {in:"",out:"",breaks:[]}; }
+}
+function todayKey(){
+  const n=new Date();
+  return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}-${String(n.getDate()).padStart(2,"0")}`;
+}
+function renderQuickToday(){
+  const btn=$("quickToday"),info=$("quickTodayInfo");
+  if(!btn||!info)return;
+  const d=dayData(todayKey());
+  if(d){
+    const yk=Number(d.yukiu||0);
+    if(yk>0){
+      btn.textContent="✏️ Hoje é yukiu — tocar pra ver";
+      info.textContent=`Yukiu de ${fmtDays(yk)} dia já lançado hoje.`;
+    }else{
+      const c=calcDay(d);
+      btn.textContent="✏️ Hoje já registrado — tocar pra editar";
+      info.textContent=`Hoje: ${d.in} → ${d.out} · ${fmtHours(c.hours)} trabalhadas.`;
+    }
+    return;
+  }
+  const std=loadStd();
+  if(std.in&&std.out){
+    btn.textContent=`⏱️ Registrar hoje · ${std.in} → ${std.out}`;
+    info.textContent="Um toque lança o dia de hoje com seu horário padrão.";
+  }else{
+    btn.textContent="⏱️ Registrar hoje";
+    info.textContent="Defina seu horário padrão na aba Jornada pra registrar com um toque.";
+  }
+}
+function quickToday(){
+  const key=todayKey();
+  const now=new Date();
+  const std=loadStd();
+  // Já registrado, ou ainda sem horário padrão: abre o dia no editor.
+  if(dayData(key)||!std.in||!std.out){
+    viewDate=new Date(now.getFullYear(),now.getMonth(),1);
+    renderCalendar();
+    renderDashboard();
+    showScreen("jornada");
+    openDay(key);
+    return;
+  }
+  localStorage.setItem(STORAGE+"-"+key,JSON.stringify({
+    in:std.in,
+    out:std.out,
+    breaks:std.breaks,
+    lunchOut:std.breaks.length?std.breaks[0].out:"",
+    lunchIn:std.breaks.length?std.breaks[0].in:"",
+    note:""
+  }));
+  renderCalendar();
+  renderDashboard();
+  renderQuickToday();
+}
+// Editor do horário padrão (aba Jornada): mesmos cartões de
+// intervalo do editor do dia; salva automaticamente a cada mudança.
+function addStdBreakRow(out="",inn=""){
+  const row=document.createElement("div");
+  row.className="breakRow";
+  row.innerHTML=`<input type="time" class="stdBreakOut" value="${out}" aria-label="Saída para o intervalo">
+    <input type="time" class="stdBreakIn" value="${inn}" aria-label="Retorno do intervalo">
+    <button type="button" class="smallBtn" aria-label="Remover intervalo">✕</button>`;
+  row.querySelector("button").onclick=()=>{row.remove();saveStdSchedule();};
+  row.querySelectorAll("input").forEach(i=>i.addEventListener("change",saveStdSchedule));
+  $("stdBreaksList").appendChild(row);
+}
+function saveStdSchedule(){
+  localStorage.setItem(SETTINGS_PREFIX+"stdIn",$("stdIn").value||"");
+  localStorage.setItem(SETTINGS_PREFIX+"stdOut",$("stdOut").value||"");
+  const breaks=[];
+  document.querySelectorAll("#stdBreaksList .breakRow").forEach(r=>{
+    const o=r.querySelector(".stdBreakOut").value;
+    const i=r.querySelector(".stdBreakIn").value;
+    if(o&&i)breaks.push({out:o,in:i});
+  });
+  localStorage.setItem(SETTINGS_PREFIX+"stdBreaks",JSON.stringify(breaks));
+  renderQuickToday();
+}
+function loadStdScheduleUI(){
+  const std=loadStd();
+  if($("stdIn"))$("stdIn").value=std.in;
+  if($("stdOut"))$("stdOut").value=std.out;
+  if($("stdBreaksList")){
+    $("stdBreaksList").innerHTML="";
+    std.breaks.forEach(b=>addStdBreakRow(b.out,b.in));
+  }
 }
 // ---------- Backup (exportar/importar) ----------
 // Todos os dados do app vivem no localStorage com o prefixo "msj-":
@@ -822,6 +925,11 @@ $("themeBtn").onclick=()=>{document.body.classList.toggle("dark");localStorage.s
 if(localStorage.getItem("msj-theme")==="dark")document.body.classList.add("dark");
 document.querySelectorAll(".navTab").forEach(b=>b.onclick=()=>showScreen(b.dataset.screen));
 $("empChip").onclick=()=>showScreen("ajustes");
+$("quickToday").onclick=quickToday;
+$("addStdBreak").onclick=()=>addStdBreakRow();
+$("stdIn").addEventListener("change",saveStdSchedule);
+$("stdOut").addEventListener("change",saveStdSchedule);
+loadStdScheduleUI();
 showScreen(localStorage.getItem(SCREEN_KEY)||"inicio");
 calculate();renderCalendar();renderDashboard();
 
