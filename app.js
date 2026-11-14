@@ -130,6 +130,7 @@ function renderHome(){
     : "Cadastre o total de dias de yukiu na aba Jornada.";
   $("homeYukiuBar").style.width=total>0?`${Math.min(100,(used/total)*100)}%`:"0%";
   renderPunch();
+  renderBackupReminder();
 }
 // ---------- Registro rápido de hoje (V5.1) ----------
 // Horário padrão por funcionário (entrada, saída e intervalos),
@@ -321,6 +322,102 @@ function loadStdScheduleUI(){
     std.breaks.forEach(b=>addStdBreakRow(b.out,b.in));
   }
 }
+// ---------- Lembrete de backup (V5.3) ----------
+// Os dados vivem só no aparelho: se passar de 30 dias do último
+// backup exportado (ou se nunca houve um, já existindo dias
+// registrados), a tela Início mostra um alerta e a tela Ajustes
+// mostra a data do último backup.
+const BACKUP_REMINDER_DAYS=30;
+function lastBackupAt(){
+  const t=Number(localStorage.getItem("msj-lastBackupAt")||0);
+  return t>0?t:null;
+}
+function backupAgeDays(){
+  const t=lastBackupAt();
+  if(!t)return null;
+  return Math.floor((Date.now()-t)/86400000);
+}
+function totalDayRecords(){
+  let n=0;
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k&&k.includes("-days-"))n++;
+  }
+  return n;
+}
+function renderBackupReminder(){
+  const t=lastBackupAt();
+  const age=backupAgeDays();
+  const when=t?new Date(t).toLocaleDateString("pt-BR"):"";
+  const line=$("backupReminder");
+  if(line){
+    if(!t)line.textContent="⚠️ Você ainda não exportou nenhum backup. Seus registros ficam só neste aparelho — exporte um arquivo e guarde em local seguro.";
+    else if(age>=BACKUP_REMINDER_DAYS)line.textContent=`⚠️ Último backup em ${when} — já faz ${age} dia(s). Exporte um novo pra manter seus registros protegidos.`;
+    else line.textContent=`✔️ Último backup em ${when} (há ${age} dia(s)). Tudo certo por aqui.`;
+  }
+  const alertBox=$("homeBackupAlert");
+  if(alertBox){
+    const overdue=totalDayRecords()>0&&(!t||age>=BACKUP_REMINDER_DAYS);
+    alertBox.classList.toggle("hidden",!overdue);
+    if(overdue){
+      $("homeBackupText").textContent=!t
+        ? "Você tem dias registrados e ainda não exportou nenhum backup. Se o aparelho der problema, o histórico se perde."
+        : `Faz ${age} dia(s) que você não exporta um backup (último em ${when}). Toque no botão pra exportar e manter o histórico protegido.`;
+    }
+  }
+}
+// ---------- Resumo anual (V5.3) ----------
+// Totais do ano por funcionário (bruto, líquido, dias, horas,
+// extras e yukiu), somando os 12 meses com as mesmas regras do
+// painel mensal. Pensado pra declaração de fim de ano.
+let annualYear=new Date().getFullYear();
+function yukiuInYear(bases,year){
+  let total=0;
+  const prefix=bases.days+"-"+year+"-";
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(!k||!k.startsWith(prefix))continue;
+    try{
+      const d=JSON.parse(localStorage.getItem(k)||"null");
+      if(d)total+=Number(d.yukiu)||0;
+    }catch(e){}
+  }
+  return total;
+}
+function renderAnnual(){
+  const box=$("annualSummary");
+  if(!box)return;
+  $("annualYearLabel").textContent=String(annualYear);
+  let totGross=0,totNet=0,anyGross=false,anyNet=false;
+  const blocks=employees.map(emp=>{
+    const bases=employeeBases(emp);
+    let gross=0,net=0,days=0,hours=0,overtime=0,hasGross=false,hasNet=false;
+    for(let m=1;m<=12;m++){
+      const s=monthStatsFor(emp,`${annualYear}-${String(m).padStart(2,"0")}`);
+      days+=s.days;hours+=s.hours;overtime+=s.overtime;
+      if(s.gross!=null){gross+=s.gross;hasGross=true;}
+      if(s.net!=null){net+=s.net;hasNet=true;}
+    }
+    if(hasGross){totGross+=gross;anyGross=true;}
+    if(hasNet){totNet+=net;anyNet=true;}
+    const yk=yukiuInYear(bases,annualYear);
+    return `<div class="annualEmp">
+      <div class="annualEmpHead"><span class="dot" style="background:${emp.color}"></span><strong>${esc(emp.name)}</strong></div>
+      <div class="metricGrid">
+        <div class="metricCard"><div class="metricTitle">💴 Bruto no ano</div><strong>${hasGross?money(gross):"—"}</strong></div>
+        <div class="metricCard"><div class="metricTitle">💰 Líquido no ano</div><strong>${hasNet?money(net):"—"}</strong></div>
+        <div class="metricCard"><div class="metricTitle">📅 Dias trabalhados</div><strong>${days}</strong></div>
+        <div class="metricCard"><div class="metricTitle">⏱️ Horas</div><strong>${fmtHours(hours)}</strong></div>
+        <div class="metricCard"><div class="metricTitle">➕ Extras</div><strong>${fmtHours(overtime)}</strong></div>
+        <div class="metricCard"><div class="metricTitle">🏖️ Yukiu usado</div><strong>${fmtDays(yk)} dia(s)</strong></div>
+      </div>
+    </div>`;
+  }).join("");
+  const couple=employees.length>1
+    ? `<div class="metricCard totalCard annualTotal"><div class="metricTitle">💑 Total do casal em ${annualYear} (líquido)</div><strong>${anyNet?money(totNet):"—"}</strong><span>Bruto somado: ${anyGross?money(totGross):"—"}</span></div>`
+    : "";
+  box.innerHTML=blocks+couple+`<p class="dashboardNote">Bruto e líquido somam o valor salvo de cada mês (ou a estimativa das configurações, quando o mês ainda não foi salvo na calculadora). Dias, horas e yukiu vêm dos dias registrados no calendário.</p>`;
+}
 // ---------- Backup (exportar/importar) ----------
 // Todos os dados do app vivem no localStorage com o prefixo "msj-":
 // dias (msj-v4-2-days-*), meses (msj-v4-3-months-*) e configurações.
@@ -354,6 +451,9 @@ function applyBackup(backup){
   return keys.length;
 }
 function exportBackup(){
+  // A data do backup fica salva ANTES de montar o arquivo: assim
+  // ela viaja dentro do próprio backup e é restaurada na importação.
+  localStorage.setItem("msj-lastBackupAt",String(Date.now()));
   const backup=collectBackup();
   const days=countBackupDays(backup.data);
   const blob=new Blob([JSON.stringify(backup,null,2)],{type:"application/json"});
@@ -365,6 +465,7 @@ function exportBackup(){
   a.remove();
   setTimeout(()=>URL.revokeObjectURL(a.href),4000);
   $("backupStatus").textContent=`Backup exportado com ${days} dia(s) registrados. Guarde o arquivo em local seguro.`;
+  renderBackupReminder();
 }
 function importBackupFile(file){
   const reader=new FileReader();
@@ -782,6 +883,7 @@ function renderDashboard(){
     el.onclick=()=>openMonth(el.dataset.month);
   });
   renderCouple();
+  renderAnnual();
 }
 function renderPairChart(title,labels,series,format){
   const all=series.flatMap(s=>s.values).filter(v=>typeof v==="number");
@@ -1016,6 +1118,9 @@ document.querySelectorAll(".navTab").forEach(b=>b.onclick=()=>showScreen(b.datas
 $("empChip").onclick=()=>showScreen("ajustes");
 $("punchBtn").onclick=punchMain;
 $("punchStd").onclick=quickToday;
+$("homeBackupBtn").onclick=()=>showScreen("ajustes");
+$("prevYear").onclick=()=>{annualYear--;renderAnnual();};
+$("nextYear").onclick=()=>{annualYear++;renderAnnual();};
 let lastPunchMinute=-1;
 setInterval(()=>{
   const clock=$("punchClock");
