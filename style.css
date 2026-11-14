@@ -42,8 +42,13 @@ main{max-width:760px;margin:auto;padding:16px 14px calc(104px + env(safe-area-in
 .heroNet strong{display:block;font-size:36px;letter-spacing:-.02em;margin:5px 0 3px;font-variant-numeric:tabular-nums}
 .heroNet .heroChange{font-size:12.5px;font-weight:700;opacity:.95}
 .homeStats{margin-bottom:12px}
-.quickToday{margin:0 0 4px}
-.quickTodayInfo{text-align:center;font-size:12.5px;color:var(--muted);font-weight:600;margin:0 0 14px}
+.punchCard{margin-bottom:12px}
+.punchHead{display:flex;justify-content:space-between;align-items:baseline;font-weight:800;font-size:15px;margin-bottom:6px}
+.punchClock{font-variant-numeric:tabular-nums;font-size:20px;color:var(--accent);letter-spacing:.01em}
+.punchStatus{margin:0;font-size:13px;color:var(--muted);font-weight:600}
+.punchBtn{margin-top:12px}
+.punchStdBtn{width:100%;margin-top:9px;border:0;border-radius:13px;padding:12px;background:var(--chip);color:var(--ink);font-size:14px;font-weight:700;cursor:pointer;transition:transform .15s ease}
+.punchStdBtn:active{transform:scale(.98)}
 .stdBox{margin-top:14px}
 .stdHead{margin-top:0}
 .stdBox .grid input{margin-top:6px}
