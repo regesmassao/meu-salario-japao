@@ -491,7 +491,7 @@ function importBackupFile(file){
 // deste aparelho (criado se ainda não existir), remapeando os
 // prefixos — no celular da outra pessoa, ela é a funcionária
 // principal; aqui, os dias dela vão para o prefixo próprio dela.
-const MERGE_SETTING_FIELDS=["hourlyRate","monthlySalary","baseHours","nightPercent","nightFixed","mealMonthly","otherAllowance","summerBonus","winterBonus","deduction","employmentInsurance","incomeTax","advanceSalary","utilities","rentDeduction","otherDeduction","yukiuTotal","mode","deductionMode","bonusSummerMonth","bonusWinterMonth","stdIn","stdOut","stdBreaks"];
+const MERGE_SETTING_FIELDS=["hourlyRate","monthlySalary","baseHours","nightPercent","nightFixed","mealMonthly","otherAllowance","summerBonus","winterBonus","deduction","employmentInsurance","incomeTax","advanceSalary","utilities","rentDeduction","otherDeduction","yukiuTotal","offHours","offPercent","mode","deductionMode","bonusSummerMonth","bonusWinterMonth","stdIn","stdOut","stdBreaks"];
 function mergeNormName(s){return String(s||"").trim().toLocaleLowerCase("pt-BR")}
 function planMerge(backup){
   if(!backup||typeof backup!=="object"||!backup.data||typeof backup.data!=="object")throw new Error("invalid backup");
@@ -579,7 +579,7 @@ function dayBreaks(data){
 }
 function calcDay(data){
   const start=timeMinutes(data.in), out=timeMinutes(data.out);
-  if(start==null||out==null)return {hours:0,worked:0,break:0,normal:0,overtime:0,night:0,nightDay:false};
+  if(start==null||out==null)return {hours:0,worked:0,break:0,normal:0,overtime:0,night:0,nightDay:false,off:0,offRate:null};
   const total=duration(start,out);
   let breakM=0;
   let nightM=nightOverlap(start,out);
@@ -591,7 +591,15 @@ function calcDay(data){
   }
   const worked=Math.max(0,total-breakM);
   nightM=Math.max(0,nightM);
-  return {hours:worked/60,worked,break:breakM,normal:Math.min(worked,480)/60,overtime:Math.max(0,worked-480)/60,night:nightM/60,nightDay:nightM>0};
+  // Folga trabalhada (V5.5): se o dia tem "off" (0, 25 ou 35), TODAS
+  // as horas do dia são pagas com esse adicional — não há divisão
+  // entre horas normais e extras. O adicional noturno continua
+  // contado à parte (na lei, ele soma: folga +35% e noturno +25%).
+  const offRate=(typeof data.off==="number"&&Number.isFinite(data.off))?data.off:null;
+  if(offRate!=null&&worked>0){
+    return {hours:worked/60,worked,break:breakM,normal:0,overtime:0,night:nightM/60,nightDay:nightM>0,off:worked/60,offRate};
+  }
+  return {hours:worked/60,worked,break:breakM,normal:Math.min(worked,480)/60,overtime:Math.max(0,worked-480)/60,night:nightM/60,nightDay:nightM>0,off:0,offRate:null};
 }
 function fmtHours(h){
   const total=Math.round(h*60);
@@ -626,6 +634,7 @@ function renderCalendar(){
     if(data)b.classList.add("hasData");
     else{const r=rawDay(key);if(r&&r.in)b.classList.add("hasData")}
     if(data&&Number(data.yukiu)>0)b.classList.add("yukiuDay");
+    if(data&&typeof data.off==="number")b.classList.add("offDay");
     b.onclick=()=>openDay(key);
     grid.appendChild(b);
   }
@@ -666,6 +675,7 @@ function openDay(key){
   $("timeIn").value=data.in||"";
   $("timeOut").value=data.out||"";
   $("dayYukiu").value=String(Number(data.yukiu)||0);
+  $("dayOff").value=(typeof data.off==="number")?String(data.off):"";
   $("breaksList").innerHTML="";
   const breaks=dayBreaks(data);
   if(breaks.length)breaks.forEach(b=>addBreakRow(b.out||"",b.in||""));
@@ -676,7 +686,8 @@ function openDay(key){
   $("dayEditor").scrollIntoView({behavior:"smooth",block:"nearest"});
 }
 function updateDaySummary(){
-  const data={in:$("timeIn").value,out:$("timeOut").value,breaks:collectBreaks()};
+  const offSel=$("dayOff")?.value;
+  const data={in:$("timeIn").value,out:$("timeOut").value,breaks:collectBreaks(),off:(offSel===""||offSel==null)?undefined:Number(offSel)};
   const c=calcDay(data);
   const yk=Number($("dayYukiu")?.value||0);
   const ykLabel=yk===0.5?"meio dia":"dia inteiro";
@@ -686,10 +697,11 @@ function updateDaySummary(){
   }
   const br=c.break?` · intervalo ${fmtHours(c.break/60)}`:"";
   const extra=c.overtime?` · Extra: ${fmtHours(c.overtime)}`:"";
+  const offText=c.off?` · 💪 Folga trabalhada (+${c.offRate}% o dia todo)`:"";
   const night=c.night?` · 🌙 Noturno: ${fmtHours(c.night)}`:"";
   const nd=c.nightDay?" · 1 dia noturno":"";
   const ykText=yk?` · 🏖️ Yukiu: ${ykLabel}`:"";
-  $("daySummary").textContent=c.worked?`⏱️ Trabalhado: ${fmtHours(c.hours)}${br}${extra}${night}${nd}${ykText}`:"Preencha entrada e saída para calcular.";
+  $("daySummary").textContent=c.worked?`⏱️ Trabalhado: ${fmtHours(c.hours)}${br}${extra}${offText}${night}${nd}${ykText}`:"Preencha entrada e saída para calcular.";
 }
 function saveCurrentDay(){
   if(!selectedKey)return;
@@ -698,6 +710,8 @@ function saveCurrentDay(){
   // do app continuarem lendo o dia de forma aproximada.
   const yukiu=Number($("dayYukiu")?.value||0);
   const data={in:$("timeIn").value,out:$("timeOut").value,breaks,lunchOut:breaks[0]?.out||"",lunchIn:breaks[0]?.in||"",note:$("dayNote").value.trim(),yukiu};
+  const offSel=$("dayOff")?.value;
+  if(offSel!==""&&offSel!=null)data.off=Number(offSel);
   if(!yukiu&&(!data.in||!data.out)){alert("Informe pelo menos a entrada e a saída.");return}
   saveData(selectedKey,data);
   renderCalendar();
@@ -707,7 +721,7 @@ function saveCurrentDay(){
 function renderHistory(){
   const y=viewDate.getFullYear(),m=viewDate.getMonth(),count=new Date(y,m+1,0).getDate();
   const h=$("history");h.innerHTML="";
-  let total=0,normalTotal=0,overtimeTotal=0,nightTotal=0,nightDays=0,days=0,rows=0,yukiuMonth=0;
+  let total=0,normalTotal=0,overtimeTotal=0,nightTotal=0,nightDays=0,days=0,rows=0,yukiuMonth=0,offTotal=0,offWeighted=0;
   for(let d=1;d<=count;d++){
     const key=keyFor(y,m,d),data=dayData(key);
     if(!data)continue;
@@ -715,23 +729,29 @@ function renderHistory(){
     const yk=Number(data.yukiu)||0;
     if(!c.worked&&!yk)continue;
     yukiuMonth+=yk;
-    if(c.worked){days++;total+=c.hours;normalTotal+=c.normal;overtimeTotal+=c.overtime;nightTotal+=c.night;if(c.nightDay)nightDays++;}
+    if(c.worked){days++;total+=c.hours;normalTotal+=c.normal;overtimeTotal+=c.overtime;nightTotal+=c.night;if(c.nightDay)nightDays++;offTotal+=c.off;offWeighted+=c.off*(1+(c.offRate||0)/100);}
     rows++;
     const row=document.createElement("div");row.className="row";
     const date=document.createElement("div");date.textContent=String(d).padStart(2,"0")+"/"+String(m+1).padStart(2,"0");
     const times=document.createElement("div");
-    if(c.worked)times.textContent=`${data.in} → ${data.out}${yk?" · 🏖️ yukiu ("+(yk===0.5?"meio dia":"dia inteiro")+")":""}${data.note?" · "+data.note:""}`;
+    const offBadge=typeof data.off==="number"?(data.off===0?" · 💪 folga (como dia normal)":` · 💪 folga +${data.off}%`):"";
+    if(c.worked)times.textContent=`${data.in} → ${data.out}${offBadge}${yk?" · 🏖️ yukiu ("+(yk===0.5?"meio dia":"dia inteiro")+")":""}${data.note?" · "+data.note:""}`;
     else times.textContent=`🏖️ Yukiu (${yk===0.5?"meio dia":"dia inteiro"})${data.note?" · "+data.note:""}`;
     const hours=document.createElement("div");hours.className="hours";hours.textContent=c.worked?fmtHours(c.hours):"🏖️";
     row.append(date,times,hours);row.onclick=()=>openDay(key);row.style.cursor="pointer";h.appendChild(row);
   }
   if(!rows)h.innerHTML='<div class="empty">Nenhum dia registrado neste mês.</div>';
   const ykMonthText=yukiuMonth?` · 🏖️ Yukiu no mês: ${fmtDays(yukiuMonth)} dia(s)`:"";
-  $("monthTotals").textContent=`${days} dia(s) · ${fmtHours(total)} · Normais: ${fmtHours(normalTotal)} · Extras: ${fmtHours(overtimeTotal)} · Noturnas: ${fmtHours(nightTotal)} · Dias noturnos: ${nightDays}${ykMonthText}`;
+  const offMonthText=offTotal?` · 💪 Folga: ${fmtHours(offTotal)}`:"";
+  $("monthTotals").textContent=`${days} dia(s) · ${fmtHours(total)} · Normais: ${fmtHours(normalTotal)} · Extras: ${fmtHours(overtimeTotal)}${offMonthText} · Noturnas: ${fmtHours(nightTotal)} · Dias noturnos: ${nightDays}${ykMonthText}`;
   $("normalHours").value=normalTotal.toFixed(2);
   $("overtimeHours").value=fmtHoursShort(overtimeTotal);
   $("nightHours").value=nightTotal.toFixed(2);
   $("nightDays").value=String(nightDays);
+  // Folga: o campo da calculadora guarda as horas já convertidas
+  // pelo adicional de cada dia, divididas pelo adicional configurado
+  // — assim o valor final sai exato mesmo com taxas diferentes.
+  $("offHours").value=offWeighted>0?(offWeighted/(1+val("offPercent")/100)).toFixed(2):"0";
   calculate();
 }
 
@@ -781,12 +801,13 @@ function currentCalculatedValues(){
   const rate=hourlyRate();
   const normal=mode==="monthly"?val("monthlySalary"):rate*val("normalHours");
   const overtime=rate*1.25*val("overtimeHours");
+  const off=rate*(1+val("offPercent")/100)*val("offHours");
   const night=rate*(val("nightPercent")/100)*val("nightHours")+val("nightFixed")*val("nightDays");
   const meal=val("mealMonthly");
   const bonus=bonusForMonth();
-  const gross=normal+overtime+night+meal+val("otherAllowance")+bonus;
+  const gross=normal+overtime+off+night+meal+val("otherAllowance")+bonus;
   const d=deductionValues(gross);
-  return {gross,net:gross-d.total,mandatory:d.mandatory,otherDeductions:d.other,deductions:d.total,bonus};
+  return {gross,net:gross-d.total,mandatory:d.mandatory,otherDeductions:d.other,deductions:d.total,bonus,off};
 }
 function monthStats(key){
   const [y,m]=key.split("-").map(Number);
@@ -830,7 +851,7 @@ function estimateFor(emp,agg,date){
     ? storedNum(p,"monthlySalary")/Math.max(1,storedNum(p,"baseHours"))
     : storedNum(p,"hourlyRate");
   const normal=modeE==="monthly"?storedNum(p,"monthlySalary"):rate*agg.normal;
-  const overtime=rate*1.25*agg.overtime;
+  const overtime=rate*1.25*agg.overtime+(rate*(agg.offWeighted||0));
   const night=rate*(storedNum(p,"nightPercent")/100)*agg.night+storedNum(p,"nightFixed")*agg.nightDays;
   const sm=Number(localStorage.getItem(p+"bonusSummerMonth")||7);
   const wm=Number(localStorage.getItem(p+"bonusWinterMonth")||12);
@@ -852,23 +873,24 @@ function monthStatsFor(emp,key){
   const bases=employeeBases(emp);
   const [y,m]=key.split("-").map(Number);
   const count=new Date(y,m,0).getDate();
-  let hours=0,normal=0,overtime=0,night=0,nightDays=0,days=0;
+  let hours=0,normal=0,overtime=0,night=0,nightDays=0,days=0,offWeighted=0;
   for(let d=1;d<=count;d++){
     const data=dayDataFor(bases,`${key}-${String(d).padStart(2,"0")}`);
     if(!data)continue;
     const c=calcDay(data);
     if(!c.worked)continue;
     days++; hours+=c.hours; normal+=c.normal; overtime+=c.overtime; night+=c.night;
+    offWeighted+=c.off*(1+(c.offRate||0)/100);
     if(c.nightDay)nightDays++;
   }
   let gross=null,net=null;
   const snap=snapshotFor(bases,key);
   if(snap){gross=snap.gross??null;net=snap.net??null;}
   else{
-    const est=estimateFor(emp,{normal,overtime,night,nightDays},new Date(y,m-1,1));
+    const est=estimateFor(emp,{normal,overtime,night,nightDays,offWeighted},new Date(y,m-1,1));
     if(est&&(days>0||est.fromMonthly)){gross=est.gross;net=est.net;}
   }
-  return {key,days,hours,overtime,night,nightDays,gross,net};
+  return {key,days,hours,overtime,night,nightDays,gross,net,offWeighted};
 }
 function changeText(current,previous){
   if(current==null||previous==null||previous===0)return "—";
@@ -1108,12 +1130,14 @@ function calculate(saveSnapshot=false){
   const rate=hourlyRate();
   const normal=mode==="monthly"?val("monthlySalary"):rate*val("normalHours");
   const overtime=rate*1.25*val("overtimeHours");
+  const off=rate*(1+val("offPercent")/100)*val("offHours");
   const night=rate*(val("nightPercent")/100)*val("nightHours")+val("nightFixed")*val("nightDays");
   const meal=val("mealMonthly");
   const bonus=bonusForMonth();
-  const gross=normal+overtime+night+meal+val("otherAllowance")+bonus;
+  const gross=normal+overtime+off+night+meal+val("otherAllowance")+bonus;
   const d=deductionValues(gross);
   const net=gross-d.total;
+  $("offOut").textContent=money(off);
   $("bonusOut").textContent=money(bonus);
   $("gross").textContent=money(gross);
   const detailed=$("deductionMode")?.value==="detailed";
@@ -1129,6 +1153,8 @@ function calculate(saveSnapshot=false){
       mode,deductionMode:$("deductionMode")?.value||"percent",
       normalHours:val("normalHours"),
       overtimeHours:val("overtimeHours"),
+      offHours:val("offHours"),
+      offPercent:val("offPercent"),
       nightHours:val("nightHours"),
       nightDays:val("nightDays")
     });
@@ -1151,7 +1177,7 @@ $("deductionMode").onchange=()=>{
 // Configurações da calculadora salvas por funcionário. Para o
 // funcionário principal o prefixo é o histórico "msj-", então os
 // valores já salvos (bônus etc.) continuam valendo sem migração.
-const SETTINGS_FIELDS=["hourlyRate","monthlySalary","baseHours","nightPercent","nightFixed","mealMonthly","otherAllowance","summerBonus","winterBonus","deduction","employmentInsurance","incomeTax","advanceSalary","utilities","rentDeduction","otherDeduction","yukiuTotal"];
+const SETTINGS_FIELDS=["hourlyRate","monthlySalary","baseHours","nightPercent","nightFixed","mealMonthly","otherAllowance","summerBonus","winterBonus","deduction","employmentInsurance","incomeTax","advanceSalary","utilities","rentDeduction","otherDeduction","yukiuTotal","offHours","offPercent"];
 SETTINGS_FIELDS.forEach(id=>{
   const el=$(id); if(!el)return;
   const saved=localStorage.getItem(SETTINGS_PREFIX+id);
@@ -1184,6 +1210,7 @@ $("calcBtn").onclick=()=>calculate(true);
 document.querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{if(i.closest(".card")&&i.id!=="dayNote")calculate();if(i.id.startsWith("time"))updateDaySummary()}));
 $("addBreak").onclick=()=>addBreakRow();
 $("dayYukiu").onchange=updateDaySummary;
+$("dayOff").onchange=updateDaySummary;
 $("yukiuTotal").addEventListener("input",renderYukiu);
 $("prevMonth").onclick=()=>{viewDate.setMonth(viewDate.getMonth()-1);renderCalendar();renderDashboard()};
 $("nextMonth").onclick=()=>{viewDate.setMonth(viewDate.getMonth()+1);renderCalendar();renderDashboard()};
