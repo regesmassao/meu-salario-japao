@@ -109,6 +109,12 @@
     </div>
   </div>
 
+  <div class="yukiuBox">
+    <label>Dias de yukiu cadastrados<input id="yukiuTotal" type="number" inputmode="decimal" value="0" min="0" step="0.5"></label>
+    <p id="yukiuStatus" class="yukiuStatus"></p>
+    <p class="yukiuNote">Marque o yukiu no editor do dia (toque no dia no calendário): o saldo diminui sozinho. Se apagar ou desmarcar o dia, o saldo volta.</p>
+  </div>
+
   <div class="calendar">
     <div class="week"><span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span></div>
     <div id="calendarGrid" class="days"></div>
@@ -123,6 +129,13 @@
       <label>Entrada<input id="timeIn" type="time"></label>
       <label>Saída<input id="timeOut" type="time"></label>
     </div>
+    <label>🏖️ Yukiu neste dia
+      <select id="dayYukiu">
+        <option value="0">Não</option>
+        <option value="1">Dia inteiro</option>
+        <option value="0.5">Meio dia</option>
+      </select>
+    </label>
     <div class="breaksHead">
       <strong>⏸️ Intervalos (kyukei) — não remunerados</strong>
       <button id="addBreak" type="button" class="smallBtn">+ Adicionar intervalo</button>
@@ -159,7 +172,7 @@
 </section>
 </main>
 
-<footer>Meu Salário Japão 🇯🇵 — V4.8</footer>
+<footer>Meu Salário Japão 🇯🇵 — V4.9</footer>
 <script src="app.js"></script>
 </body>
 </html>

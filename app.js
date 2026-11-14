@@ -60,6 +60,40 @@ function dayDataFor(bases,key){
 function dayData(key){return dayDataFor(ACTIVE_BASES,key)}
 function saveData(key,data){localStorage.setItem(STORAGE+"-"+key,JSON.stringify(data))}
 function deleteData(key){localStorage.removeItem(STORAGE+"-"+key)}
+// ---------- Yukiu (férias remuneradas) ----------
+// O total de dias é cadastrado por funcionário (configuração
+// "yukiuTotal"). No editor do dia, o campo yukiu guarda 1 (dia
+// inteiro) ou 0,5 (meio dia). O saldo é calculado a partir dos
+// dias salvos: total cadastrado − soma dos yukiu marcados.
+// Apagar ou desmarcar o dia devolve o saldo automaticamente.
+function yukiuUsedFor(bases){
+  const prefix=bases.days+"-";
+  let used=0;
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(!k||!k.startsWith(prefix))continue;
+    try{
+      const d=JSON.parse(localStorage.getItem(k)||"null");
+      if(d)used+=Number(d.yukiu)||0;
+    }catch(e){}
+  }
+  return used;
+}
+function fmtDays(n){
+  const r=Math.round(n*10)/10;
+  return Number.isInteger(r)?String(r):String(r).replace(".",",");
+}
+function renderYukiu(){
+  const el=$("yukiuStatus");
+  if(!el)return;
+  const total=val("yukiuTotal");
+  if(total<=0){
+    el.textContent="🏖️ Cadastre acima o total de dias de yukiu deste funcionário para acompanhar o saldo.";
+    return;
+  }
+  const used=yukiuUsedFor(ACTIVE_BASES);
+  el.textContent=`🏖️ Yukiu: usados ${fmtDays(used)} · restam ${fmtDays(total-used)} de ${fmtDays(total)} dia(s)`;
+}
 // ---------- Backup (exportar/importar) ----------
 // Todos os dados do app vivem no localStorage com o prefixo "msj-":
 // dias (msj-v4-2-days-*), meses (msj-v4-3-months-*) e configurações.
@@ -189,10 +223,12 @@ function renderCalendar(){
     const today=new Date();
     if(yy===today.getFullYear()&&mm===today.getMonth()&&d===today.getDate())b.classList.add("today");
     if(data)b.classList.add("hasData");
+    if(data&&Number(data.yukiu)>0)b.classList.add("yukiuDay");
     b.onclick=()=>openDay(key);
     grid.appendChild(b);
   }
   renderHistory();
+  renderYukiu();
 }
 function addBreakRow(outVal="",inVal=""){
   const row=document.createElement("div");
@@ -227,6 +263,7 @@ function openDay(key){
   $("editorDate").textContent=new Date(y,m,d).toLocaleDateString("pt-BR",{weekday:"long",day:"2-digit",month:"2-digit",year:"numeric"});
   $("timeIn").value=data.in||"";
   $("timeOut").value=data.out||"";
+  $("dayYukiu").value=String(Number(data.yukiu)||0);
   $("breaksList").innerHTML="";
   const breaks=dayBreaks(data);
   if(breaks.length)breaks.forEach(b=>addBreakRow(b.out||"",b.in||""));
@@ -239,19 +276,27 @@ function openDay(key){
 function updateDaySummary(){
   const data={in:$("timeIn").value,out:$("timeOut").value,breaks:collectBreaks()};
   const c=calcDay(data);
+  const yk=Number($("dayYukiu")?.value||0);
+  const ykLabel=yk===0.5?"meio dia":"dia inteiro";
+  if(!c.worked&&yk){
+    $("daySummary").textContent=`🏖️ Dia de yukiu (${ykLabel}) — será descontado do saldo ao salvar. Não precisa preencher entrada e saída.`;
+    return;
+  }
   const br=c.break?` · intervalo ${fmtHours(c.break/60)}`:"";
   const extra=c.overtime?` · Extra: ${fmtHours(c.overtime)}`:"";
   const night=c.night?` · 🌙 Noturno: ${fmtHours(c.night)}`:"";
   const nd=c.nightDay?" · 1 dia noturno":"";
-  $("daySummary").textContent=c.worked?`⏱️ Trabalhado: ${fmtHours(c.hours)}${br}${extra}${night}${nd}`:"Preencha entrada e saída para calcular.";
+  const ykText=yk?` · 🏖️ Yukiu: ${ykLabel}`:"";
+  $("daySummary").textContent=c.worked?`⏱️ Trabalhado: ${fmtHours(c.hours)}${br}${extra}${night}${nd}${ykText}`:"Preencha entrada e saída para calcular.";
 }
 function saveCurrentDay(){
   if(!selectedKey)return;
   const breaks=collectBreaks();
   // lunchOut/lunchIn espelham o primeiro intervalo, para versões antigas
   // do app continuarem lendo o dia de forma aproximada.
-  const data={in:$("timeIn").value,out:$("timeOut").value,breaks,lunchOut:breaks[0]?.out||"",lunchIn:breaks[0]?.in||"",note:$("dayNote").value.trim()};
-  if(!data.in||!data.out){alert("Informe pelo menos a entrada e a saída.");return}
+  const yukiu=Number($("dayYukiu")?.value||0);
+  const data={in:$("timeIn").value,out:$("timeOut").value,breaks,lunchOut:breaks[0]?.out||"",lunchIn:breaks[0]?.in||"",note:$("dayNote").value.trim(),yukiu};
+  if(!yukiu&&(!data.in||!data.out)){alert("Informe pelo menos a entrada e a saída.");return}
   saveData(selectedKey,data);
   renderCalendar();
   renderDashboard();
@@ -260,20 +305,27 @@ function saveCurrentDay(){
 function renderHistory(){
   const y=viewDate.getFullYear(),m=viewDate.getMonth(),count=new Date(y,m+1,0).getDate();
   const h=$("history");h.innerHTML="";
-  let total=0,normalTotal=0,overtimeTotal=0,nightTotal=0,nightDays=0,days=0;
+  let total=0,normalTotal=0,overtimeTotal=0,nightTotal=0,nightDays=0,days=0,rows=0,yukiuMonth=0;
   for(let d=1;d<=count;d++){
     const key=keyFor(y,m,d),data=dayData(key);
     if(!data)continue;
-    const c=calcDay(data); if(!c.worked)continue;
-    days++;total+=c.hours;normalTotal+=c.normal;overtimeTotal+=c.overtime;nightTotal+=c.night;if(c.nightDay)nightDays++;
+    const c=calcDay(data);
+    const yk=Number(data.yukiu)||0;
+    if(!c.worked&&!yk)continue;
+    yukiuMonth+=yk;
+    if(c.worked){days++;total+=c.hours;normalTotal+=c.normal;overtimeTotal+=c.overtime;nightTotal+=c.night;if(c.nightDay)nightDays++;}
+    rows++;
     const row=document.createElement("div");row.className="row";
     const date=document.createElement("div");date.textContent=String(d).padStart(2,"0")+"/"+String(m+1).padStart(2,"0");
-    const times=document.createElement("div");times.textContent=`${data.in} → ${data.out}${data.note?" · "+data.note:""}`;
-    const hours=document.createElement("div");hours.className="hours";hours.textContent=fmtHours(c.hours);
+    const times=document.createElement("div");
+    if(c.worked)times.textContent=`${data.in} → ${data.out}${yk?" · 🏖️ yukiu ("+(yk===0.5?"meio dia":"dia inteiro")+")":""}${data.note?" · "+data.note:""}`;
+    else times.textContent=`🏖️ Yukiu (${yk===0.5?"meio dia":"dia inteiro"})${data.note?" · "+data.note:""}`;
+    const hours=document.createElement("div");hours.className="hours";hours.textContent=c.worked?fmtHours(c.hours):"🏖️";
     row.append(date,times,hours);row.onclick=()=>openDay(key);row.style.cursor="pointer";h.appendChild(row);
   }
-  if(!days)h.innerHTML='<div class="empty">Nenhum dia registrado neste mês.</div>';
-  $("monthTotals").textContent=`${days} dia(s) · ${fmtHours(total)} · Normais: ${fmtHours(normalTotal)} · Extras: ${fmtHours(overtimeTotal)} · Noturnas: ${fmtHours(nightTotal)} · Dias noturnos: ${nightDays}`;
+  if(!rows)h.innerHTML='<div class="empty">Nenhum dia registrado neste mês.</div>';
+  const ykMonthText=yukiuMonth?` · 🏖️ Yukiu no mês: ${fmtDays(yukiuMonth)} dia(s)`:"";
+  $("monthTotals").textContent=`${days} dia(s) · ${fmtHours(total)} · Normais: ${fmtHours(normalTotal)} · Extras: ${fmtHours(overtimeTotal)} · Noturnas: ${fmtHours(nightTotal)} · Dias noturnos: ${nightDays}${ykMonthText}`;
   $("normalHours").value=normalTotal.toFixed(2);
   $("overtimeHours").value=fmtHoursShort(overtimeTotal);
   $("nightHours").value=nightTotal.toFixed(2);
@@ -669,7 +721,7 @@ $("deductionMode").onchange=()=>{
 // Configurações da calculadora salvas por funcionário. Para o
 // funcionário principal o prefixo é o histórico "msj-", então os
 // valores já salvos (bônus etc.) continuam valendo sem migração.
-const SETTINGS_FIELDS=["hourlyRate","monthlySalary","baseHours","nightPercent","nightFixed","mealMonthly","otherAllowance","summerBonus","winterBonus","deduction","employmentInsurance","incomeTax","advanceSalary","utilities","rentDeduction","otherDeduction"];
+const SETTINGS_FIELDS=["hourlyRate","monthlySalary","baseHours","nightPercent","nightFixed","mealMonthly","otherAllowance","summerBonus","winterBonus","deduction","employmentInsurance","incomeTax","advanceSalary","utilities","rentDeduction","otherDeduction","yukiuTotal"];
 SETTINGS_FIELDS.forEach(id=>{
   const el=$(id); if(!el)return;
   const saved=localStorage.getItem(SETTINGS_PREFIX+id);
@@ -701,6 +753,8 @@ SETTINGS_FIELDS.forEach(id=>{
 $("calcBtn").onclick=()=>calculate(true);
 document.querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{if(i.closest(".card")&&i.id!=="dayNote")calculate();if(i.id.startsWith("time"))updateDaySummary()}));
 $("addBreak").onclick=()=>addBreakRow();
+$("dayYukiu").onchange=updateDaySummary;
+$("yukiuTotal").addEventListener("input",renderYukiu);
 $("prevMonth").onclick=()=>{viewDate.setMonth(viewDate.getMonth()-1);renderCalendar();renderDashboard()};
 $("nextMonth").onclick=()=>{viewDate.setMonth(viewDate.getMonth()+1);renderCalendar();renderDashboard()};
 $("saveDay").onclick=saveCurrentDay;
