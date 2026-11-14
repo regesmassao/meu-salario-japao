@@ -94,6 +94,42 @@ function renderYukiu(){
   const used=yukiuUsedFor(ACTIVE_BASES);
   el.textContent=`🏖️ Yukiu: usados ${fmtDays(used)} · restam ${fmtDays(total-used)} de ${fmtDays(total)} dia(s)`;
 }
+// ---------- Navegação por abas (V5.0) ----------
+// O app é dividido em 5 telas (inicio, calculadora, jornada, casal,
+// ajustes); a barra inferior troca a tela visível e a última tela
+// aberta é lembrada para a próxima visita.
+const SCREEN_KEY="msj-screen";
+const SCREEN_NAMES=["inicio","calculadora","jornada","casal","ajustes"];
+function showScreen(name){
+  if(!SCREEN_NAMES.includes(name))name="inicio";
+  document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("active",s.dataset.screen===name));
+  document.querySelectorAll(".navTab").forEach(b=>b.classList.toggle("active",b.dataset.screen===name));
+  localStorage.setItem(SCREEN_KEY,name);
+  window.scrollTo(0,0);
+}
+// ---------- Tela Início ----------
+// Resumo do mês exibido (mesmo mês do calendário): líquido em
+// destaque, bruto/dias/horas/extras, saldo de yukiu e — no cartão
+// preenchido por renderCouple — o total do casal.
+function renderHome(){
+  if(!$("homeNet"))return;
+  const s=monthStats(monthlyKey());
+  const prev=monthStats(monthlyKey(new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1)));
+  $("homeMonth").textContent=viewDate.toLocaleDateString("pt-BR",{month:"long",year:"numeric"});
+  $("homeNet").textContent=s.net==null?"—":money(s.net);
+  $("homeNetChange").textContent=(s.net!=null&&prev.net!=null)?`${changeText(s.net,prev.net)} vs. mês anterior`:"";
+  $("homeGross").textContent=s.gross==null?"—":money(s.gross);
+  $("homeDays").textContent=String(s.days);
+  $("homeHours").textContent=fmtHours(s.hours);
+  $("homeOvertime").textContent=fmtHours(s.overtime);
+  const total=val("yukiuTotal");
+  const used=yukiuUsedFor(ACTIVE_BASES);
+  $("homeYukiuLeft").textContent=total>0?fmtDays(total-used):"—";
+  $("homeYukiuText").textContent=total>0
+    ? `${fmtDays(used)} usado(s) de ${fmtDays(total)} dia(s) cadastrados`
+    : "Cadastre o total de dias de yukiu na aba Jornada.";
+  $("homeYukiuBar").style.width=total>0?`${Math.min(100,(used/total)*100)}%`:"0%";
+}
 // ---------- Backup (exportar/importar) ----------
 // Todos os dados do app vivem no localStorage com o prefixo "msj-":
 // dias (msj-v4-2-days-*), meses (msj-v4-3-months-*) e configurações.
@@ -512,6 +548,7 @@ function openMonth(key){
   viewDate=new Date(y,m-1,1);
   renderCalendar();
   renderDashboard();
+  showScreen("jornada");
   $("calendarGrid").scrollIntoView({behavior:"smooth",block:"start"});
 }
 function renderDashboard(){
@@ -597,6 +634,13 @@ function renderCouple(){
       <strong>${esc(e.name)}</strong>${e.id===activeEmployee.id?'<span class="empBadge">ativo</span>':""}
       <span class="empBtns"><button type="button" class="smallBtn" data-act="rename" data-id="${e.id}">Renomear</button>${e.id!=="principal"?`<button type="button" class="smallBtn" data-act="delete" data-id="${e.id}">Excluir</button>`:""}</span>
     </div>`).join("");
+  const hc=$("homeCouple");
+  if(hc){
+    hc.innerHTML=`
+      <div class="metricTitle">💑 Total do casal — ${monthName(monthlyKey())}</div>
+      <strong class="homeCoupleValue">${money(totalNet)}</strong>
+      <span>${sel.map(({emp,s})=>`${esc(emp.name)} ${s.net==null?"—":money(s.net)}`).join(" + ")}</span>`;
+  }
   box.innerHTML=`
     <div class="sectionHead dashboardHead">
       <div><h2>👥 Funcionários — visão do casal</h2><p>Líquido de cada funcionário no mês selecionado e o total dos dois juntos.</p></div>
@@ -631,6 +675,8 @@ function renderEmployeeSelect(){
   const sel=$("employeeSelect");
   if(!sel)return;
   sel.innerHTML=employees.map(e=>`<option value="${e.id}"${e.id===activeEmployee.id?" selected":""}>${esc(e.name)}</option>`).join("");
+  const chip=$("empChipName");
+  if(chip)chip.textContent=activeEmployee.name;
 }
 function setActiveEmployee(id){
   if(!employees.some(e=>e.id===id))return;
@@ -705,6 +751,7 @@ function calculate(saveSnapshot=false){
     });
     renderDashboard();
   }
+  renderHome();
 }
 document.querySelectorAll(".tab").forEach(btn=>btn.onclick=()=>{
   mode=btn.dataset.mode;
@@ -773,6 +820,9 @@ $("importFile").addEventListener("change",e=>{
 });
 $("themeBtn").onclick=()=>{document.body.classList.toggle("dark");localStorage.setItem("msj-theme",document.body.classList.contains("dark")?"dark":"light")};
 if(localStorage.getItem("msj-theme")==="dark")document.body.classList.add("dark");
+document.querySelectorAll(".navTab").forEach(b=>b.onclick=()=>showScreen(b.dataset.screen));
+$("empChip").onclick=()=>showScreen("ajustes");
+showScreen(localStorage.getItem(SCREEN_KEY)||"inicio");
 calculate();renderCalendar();renderDashboard();
 
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
