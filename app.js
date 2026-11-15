@@ -60,6 +60,8 @@ employerNamePh:"Nome da empresa onde você trabalha agora",
 psEmployerLbl:"Empresa deste holerite",
 pairTapHint:"Toque num mês para ver os valores",
 pairCombined:"Juntos",
+sumDayPay:" · 💴 {v}",
+totalsEarned:" · 💴 Acumulado do mês: {v}",
 slipCardTitle:"🧾 Holerite do mês",
 slipIntro:"Ao receber o holerite, fotografe ele aqui: o app lê os totais, grava o mês com os valores oficiais e explica cada linha.",
 slipBtn:"📷 Ler holerite de {month}",
@@ -218,6 +220,8 @@ employerNamePh:"今働いている会社名",
 psEmployerLbl:"この明細の会社",
 pairTapHint:"月をタップすると金額が表示されます",
 pairCombined:"合計",
+sumDayPay:" · 💴 {v}",
+totalsEarned:" · 💴 月の累計：{v}",
 slipCardTitle:"🧾 今月の給与明細",
 slipIntro:"給与明細を受け取ったら写真を撮ってください。合計を読み取り、正式な金額で月を保存し、各項目を説明します。",
 slipBtn:"📷 {month}の明細を読む",
@@ -376,6 +380,8 @@ employerNamePh:"Name of the company you work at now",
 psEmployerLbl:"Employer on this payslip",
 pairTapHint:"Tap a month to see the values",
 pairCombined:"Together",
+sumDayPay:" · 💴 {v}",
+totalsEarned:" · 💴 Month so far: {v}",
 slipCardTitle:"🧾 This month's payslip",
 slipIntro:"When your payslip arrives, photograph it here: the app reads the totals, saves the month with the official values and explains each line.",
 slipBtn:"📷 Read the {month} payslip",
@@ -534,6 +540,8 @@ employerNamePh:"Tên công ty bạn đang làm việc",
 psEmployerLbl:"Công ty trên phiếu này",
 pairTapHint:"Chạm vào một tháng để xem số tiền",
 pairCombined:"Tổng cộng",
+sumDayPay:" · 💴 {v}",
+totalsEarned:" · 💴 Lũy kế tháng: {v}",
 slipCardTitle:"🧾 Phiếu lương tháng này",
 slipIntro:"Khi nhận phiếu lương, hãy chụp tại đây: ứng dụng đọc tổng số, lưu tháng với giá trị chính thức và giải thích từng dòng.",
 slipBtn:"📷 Đọc phiếu lương {month}",
@@ -692,6 +700,8 @@ employerNamePh:"तपाईं अहिले काम गर्ने कम
 psEmployerLbl:"यो पर्चीको कम्पनी",
 pairTapHint:"रकम हेर्न महिनामा ट्याप गर्नुहोस्",
 pairCombined:"जम्मा",
+sumDayPay:" · 💴 {v}",
+totalsEarned:" · 💴 महिनाको जम्मा: {v}",
 slipCardTitle:"🧾 यो महिनाको तलब पर्ची",
 slipIntro:"तलब पर्ची पाएपछि यहाँ फोटो खिच्नुहोस्: एपले जम्मा रकम पढ्छ, आधिकारिक मानहरूसहित महिना सुरक्षित गर्छ र प्रत्येक लाइन व्याख्या गर्छ।",
 slipBtn:"📷 {month} को पर्ची पढ्नुहोस्",
@@ -1512,6 +1522,16 @@ function openDay(key){
   updateDaySummary();
   $("dayEditor").scrollIntoView({behavior:"smooth",block:"nearest"});
 }
+// Valor estimado de um dia trabalhado, pelas configurações do
+// funcionário ativo: normais + extras (×1,25) + folga trabalhada
+// (com o adicional daquele dia) + adicional noturno.
+function dayPay(c){
+  if(!c||!c.worked)return 0;
+  const rate=hourlyRate();
+  let v=(c.normal||0)*rate+(c.overtime||0)*rate*1.25+(c.off||0)*rate*(1+(c.offRate||0)/100)+(c.night||0)*rate*(val("nightPercent")/100);
+  if(c.nightDay)v+=val("nightFixed");
+  return v;
+}
 function updateDaySummary(){
   const offSel=$("dayOff")?.value;
   const data={in:$("timeIn").value,out:$("timeOut").value,breaks:collectBreaks(),off:(offSel===""||offSel==null)?undefined:Number(offSel)};
@@ -1528,7 +1548,9 @@ function updateDaySummary(){
   const night=c.night?t("sumNight",{hours:fmtHours(c.night)}):"";
   const nd=c.nightDay?t("sumNightDay"):"";
   const ykText=yk?t("sumYukiu",{label:ykLabel}):"";
-  $("daySummary").textContent=c.worked?`${t("sumWorked",{hours:fmtHours(c.hours)})}${br}${extra}${offText}${night}${nd}${ykText}`:t("sumFillInOut");
+  const dp=c.worked?dayPay(c):0;
+  const payText=dp>0?t("sumDayPay",{v:money(dp)}):"";
+  $("daySummary").textContent=c.worked?`${t("sumWorked",{hours:fmtHours(c.hours)})}${br}${extra}${offText}${night}${nd}${ykText}${payText}`:t("sumFillInOut");
 }
 function saveCurrentDay(){
   if(!selectedKey)return;
@@ -1548,7 +1570,7 @@ function saveCurrentDay(){
 function renderHistory(){
   const y=viewDate.getFullYear(),m=viewDate.getMonth(),count=new Date(y,m+1,0).getDate();
   const h=$("history");h.innerHTML="";
-  let total=0,normalTotal=0,overtimeTotal=0,nightTotal=0,nightDays=0,days=0,rows=0,yukiuMonth=0,offTotal=0,offWeighted=0;
+  let total=0,normalTotal=0,overtimeTotal=0,nightTotal=0,nightDays=0,days=0,rows=0,yukiuMonth=0,offTotal=0,offWeighted=0,earnedTotal=0;
   for(let d=1;d<=count;d++){
     const key=keyFor(y,m,d),data=dayData(key);
     if(!data)continue;
@@ -1556,7 +1578,7 @@ function renderHistory(){
     const yk=Number(data.yukiu)||0;
     if(!c.worked&&!yk)continue;
     yukiuMonth+=yk;
-    if(c.worked){days++;total+=c.hours;normalTotal+=c.normal;overtimeTotal+=c.overtime;nightTotal+=c.night;if(c.nightDay)nightDays++;offTotal+=c.off;offWeighted+=c.off*(1+(c.offRate||0)/100);}
+    if(c.worked){days++;total+=c.hours;normalTotal+=c.normal;overtimeTotal+=c.overtime;nightTotal+=c.night;if(c.nightDay)nightDays++;offTotal+=c.off;offWeighted+=c.off*(1+(c.offRate||0)/100);earnedTotal+=dayPay(c);}
     rows++;
     const row=document.createElement("div");row.className="row";
     const date=document.createElement("div");date.textContent=String(d).padStart(2,"0")+"/"+String(m+1).padStart(2,"0");
@@ -1564,11 +1586,12 @@ function renderHistory(){
     const offBadge=typeof data.off==="number"?(data.off===0?t("histOffNormal"):t("histOffPct",{rate:data.off})):"";
     if(c.worked)times.textContent=`${data.in} → ${data.out}${offBadge}${yk?t("histYukiu",{label:yk===0.5?t("halfDay"):t("fullDay")}):""}${data.note?" · "+data.note:""}`;
     else times.textContent=`${t("histYukiuOnly",{label:yk===0.5?t("halfDay"):t("fullDay")})}${data.note?" · "+data.note:""}`;
-    const hours=document.createElement("div");hours.className="hours";hours.textContent=c.worked?fmtHours(c.hours):"🏖️";
+    const hours=document.createElement("div");hours.className="hours";hours.textContent=c.worked?`${fmtHours(c.hours)} · ${money(dayPay(c))}`:"🏖️";
     row.append(date,times,hours);row.onclick=()=>openDay(key);row.style.cursor="pointer";h.appendChild(row);
   }
   if(!rows)h.innerHTML=`<div class="empty">${t("histEmpty")}</div>`;
   $("monthTotals").textContent=t("totalsLine",{days,hours:fmtHours(total),normal:fmtHours(normalTotal),overtime:fmtHours(overtimeTotal),off:offTotal?t("totalsOff",{hours:fmtHours(offTotal)}):"",night:fmtHours(nightTotal),nightDays,yukiu:yukiuMonth?t("totalsYukiu",{days:fmtDays(yukiuMonth)}):""});
+  if(earnedTotal>0)$("monthTotals").textContent+=t("totalsEarned",{v:money(earnedTotal)});
   $("normalHours").value=normalTotal.toFixed(2);
   $("overtimeHours").value=fmtHoursShort(overtimeTotal);
   $("nightHours").value=nightTotal.toFixed(2);
