@@ -137,6 +137,48 @@
   <button id="calcBtn" class="primary" data-i18n="calcBtn">Calcular</button>
 </section>
 </section>
+<section class="card" id="payslipCard">
+  <h2 data-i18n="slipCardTitle">🧾 Holerite do mês</h2>
+  <p data-i18n="slipIntro">Ao receber o holerite, fotografe ele aqui: o app lê os totais, grava o mês com os valores oficiais e explica cada linha.</p>
+  <p class="slipHint" data-i18n="slipHint">Dica de foto: aproxime bem os quadros de totais (parte de cima do holerite), com boa luz e a folha reta. A foto fica só no seu aparelho.</p>
+  <div id="slipChecked" class="slipChecked hidden"></div>
+  <button id="payslipBtn" class="primary" type="button">📷 Ler holerite</button>
+  <button id="raioxBtn" class="psBtn2 hidden" type="button">🔍 Raio-X deste mês</button>
+  <input id="payslipFile" type="file" accept="image/*" class="hidden">
+  <div id="payslipPanel" class="hidden">
+    <div id="ocrStatus" class="hidden">
+      <p id="ocrStatusText"></p>
+      <div class="ocrBarWrap"><div id="ocrBar"></div></div>
+    </div>
+    <div id="payslipReview" class="hidden">
+      <h3 data-i18n="reviewTitle">Confira a leitura e corrija o que estiver errado</h3>
+      <p id="ocrFailNote" class="psFail hidden" data-i18n="ocrFail">Não consegui ler tudo desta foto. Confira e complete os valores abaixo — dá pra salvar mesmo assim.</p>
+      <div class="grid">
+        <label><span data-i18n="psGrossLbl">Bruto total (¥)</span><input id="psGross" type="number" inputmode="numeric" min="0"></label>
+        <label><span data-i18n="psNetLbl">Líquido (¥)</span><input id="psNet" type="number" inputmode="numeric" min="0"></label>
+        <label><span data-i18n="psDaysLbl">Dias trabalhados</span><input id="psDays" type="number" inputmode="decimal" min="0" step="0.5"></label>
+        <label><span data-i18n="psOtLbl">Horas extras (h)</span><input id="psOt" type="number" inputmode="decimal" min="0" step="0.01"></label>
+        <label><span data-i18n="psNightLbl">Horas noturnas (h)</span><input id="psNight" type="number" inputmode="decimal" min="0" step="0.01"></label>
+      </div>
+      <h3 data-i18n="psEarnTitle">💴 Pagamentos</h3>
+      <div id="psEarnLines"></div>
+      <button id="psAddEarn" class="psBtn2" type="button" data-i18n="psAddLine">＋ Adicionar linha</button>
+      <h3 data-i18n="psDedTitle">🧾 Descontos</h3>
+      <div id="psDedLines"></div>
+      <button id="psAddDed" class="psBtn2" type="button" data-i18n="psAddLine">＋ Adicionar linha</button>
+      <p id="psCheck" class="psCheck"></p>
+      <p class="psDisclaimer" data-i18n="slipDisclaimer">Guarde o holerite original (papel ou PDF da empresa). Este app apenas organiza e explica as informações — ele não substitui o documento oficial. Para prefeitura, impostos ou qualquer questão com o empregador, vale sempre o original.</p>
+      <button id="psSave" class="primary" type="button" data-i18n="psSaveBtn">Salvar leitura do mês</button>
+      <button id="psCancel" class="psBtn2" type="button" data-i18n="psCancelBtn">Cancelar</button>
+    </div>
+  </div>
+  <div id="raioxPanel" class="hidden">
+    <h3 id="raioxTitle">🔍 Raio-X</h3>
+    <div id="raioxBody"></div>
+    <p class="psDisclaimer" data-i18n="raioxDisclaimer">Explicação educativa, a partir da leitura salva. Não substitui o holerite original nem orientação profissional (contador, advogado ou Hello Work).</p>
+    <button id="raioxClose" class="psBtn2" type="button" data-i18n="raioxClose">Fechar</button>
+  </div>
+</section>
 
 <section class="screen" data-screen="jornada" id="screen-jornada">
 <section class="card">
@@ -289,7 +331,7 @@
   <p id="backupReminder" class="backupReminder"></p>
 </section>
 
-<footer>Meu Salário Japão 🇯🇵 — V5.6.1<br><span data-i18n="copyrightLine">© 2026 Reges Massao da Costa — Todos os direitos reservados</span></footer>
+<footer>Meu Salário Japão 🇯🇵 — V5.7<br><span data-i18n="copyrightLine">© 2026 Reges Massao da Costa — Todos os direitos reservados</span></footer>
 </section>
 </main>
 

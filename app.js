@@ -55,6 +55,38 @@ const I18N={
 pt:{
 appSubtitle:"Calculadora e controle de jornada",
 copyrightLine:"© 2026 Reges Massao da Costa — Todos os direitos reservados",
+slipCardTitle:"🧾 Holerite do mês",
+slipIntro:"Ao receber o holerite, fotografe ele aqui: o app lê os totais, grava o mês com os valores oficiais e explica cada linha.",
+slipBtn:"📷 Ler holerite de {month}",
+slipHint:"Dica de foto: aproxime bem os quadros de totais (parte de cima do holerite), com boa luz e a folha reta. A foto fica só no seu aparelho.",
+raioxBtn:"🔍 Raio-X deste mês",
+slipChecked:"✔️ Mês conferido pelo holerite em {date}",
+ocrEngine:"Baixando o leitor de japonês… (só na primeira vez; precisa de internet)",
+ocrReading:"Lendo a foto… {pct}%",
+ocrFail:"Não consegui ler tudo desta foto. Confira e complete os valores abaixo — dá pra salvar mesmo assim.",
+reviewTitle:"Confira a leitura e corrija o que estiver errado",
+psGrossLbl:"Bruto total (¥)",
+psNetLbl:"Líquido (¥)",
+psDaysLbl:"Dias trabalhados",
+psOtLbl:"Horas extras (h)",
+psNightLbl:"Horas noturnas (h)",
+psEarnTitle:"💴 Pagamentos",
+psDedTitle:"🧾 Descontos",
+psAddLine:"＋ Adicionar linha",
+psCustom:"Outro (digitar o nome)",
+psLineName:"Nome da linha (como está no holerite)",
+psSaveBtn:"Salvar leitura do mês",
+psCancelBtn:"Cancelar",
+psCheckOk:"✔️ As contas fecham com os totais.",
+psCheckWarn:"⚠️ Diferença de {diff} entre as linhas e os totais — confira no holerite original.",
+slipDisclaimer:"Guarde o holerite original (papel ou PDF da empresa). Este app apenas organiza e explica as informações — ele não substitui o documento oficial. Para prefeitura, impostos ou qualquer questão com o empregador, vale sempre o original.",
+raioxTitle:"🔍 Raio-X de {month}",
+raioxUnknown:"Item não reconhecido",
+raioxUnknownNote:"Confira este item no holerite original ou pergunte ao empregador.",
+raioxDisclaimer:"Explicação educativa, a partir da leitura salva. Não substitui o holerite original nem orientação profissional (contador, advogado ou Hello Work).",
+raioxClose:"Fechar",
+psSavedMsg:"Leitura salva! O mês agora usa os valores do holerite.",
+psNeedValues:"Preencha pelo menos o bruto e o líquido para salvar.",
 themeToggle:"Alternar tema",
 navHome:"Início",navCalc:"Calculadora",navWork:"Jornada",navCouple:"Casal",navSettings:"Ajustes",
 homeNetMonth:"Líquido do mês",
@@ -176,6 +208,38 @@ mergeDone:"Backup juntado com sucesso: {days} dia(s) incorporados. Recarregando 
 ja:{
 appSubtitle:"給与計算と勤務管理",
 copyrightLine:"© 2026 Reges Massao da Costa — 無断転載・複製を禁じます",
+slipCardTitle:"🧾 今月の給与明細",
+slipIntro:"給与明細を受け取ったら写真を撮ってください。合計を読み取り、正式な金額で月を保存し、各項目を説明します。",
+slipBtn:"📷 {month}の明細を読む",
+slipHint:"撮影のコツ：明細の上部にある合計欄に近づけて、明るい場所でまっすぐ撮ってください。写真は端末の中だけに残ります。",
+raioxBtn:"🔍 今月の明細チェック",
+slipChecked:"✔️ {date}に明細で確認済み",
+ocrEngine:"日本語リーダーをダウンロード中…（初回のみ・要インターネット）",
+ocrReading:"写真を読み取り中… {pct}%",
+ocrFail:"この写真では全部読めませんでした。下の金額を確認・入力してください。そのまま保存できます。",
+reviewTitle:"読み取り結果を確認し、間違いを直してください",
+psGrossLbl:"総支給額 (¥)",
+psNetLbl:"差引支給額 (¥)",
+psDaysLbl:"出勤日数",
+psOtLbl:"残業時間 (h)",
+psNightLbl:"深夜時間 (h)",
+psEarnTitle:"💴 支給",
+psDedTitle:"🧾 控除",
+psAddLine:"＋ 行を追加",
+psCustom:"その他（名前を入力）",
+psLineName:"項目名（明細の表記どおり）",
+psSaveBtn:"この月の読み取りを保存",
+psCancelBtn:"キャンセル",
+psCheckOk:"✔️ 合計と一致しています。",
+psCheckWarn:"⚠️ 項目と合計に{diff}の差があります — 元の明細で確認してください。",
+slipDisclaimer:"給与明細の原本（紙または会社のPDF）は必ず保管してください。このアプリは情報の整理と説明のためのもので、公式書類の代わりにはなりません。役所・税金・会社との手続きでは常に原本が有効です。",
+raioxTitle:"🔍 {month}の明細チェック",
+raioxUnknown:"不明な項目",
+raioxUnknownNote:"元の明細で確認するか、会社に聞いてください。",
+raioxDisclaimer:"保存した読み取りに基づく説明です。原本や専門家（税理士・弁護士・ハローワーク）の代わりにはなりません。",
+raioxClose:"閉じる",
+psSavedMsg:"保存しました。この月は明細の金額で表示されます。",
+psNeedValues:"保存には総支給額と差引支給額が必要です。",
 themeToggle:"テーマを切り替え",
 navHome:"ホーム",navCalc:"給与計算",navWork:"勤務",navCouple:"カップル",navSettings:"設定",
 homeNetMonth:"今月の手取り",
@@ -297,6 +361,38 @@ mergeDone:"合体が完了しました：{days} 日分を取り込みました�
 en:{
 appSubtitle:"Salary calculator & work log",
 copyrightLine:"© 2026 Reges Massao da Costa — All rights reserved",
+slipCardTitle:"🧾 This month's payslip",
+slipIntro:"When your payslip arrives, photograph it here: the app reads the totals, saves the month with the official values and explains each line.",
+slipBtn:"📷 Read the {month} payslip",
+slipHint:"Photo tip: get close to the totals boxes (top of the payslip), with good light and the page flat. The photo never leaves your phone.",
+raioxBtn:"🔍 This month's payslip X-ray",
+slipChecked:"✔️ Month checked against the payslip on {date}",
+ocrEngine:"Downloading the Japanese reader… (first time only; needs internet)",
+ocrReading:"Reading the photo… {pct}%",
+ocrFail:"I couldn't read everything in this photo. Check and complete the values below — you can still save.",
+reviewTitle:"Check the reading and fix anything wrong",
+psGrossLbl:"Gross total (¥)",
+psNetLbl:"Net pay (¥)",
+psDaysLbl:"Days worked",
+psOtLbl:"Overtime hours (h)",
+psNightLbl:"Night hours (h)",
+psEarnTitle:"💴 Payments",
+psDedTitle:"🧾 Deductions",
+psAddLine:"＋ Add line",
+psCustom:"Other (type the name)",
+psLineName:"Line name (as on the payslip)",
+psSaveBtn:"Save this month's reading",
+psCancelBtn:"Cancel",
+psCheckOk:"✔️ The lines match the totals.",
+psCheckWarn:"⚠️ A {diff} difference between lines and totals — check the original payslip.",
+slipDisclaimer:"Keep the original payslip (paper or the company's PDF). This app only organises and explains the information — it does not replace the official document. For city hall, taxes or any matter with your employer, the original always prevails.",
+raioxTitle:"🔍 {month} payslip X-ray",
+raioxUnknown:"Unrecognised item",
+raioxUnknownNote:"Check this item on the original payslip or ask your employer.",
+raioxDisclaimer:"Educational explanation based on the saved reading. It does not replace the original payslip or professional advice (accountant, lawyer or Hello Work).",
+raioxClose:"Close",
+psSavedMsg:"Reading saved! This month now uses the payslip values.",
+psNeedValues:"Fill in at least the gross and net to save.",
 themeToggle:"Toggle theme",
 navHome:"Home",navCalc:"Calculator",navWork:"Work log",navCouple:"Couple",navSettings:"Settings",
 homeNetMonth:"Net pay this month",
@@ -418,6 +514,38 @@ mergeDone:"Backup merged successfully: {days} day(s) added. Reloading the app…
 vi:{
 appSubtitle:"Tính lương & quản lý giờ làm",
 copyrightLine:"© 2026 Reges Massao da Costa — Mọi quyền được bảo lưu",
+slipCardTitle:"🧾 Phiếu lương tháng này",
+slipIntro:"Khi nhận phiếu lương, hãy chụp tại đây: ứng dụng đọc tổng số, lưu tháng với giá trị chính thức và giải thích từng dòng.",
+slipBtn:"📷 Đọc phiếu lương {month}",
+slipHint:"Mẹo chụp: lại gần các ô tổng (phần trên của phiếu lương), đủ sáng và giấy phẳng. Ảnh chỉ ở trong máy của bạn.",
+raioxBtn:"🔍 Soi phiếu lương tháng này",
+slipChecked:"✔️ Đã đối chiếu phiếu lương ngày {date}",
+ocrEngine:"Đang tải bộ đọc tiếng Nhật… (chỉ lần đầu; cần internet)",
+ocrReading:"Đang đọc ảnh… {pct}%",
+ocrFail:"Không đọc hết được ảnh này. Hãy kiểm tra và bổ sung các giá trị bên dưới — vẫn lưu được.",
+reviewTitle:"Kiểm tra kết quả đọc và sửa chỗ sai",
+psGrossLbl:"Tổng lương gộp (¥)",
+psNetLbl:"Lương thực nhận (¥)",
+psDaysLbl:"Số ngày làm",
+psOtLbl:"Giờ tăng ca (h)",
+psNightLbl:"Giờ ban đêm (h)",
+psEarnTitle:"💴 Các khoản trả",
+psDedTitle:"🧾 Các khoản trừ",
+psAddLine:"＋ Thêm dòng",
+psCustom:"Khác (tự nhập tên)",
+psLineName:"Tên dòng (như trên phiếu lương)",
+psSaveBtn:"Lưu kết quả đọc tháng này",
+psCancelBtn:"Hủy",
+psCheckOk:"✔️ Các dòng khớp với tổng.",
+psCheckWarn:"⚠️ Chênh lệch {diff} giữa các dòng và tổng — kiểm tra phiếu lương gốc.",
+slipDisclaimer:"Hãy giữ phiếu lương gốc (bản giấy hoặc PDF của công ty). Ứng dụng này chỉ sắp xếp và giải thích thông tin — không thay thế tài liệu chính thức. Với tòa thị chính, thuế hoặc việc với công ty, bản gốc luôn có giá trị.",
+raioxTitle:"🔍 Soi phiếu lương {month}",
+raioxUnknown:"Mục chưa nhận biết",
+raioxUnknownNote:"Kiểm tra mục này trên phiếu lương gốc hoặc hỏi công ty.",
+raioxDisclaimer:"Giải thích mang tính tham khảo, dựa trên kết quả đọc đã lưu. Không thay thế phiếu lương gốc hay tư vấn chuyên môn (kế toán, luật sư, Hello Work).",
+raioxClose:"Đóng",
+psSavedMsg:"Đã lưu! Tháng này dùng giá trị từ phiếu lương.",
+psNeedValues:"Hãy nhập ít nhất lương gộp và thực nhận để lưu.",
 themeToggle:"Đổi giao diện",
 navHome:"Trang chủ",navCalc:"Tính lương",navWork:"Giờ làm",navCouple:"Cặp đôi",navSettings:"Cài đặt",
 homeNetMonth:"Lương thực nhận tháng này",
@@ -539,6 +667,38 @@ mergeDone:"Đã gộp sao lưu thành công: thêm {days} ngày. Đang tải l�
 ne:{
 appSubtitle:"तलब क्याल्कुलेटर र कामको रेकर्ड",
 copyrightLine:"© 2026 Reges Massao da Costa — सर्वाधिकार सुरक्षित",
+slipCardTitle:"🧾 यो महिनाको तलब पर्ची",
+slipIntro:"तलब पर्ची पाएपछि यहाँ फोटो खिच्नुहोस्: एपले जम्मा रकम पढ्छ, आधिकारिक मानहरूसहित महिना सुरक्षित गर्छ र प्रत्येक लाइन व्याख्या गर्छ।",
+slipBtn:"📷 {month} को पर्ची पढ्नुहोस्",
+slipHint:"फोटो टिप: जम्मा बक्सहरू (पर्चीको माथिल्लो भाग) नजिकबाट, राम्रो उज्यालोमा र पाना सिधा राखेर खिच्नुहोस्। फोटो तपाईंको फोनमै रहन्छ।",
+raioxBtn:"🔍 यो महिनाको पर्ची विश्लेषण",
+slipChecked:"✔️ {date} मा पर्चीसँग जाँचियो",
+ocrEngine:"जापानी रिडर डाउनलोड हुँदैछ… (पहिलो पटक मात्र; इन्टरनेट चाहिन्छ)",
+ocrReading:"फोटो पढ्दैछ… {pct}%",
+ocrFail:"यो फोटोबाट सबै पढ्न सकिएन। तलका मानहरू जाँचेर पूरा गर्नुहोस् — तैपनि सुरक्षित गर्न सकिन्छ।",
+reviewTitle:"पढेको नतिजा जाँच्नुहोस् र गल्ती सच्याउनुहोस्",
+psGrossLbl:"कुल तलब (¥)",
+psNetLbl:"शुद्ध तलब (¥)",
+psDaysLbl:"काम गरेको दिन",
+psOtLbl:"ओभरटाइम घण्टा (h)",
+psNightLbl:"रातको घण्टा (h)",
+psEarnTitle:"💴 भुक्तानीहरू",
+psDedTitle:"🧾 कटौतीहरू",
+psAddLine:"＋ लाइन थप्नुहोस्",
+psCustom:"अन्य (नाम लेख्नुहोस्)",
+psLineName:"लाइनको नाम (पर्चीमा भएजस्तै)",
+psSaveBtn:"यो महिनाको नतिजा सुरक्षित गर्नुहोस्",
+psCancelBtn:"रद्द गर्नुहोस्",
+psCheckOk:"✔️ लाइनहरू जम्मासँग मिल्छन्।",
+psCheckWarn:"⚠️ लाइन र जम्माबीच {diff} फरक छ — मूल पर्चीमा जाँच्नुहोस्।",
+slipDisclaimer:"मूल तलब पर्ची (कागज वा कम्पनीको PDF) राख्नुहोस्। यो एपले जानकारी व्यवस्थित र व्याख्या मात्र गर्छ — आधिकारिक कागजातको विकल्प होइन। नगरपालिका, कर वा कम्पनीसँगको काममा सधैं मूल नै मान्य हुन्छ।",
+raioxTitle:"🔍 {month} को पर्ची विश्लेषण",
+raioxUnknown:"नचिनिएको 항목",
+raioxUnknownNote:"यो 항목 मूल पर्चीमा जाँच्नुहोस् वा कम्पनीलाई सोध्नुहोस्।",
+raioxDisclaimer:"सुरक्षित गरिएको नतिजामा आधारित शैक्षिक व्याख्या। मूल पर्ची वा व्यावसायिक सल्लाह (लेखापाल, वकिल, Hello Work) को विकल्प होइन।",
+raioxClose:"बन्द गर्नुहोस्",
+psSavedMsg:"सुरक्षित भयो! यो महिनामा अब पर्चीका मानहरू प्रयोग हुन्छन्।",
+psNeedValues:"सुरक्षित गर्न कम्तिमा कुल र शुद्ध तलब भर्नुहोस्।",
 themeToggle:"थिम बदल्नुहोस्",
 navHome:"गृहपृष्ठ",navCalc:"क्याल्कुलेटर",navWork:"कामको रेकर्ड",navCouple:"जोडी",navSettings:"सेटिङ",
 homeNetMonth:"यो महिनाको खुद तलब",
@@ -1405,6 +1565,395 @@ function monthName(key){
   const [y,m]=key.split("-").map(Number);
   return new Date(y,m-1,1).toLocaleDateString(LOCALES[LANG],{month:"short",year:"2-digit"}).replace(".", "");
 }
+// ===== V5.7: leitura do holerite (OCR) + Raio-X linha a linha =====
+// Dicionário de termos de holerite japonês. match: nomes como aparecem
+// no documento (o parser ignora espaços). name/desc/check nos 5 idiomas.
+const PAYSLIP_TERMS=[
+{id:"basePay",kind:"earn",match:["基本給","基本賃金"],
+name:{pt:"Salário-base",ja:"基本給",en:"Base pay",vi:"Lương cơ bản",ne:"आधार तलब"},
+desc:{pt:"O valor fixo do contrato, sem adicionais. Para quem recebe por hora, é horas normais × valor-hora.",ja:"契約で決まった固定給。時給の場合は通常時間×時給です。",en:"Your fixed contract pay, before extras. For hourly workers: normal hours × hourly rate.",vi:"Mức lương cố định theo hợp đồng, chưa gồm phụ cấp. Nếu tính theo giờ: giờ thường × lương giờ.",ne:"सम्झौताको निश्चित तलब, अतिरिक्त बिना। घण्टाको हिसाबले: सामान्य घण्टा × प्रति घण्टा दर।"},
+check:{pt:"Confira se o valor-hora é o do contrato.",ja:"時給が契約どおりか確認しましょう。",en:"Check the hourly rate matches your contract.",vi:"Kiểm tra lương giờ có đúng hợp đồng không.",ne:"प्रति घण्टा दर सम्झौताअनुसार छ कि जाँच्नुहोस्।"}},
+{id:"overtimePay",kind:"earn",match:["残業金額","残業手当","時間外手当","時間外勤務手当","残業代"],
+name:{pt:"Horas extras",ja:"残業代",en:"Overtime pay",vi:"Tiền tăng ca",ne:"ओभरटाइम भुक्तानी"},
+desc:{pt:"Pagamento pelas horas além da jornada normal, com adicional (em geral +25%).",ja:"所定時間を超えた労働への割増賃金です（通常+25%）。",en:"Pay for hours beyond the normal schedule, with a premium (usually +25%).",vi:"Tiền cho giờ làm ngoài giờ thường, có phụ cấp (thường +25%).",ne:"सामान्य समयभन्दा बढी कामको भुक्तानी, प्रिमियमसहित (सामान्यतया +25%)।"},
+check:{pt:"Compare as horas extras com o seu controle no app.",ja:"アプリの記録と残業時間を比べましょう。",en:"Compare the overtime hours with your records in the app.",vi:"So sánh giờ tăng ca với ghi chép trong ứng dụng.",ne:"ओभरटाइम घण्टा एपको रेकर्डसँग तुलना गर्नुहोस्।"}},
+{id:"nightPay",kind:"earn",match:["深夜金額","深夜手当","深夜勤務手当","深夜割増"],
+name:{pt:"Adicional noturno",ja:"深夜手当",en:"Night premium",vi:"Phụ cấp ca đêm",ne:"राति प्रिमियम"},
+desc:{pt:"Adicional pelo trabalho entre 22h e 5h (em geral +25% sobre a hora).",ja:"22時から5時までの労働への割増です（通常+25%）。",en:"Premium for work between 22:00 and 5:00 (usually +25% of the hourly rate).",vi:"Phụ cấp cho giờ làm từ 22h đến 5h (thường +25% lương giờ).",ne:"राति 22:00 देखि 5:00 सम्मको कामको प्रिमियम (सामान्यतया +25%)।"},
+check:{pt:"Confira se os dias após 22h batem com o app.",ja:"22時以降働いた日がアプリと合うか確認しましょう。",en:"Check days worked past 22:00 match the app.",vi:"Kiểm tra ngày làm sau 22h có khớp ứng dụng không.",ne:"22:00 पछि काम गरेका दिनहरू एपसँग मिल्छन् कि जाँच्नुहोस्।"}},
+{id:"holidayPay",kind:"earn",match:["休日出勤手当","法定休日","休日手当"],
+name:{pt:"Folga trabalhada / feriado",ja:"休日出勤手当",en:"Day-off / holiday work",vi:"Làm ngày nghỉ / lễ",ne:"बिदाको दिन काम"},
+desc:{pt:"Pagamento por trabalhar na folga ou feriado, com adicional (folga legal: +35%).",ja:"休日に働いた分の割増賃金です（法定休日は+35%）。",en:"Pay for working a day off or holiday, with a premium (statutory holiday: +35%).",vi:"Tiền làm vào ngày nghỉ hoặc lễ, có phụ cấp (ngày nghỉ luật định: +35%).",ne:"बिदा वा चाडपर्वमा काम गरेको भुक्तानी, प्रिमियमसहित (कानुनी बिदा: +35%)।"},
+check:{pt:"Confira o percentual combinado com a empresa.",ja:"会社と約束した割増率を確認しましょう。",en:"Check the premium rate agreed with the company.",vi:"Kiểm tra tỉ lệ phụ cấp đã thỏa thuận với công ty.",ne:"कम्पनीसँग सहमति भएको प्रिमियम दर जाँच्नुहोस्।"}},
+{id:"commute",kind:"earn",match:["通勤手当","交通費"],
+name:{pt:"Ajuda de transporte",ja:"通勤手当",en:"Commuting allowance",vi:"Phụ cấp đi lại",ne:"यातायात भत्ता"},
+desc:{pt:"Reembolso do trajeto casa–trabalho (passe, gasolina etc.).",ja:"自宅から職場までの交通費の支給です。",en:"Reimbursement for commuting (train pass, fuel, etc.).",vi:"Hỗ trợ chi phí đi lại nhà–nơi làm (vé tàu, xăng...).",ne:"घरदेखि कार्यस्थलसम्मको यातायात खर्च फिर्ता।"},
+check:{pt:"Se mudou de endereço, avise a empresa: o valor pode mudar.",ja:"引っ越したら会社に伝えましょう。金額が変わることがあります。",en:"Moved house? Tell the company — the amount can change.",vi:"Chuyển nhà thì báo công ty — số tiền có thể thay đổi.",ne:"घर सर्नुभयो भने कम्पनीलाई भन्नुहोस् — रकम बदलिन सक्छ।"}},
+{id:"housingAllow",kind:"earn",match:["住宅手当"],
+name:{pt:"Ajuda de moradia",ja:"住宅手当",en:"Housing allowance",vi:"Phụ cấp nhà ở",ne:"आवास भत्ता"},
+desc:{pt:"Benefício fixo da empresa para ajudar no aluguel.",ja:"家賃補助として会社が支給する手当です。",en:"A fixed company benefit toward your rent.",vi:"Phụ cấp cố định của công ty hỗ trợ tiền thuê nhà.",ne:"भाडामा सहयोगका लागि कम्पनीको निश्चित लाभ।"},
+check:{pt:"Ele entra no seu planejamento mensal como renda fixa.",ja:"毎月の固定収入として計画に入れましょう。",en:"Count it as fixed income in your monthly planning.",vi:"Tính nó là thu nhập cố định trong kế hoạch tháng.",ne:"यसलाई मासिक योजनामा निश्चित आम्दानी मान्नुहोस्।"}},
+{id:"familyAllow",kind:"earn",match:["家族手当","扶養手当"],
+name:{pt:"Ajuda família",ja:"家族手当",en:"Family allowance",vi:"Phụ cấp gia đình",ne:"परिवार भत्ता"},
+desc:{pt:"Benefício por dependentes (cônjuge/filhos), conforme a regra da empresa.",ja:"配偶者や子どもなど扶養家族への手当です（会社の規定によります）。",en:"Benefit for dependents (spouse/children), per company rules.",vi:"Phụ cấp cho người phụ thuộc (vợ/chồng/con), theo quy định công ty.",ne:"आश्रितहरूका लागि लाभ (पति/पत्नी/बच्चा), कम्पनीको नियमअनुसार।"},
+check:{pt:"Nascimento ou mudança na família pode alterar o valor.",ja:"出産や家族の変化で金額が変わることがあります。",en:"A birth or family change can alter the amount.",vi:"Sinh con hoặc thay đổi gia đình có thể đổi số tiền.",ne:"जन्म वा परिवार परिवर्तनले रकम बदलिन सक्छ।"}},
+{id:"mealAllow",kind:"earn",match:["食事手当","食費補助","昼食手当","食事補助"],
+name:{pt:"Ajuda alimentação",ja:"食事手当",en:"Meal allowance",vi:"Phụ cấp ăn uống",ne:"खाना भत्ता"},
+desc:{pt:"Benefício para refeição, fixo ou por dia trabalhado.",ja:"食事への補助です。固定額か勤務日数分の場合があります。",en:"Meal benefit, fixed or per worked day.",vi:"Phụ cấp ăn, cố định hoặc theo ngày làm.",ne:"खानाको लाभ, निश्चित वा काम गरेको दिनअनुसार।"},
+check:{pt:"Confira se foi pago em meses com faltas ou férias.",ja:"欠勤や有給の月も支給されたか確認しましょう。",en:"Check it was paid in months with absences or leave.",vi:"Kiểm tra có được trả trong tháng nghỉ phép không.",ne:"अनुपस्थिति वा बिदा भएको महिनामा भुक्तानी भयो कि जाँच्नुहोस्।"}},
+{id:"positionAllow",kind:"earn",match:["役職手当","職務手当"],
+name:{pt:"Adicional de função",ja:"役職手当",en:"Position allowance",vi:"Phụ cấp chức vụ",ne:"पद भत्ता"},
+desc:{pt:"Valor pago pelo cargo ou função exercida.",ja:"役職や担当業務に対して支払われる手当です。",en:"Extra pay for your role or position.",vi:"Phụ cấp cho chức vụ hoặc công việc đảm nhiệm.",ne:"तपाईंको पद वा भूमिकाका लागि अतिरिक्त भुक्तानी।"},
+check:{pt:"Mudança de função pode mudar este valor.",ja:"担当が変わると金額も変わることがあります。",en:"A role change can change this amount.",vi:"Đổi công việc có thể đổi số tiền này.",ne:"भूमिका परिवर्तनले यो रकम बदलिन सक्छ।"}},
+{id:"attendanceBonus",kind:"earn",match:["皆勤手当","精勤手当"],
+name:{pt:"Prêmio de assiduidade",ja:"皆勤手当",en:"Attendance bonus",vi:"Thưởng chuyên cần",ne:"उपस्थिति बोनस"},
+desc:{pt:"Prêmio por não faltar nem atrasar no mês.",ja:"欠勤・遅刻がなかった月への手当です。",en:"Bonus for a month with no absences or lateness.",vi:"Thưởng cho tháng không nghỉ, không đi trễ.",ne:"अनुपस्थिति वा ढिलाइ नभएको महिनाको बोनस।"},
+check:{pt:"Um atraso pode zerar o prêmio do mês — confira a regra.",ja:"遅刻1回でゼロになる会社もあります。規則を確認しましょう。",en:"One late day can zero the month's bonus — check the rule.",vi:"Một lần đi trễ có thể mất thưởng cả tháng — kiểm tra quy định.",ne:"एकपटक ढिला हुँदा महिनाको बोनस शून्य हुन सक्छ — नियम जाँच्नुहोस्।"}},
+{id:"qualificationAllow",kind:"earn",match:["資格手当"],
+name:{pt:"Adicional de qualificação",ja:"資格手当",en:"Qualification allowance",vi:"Phụ cấp chứng chỉ",ne:"योग्यता भत्ता"},
+desc:{pt:"Valor por certificações ou licenças que a empresa reconhece.",ja:"会社が認める資格や免許への手当です。",en:"Pay for certifications or licences the company recognises.",vi:"Phụ cấp cho chứng chỉ/bằng cấp công ty công nhận.",ne:"कम्पनीले मान्यता दिएका प्रमाणपत्रहरूको भुक्तानी।"},
+check:{pt:"Nova certificação? Avise o RH para atualizar.",ja:"新しい資格を取ったら人事に伝えましょう。",en:"New certification? Tell HR to update it.",vi:"Có chứng chỉ mới? Báo nhân sự để cập nhật.",ne:"नयाँ प्रमाणपत्र छ? HR लाई जानकारी दिनुहोस्।"}},
+{id:"bonusPay",kind:"earn",match:["賞与"],
+name:{pt:"Bônus",ja:"賞与",en:"Bonus",vi:"Thưởng (bonus)",ne:"बोनस"},
+desc:{pt:"Pagamento extra da empresa (no Japão, costuma cair no verão e no inverno).",ja:"会社の賞与です（日本では夏と冬が多いです）。",en:"Extra company payment (in Japan, usually summer and winter).",vi:"Khoản trả thêm của công ty (ở Nhật thường vào hè và đông).",ne:"कम्पनीको अतिरिक्त भुक्तानी (जापानमा सामान्यतया गर्मी र जाडोमा)।"},
+check:{pt:"Varia com lucro e avaliação — não conte com valor fixo.",ja:"業績と評価で変わります。固定額と思わないように。",en:"It varies with profit and evaluation — don't count on a fixed amount.",vi:"Thay đổi theo lợi nhuận và đánh giá — đừng tính là cố định.",ne:"नाफा र मूल्याङ्कनअनुसार बदलिन्छ — निश्चित नसोच्नुहोस्।"}},
+{id:"otherEarn",kind:"earn",match:["その他手当","その他支給"],
+name:{pt:"Outros pagamentos",ja:"その他支給",en:"Other payments",vi:"Khoản trả khác",ne:"अन्य भुक्तानी"},
+desc:{pt:"Pagamentos que não se encaixam nas outras linhas.",ja:"他の項目に当てはまらない支給です。",en:"Payments that don't fit the other lines.",vi:"Khoản trả không thuộc các dòng khác.",ne:"अन्य लाइनहरूमा नपर्ने भुक्तानीहरू।"},
+check:{pt:"Se não souber o que é, pergunte ao empregador por escrito.",ja:"内容が不明なら会社に書面で確認しましょう。",en:"If unsure what it is, ask the employer in writing.",vi:"Không rõ là gì thì hỏi công ty bằng văn bản.",ne:"के हो थाहा छैन भने कम्पनीलाई लिखित रूपमा सोध्नुहोस्।"}},
+{id:"healthIns",kind:"ded",match:["健康保険料","健康保険"],
+name:{pt:"Seguro-saúde",ja:"健康保険料",en:"Health insurance",vi:"Bảo hiểm y tế",ne:"स्वास्थ्य बीमा"},
+desc:{pt:"Sua parte do seguro-saúde (Shakai Hoken). A empresa paga outra parte.",ja:"健康保険料の本人負担分です。会社も負担しています。",en:"Your share of health insurance (Shakai Hoken). The company pays its own share.",vi:"Phần bảo hiểm y tế bạn đóng (Shakai Hoken). Công ty đóng phần riêng.",ne:"स्वास्थ्य बीमाको तपाईंको हिस्सा (Shakai Hoken)। कम्पनीले आफ्नो हिस्सा तिर्छ।"},
+check:{pt:"É calculado sobre o salário padrão; a média de abr–jun define o valor de set–ago.",ja:"標準報酬で決まります。4–6月の平均が9月–翌8月に反映されます。",en:"Based on your standard salary; the Apr–Jun average sets the Sep–Aug amount.",vi:"Tính trên lương chuẩn; trung bình tháng 4–6 quyết định mức tháng 9–8.",ne:"मानक तलबमा आधारित; अप्रिल–जुनको औसतले सेप्टेम्बर–अगस्ट निर्धारण गर्छ।"}},
+{id:"careIns",kind:"ded",match:["介護保険料","介護保険"],
+name:{pt:"Seguro de cuidados (kaigo)",ja:"介護保険料",en:"Long-term care insurance",vi:"Bảo hiểm chăm sóc (kaigo)",ne:"हेरचाह बीमा (kaigo)"},
+desc:{pt:"Contribuição para o seguro de cuidados de idosos; cobrada de quem tem 40 anos ou mais.",ja:"介護保険料です。40歳以上が対象です。",en:"Contribution to elderly-care insurance; charged from age 40.",vi:"Đóng góp bảo hiểm chăm sóc người già; thu từ 40 tuổi.",ne:"वृद्ध हेरचाह बीमाको योगदान; 40 वर्षदेखि लाग्छ।"},
+check:{pt:"Aparece a partir dos 40 anos — se veio antes, pergunte.",ja:"40歳未満で引かれていたら確認しましょう。",en:"It starts at 40 — if it appears earlier, ask.",vi:"Bắt đầu từ 40 tuổi — xuất hiện sớm hơn thì hỏi lại.",ne:"40 वर्षदेखि सुरु हुन्छ — पहिले आएमा सोध्नुहोस्।"}},
+{id:"pension",kind:"ded",match:["厚生年金保険料","厚生年金"],
+name:{pt:"Previdência (pensão)",ja:"厚生年金保険料",en:"Pension (Kosei Nenkin)",vi:"Lương hưu (Kosei Nenkin)",ne:"पेन्सन (Kosei Nenkin)"},
+desc:{pt:"Sua parte da aposentadoria via empresa (Kosei Nenkin).",ja:"厚生年金保険料の本人負担分です。",en:"Your share of the employees' pension (Kosei Nenkin).",vi:"Phần lương hưu qua công ty bạn đóng (Kosei Nenkin).",ne:"कर्मचारी पेन्सनको तपाईंको हिस्सा (Kosei Nenkin)।"},
+check:{pt:"É o que garante sua aposentadoria no Japão; confira no Nenkin Teikibin anual.",ja:"日本の年金の土台です。年1回のねんきん定期便で確認しましょう。",en:"This builds your Japan pension; check the yearly Nenkin Teikibin statement.",vi:"Đây là nền lương hưu ở Nhật; kiểm tra Nenkin Teikibin hằng năm.",ne:"यसले जापान पेन्सन बनाउँछ; वार्षिक Nenkin Teikibin जाँच्नुहोस्।"}},
+{id:"employmentIns",kind:"ded",match:["雇用保険料","雇用保険"],
+name:{pt:"Seguro-desemprego",ja:"雇用保険料",en:"Employment insurance",vi:"Bảo hiểm thất nghiệp",ne:"रोजगार बीमा"},
+desc:{pt:"Contribuição para o seguro-desemprego (0,5% do bruto em 2026).",ja:"雇用保険料です（2026年は総支給の0.5%）。",en:"Contribution to unemployment insurance (0.5% of gross in 2026).",vi:"Đóng bảo hiểm thất nghiệp (0,5% lương gộp năm 2026).",ne:"बेरोजगारी बीमाको योगदान (2026 मा कुल तलबको 0.5%)।"},
+check:{pt:"Se fugir muito de ~0,5% do bruto, confira.",ja:"総支給の0.5%から大きく外れたら確認しましょう。",en:"If it's far from ~0.5% of gross, check it.",vi:"Nếu khác xa ~0,5% lương gộp, hãy kiểm tra.",ne:"कुल तलबको ~0.5% भन्दा धेरै फरक भए जाँच्नुहोस्।"}},
+{id:"incomeTax",kind:"ded",match:["所得税"],
+name:{pt:"Imposto de renda",ja:"所得税",en:"Income tax",vi:"Thuế thu nhập",ne:"आयकर"},
+desc:{pt:"Imposto retido todo mês do salário, ajustado no fim do ano (nenmatsu chosei).",ja:"毎月天引きされる所得税です。年末調整で精算されます。",en:"Tax withheld monthly, settled at year-end (nenmatsu chosei).",vi:"Thuế khấu trừ hằng tháng, quyết toán cuối năm (nenmatsu chosei).",ne:"मासिक कटौती हुने कर, वर्ष अन्त्यमा समायोजन हुन्छ।"},
+check:{pt:"Diferenças voltam ou são cobradas no ajuste de dezembro.",ja:"過不足は12月の年末調整で戻る/引かれます。",en:"Differences are refunded or charged in the December adjustment.",vi:"Chênh lệch được hoàn hoặc thu thêm vào tháng 12.",ne:"फरक डिसेम्बर समायोजनमा फिर्ता वा कटौती हुन्छ।"}},
+{id:"residentTax",kind:"ded",match:["住民税"],
+name:{pt:"Imposto de residência (juminzei)",ja:"住民税",en:"Resident tax (juminzei)",vi:"Thuế cư trú (juminzei)",ne:"निवासी कर (juminzei)"},
+desc:{pt:"Imposto municipal sobre a renda do ano anterior; aparece a partir do 2º ano no Japão, em 12 parcelas (jun–mai).",ja:"前年の所得への住民税です。日本2年目から、6月–翌5月の12回で引かれます。",en:"City tax on last year's income; starts in your 2nd year in Japan, in 12 parts (Jun–May).",vi:"Thuế thành phố trên thu nhập năm trước; từ năm 2 ở Nhật, chia 12 lần (tháng 6–5).",ne:"गत वर्षको आम्दानीमा नगर कर; जापानमा दोस्रो वर्षदेखि, 12 किस्तामा (जुन–मे)।"},
+check:{pt:"Quem está no 1º ano ainda não paga — separe dinheiro para o 2º ano.",ja:"1年目は引かれません。2年目に備えて貯めましょう。",en:"Not charged in year 1 — save up for year 2.",vi:"Năm đầu chưa bị thu — hãy để dành cho năm 2.",ne:"पहिलो वर्ष लाग्दैन — दोस्रो वर्षका लागि बचत गर्नुहोस्।"}},
+{id:"socialInsTotal",kind:"ded",match:["社会保険料合計","社会保険料"],
+name:{pt:"Total dos seguros sociais",ja:"社会保険料合計",en:"Social insurance total",vi:"Tổng bảo hiểm xã hội",ne:"सामाजिक बीमा जम्मा"},
+desc:{pt:"Soma de saúde + pensão (+ cuidados). É um subtotal, não um desconto extra.",ja:"健康保険＋厚生年金（＋介護）の合計です。小計であり追加の控除ではありません。",en:"Sum of health + pension (+ care). A subtotal, not an extra deduction.",vi:"Tổng y tế + hưu trí (+ chăm sóc). Là tổng phụ, không phải khoản trừ thêm.",ne:"स्वास्थ्य + पेन्सन (+ हेरचाह) को योग। उप-जम्मा हो, अतिरिक्त कटौती होइन।"},
+check:{pt:"Não some de novo: ele já está dentro do total de descontos.",ja:"二重に数えないでください。控除合計に含まれています。",en:"Don't count it twice: it's already inside the deduction total.",vi:"Đừng cộng hai lần: nó đã nằm trong tổng khấu trừ.",ne:"दोहोरो नगण्नुहोस्: यो कटौती जम्माभित्रै छ।"}},
+{id:"advance",kind:"ded",match:["前払給与","前払金","前払"],
+name:{pt:"Adiantamento / cobrança parcelada",ja:"前払給与",en:"Advance / instalment charge",vi:"Ứng trước / thu theo đợt",ne:"अग्रिम / किस्ता शुल्क"},
+desc:{pt:"Desconto de adiantamento ou de custos combinados (ex.: passagem e taxa da empreiteira, parcelados).",ja:"前払い分や、約束した費用（渡航費・紹介料など）の分割控除です。",en:"Deduction for an advance or agreed costs (e.g. airfare and agency fee, in instalments).",vi:"Khấu trừ tiền ứng hoặc chi phí đã thỏa thuận (vé máy bay, phí giới thiệu...) theo đợt.",ne:"अग्रिम वा सहमति भएका लागतहरू (हवाई भाडा, एजेन्सी शुल्क) को किस्ता कटौती।"},
+check:{pt:"Exija o acordo por escrito: valor total, parcelas e quando termina.",ja:"総額・回数・終了時期を書面で確認しましょう。",en:"Demand the agreement in writing: total, instalments, end date.",vi:"Yêu cầu thỏa thuận bằng văn bản: tổng tiền, số đợt, ngày kết thúc.",ne:"लिखित सम्झौता माग्नुहोस्: जम्मा, किस्ता, अन्त्य मिति।"}},
+{id:"rentDed",kind:"ded",match:["家賃"],
+name:{pt:"Aluguel descontado",ja:"家賃",en:"Rent deduction",vi:"Khấu trừ tiền nhà",ne:"भाडा कटौती"},
+desc:{pt:"Aluguel do imóvel da empresa/empreiteira descontado direto do salário.",ja:"会社や派遣会社の住居の家賃が給与から引かれています。",en:"Rent for company/agency housing, deducted from pay.",vi:"Tiền nhà của công ty/công ty phái cử, trừ thẳng vào lương.",ne:"कम्पनी/एजेन्सी आवासको भाडा, तलबबाट कटौती।"},
+check:{pt:"Compare com o contrato do imóvel e peça o histórico das contas.",ja:"住居の契約と比べ、明細を求めましょう。",en:"Compare with the housing contract and ask for the breakdown.",vi:"So với hợp đồng nhà và yêu cầu chi tiết.",ne:"आवास सम्झौतासँग तुलना गरी विवरण माग्नुहोस्।"}},
+{id:"utilitiesDed",kind:"ded",match:["水道光熱費","光熱費","電気代","水道代","ガス代"],
+name:{pt:"Água, luz e gás",ja:"光熱費",en:"Utilities",vi:"Điện, nước, gas",ne:"बिजुली, पानी, ग्यास"},
+desc:{pt:"Contas da casa descontadas do salário (comum em imóvel de empreiteira).",ja:"住居の光熱費が給与から引かれています（派遣会社の住居で多いです）。",en:"Household utilities deducted from pay (common in agency housing).",vi:"Tiền điện nước gas trừ vào lương (thường gặp ở nhà công ty phái cử).",ne:"तलबबाट कटौती हुने घरको उपयोगिता बिल (एजेन्सी आवासमा सामान्य)।"},
+check:{pt:"Peça os valores por consumo; pode haver margem embutida.",ja:"使用量の明細を求めましょう。上乗せがある場合があります。",en:"Ask for usage details; a markup may be included.",vi:"Yêu cầu chi tiết mức sử dụng; có thể có phụ phí.",ne:"प्रयोग विवरण माग्नुहोस्; थप शुल्क हुन सक्छ।"}},
+{id:"foodDed",kind:"ded",match:["弁当代","食費"],
+name:{pt:"Refeição descontada",ja:"食費",en:"Meal deduction",vi:"Khấu trừ tiền ăn",ne:"खाना कटौती"},
+desc:{pt:"Desconto de refeições ou marmitas fornecidas pela empresa.",ja:"会社が用意した食事・弁当の控除です。",en:"Deduction for meals or lunch boxes provided by the company.",vi:"Khấu trừ tiền ăn/cơm hộp do công ty cung cấp.",ne:"कम्पनीले दिएको खानाको कटौती।"},
+check:{pt:"Confira o valor por refeição e os dias cobrados.",ja:"1食あたりの金額と日数を確認しましょう。",en:"Check the per-meal price and the days charged.",vi:"Kiểm tra giá mỗi bữa và số ngày bị thu.",ne:"प्रति खाना मूल्य र शुल्क लागेका दिनहरू जाँच्नुहोस्।"}},
+{id:"unionDed",kind:"ded",match:["組合費"],
+name:{pt:"Sindicato",ja:"組合費",en:"Union dues",vi:"Phí công đoàn",ne:"युनियन शुल्क"},
+desc:{pt:"Contribuição ao sindicato da categoria, quando há.",ja:"労働組合の組合費です。",en:"Union membership dues, when applicable.",vi:"Phí công đoàn, nếu có.",ne:"युनियन सदस्यता शुल्क, लागु भएमा।"},
+check:{pt:"A filiação costuma ser opcional — confirme se você aderiu.",ja:"加入は任意のことが多いです。加入したか確認しましょう。",en:"Membership is usually optional — confirm you joined.",vi:"Tham gia thường là tự nguyện — xác nhận bạn đã tham gia chưa.",ne:"सदस्यता सामान्यतया ऐच्छिक हुन्छ — तपाईं सामेल हुनुभयो कि पुष्टि गर्नुहोस्।"}},
+{id:"futonDed",kind:"ded",match:["布団代","布団"],
+name:{pt:"Enxoval / futon",ja:"布団代",en:"Futon / bedding charge",vi:"Phí chăn đệm (futon)",ne:"फुटन / ओछ्यान शुल्क"},
+desc:{pt:"Cobrança de futon/enxoval fornecido na chegada (comum em empreiteira).",ja:"到着時に用意された布団などの請求です（派遣会社で多いです）。",en:"Charge for futon/bedding provided on arrival (common with agencies).",vi:"Phí chăn đệm được cấp khi đến (thường gặp ở công ty phái cử).",ne:"आगमनमा दिइएको फुटन/ओछ्यानको शुल्क (एजेन्सीमा सामान्य)।"},
+check:{pt:"Deve ser cobrança única ou poucas parcelas — confira se parou.",ja:"1回か数回で終わるはずです。止まっているか確認しましょう。",en:"It should be one or a few charges — check it stopped.",vi:"Chỉ thu một hoặc vài lần — kiểm tra đã dừng chưa.",ne:"एक वा केही पटक मात्र हुनुपर्छ — रोकियो कि जाँच्नुहोस्।"}},
+{id:"otherDed",kind:"ded",match:["その他控除"],
+name:{pt:"Outros descontos",ja:"その他控除",en:"Other deductions",vi:"Khấu trừ khác",ne:"अन्य कटौती"},
+desc:{pt:"Descontos que não se encaixam nas outras linhas.",ja:"他の項目に当てはまらない控除です。",en:"Deductions that don't fit the other lines.",vi:"Khoản trừ không thuộc các dòng khác.",ne:"अन्य लाइनहरूमा नपर्ने कटौतीहरू।"},
+check:{pt:"Todo desconto precisa de explicação: pergunte por escrito o que é.",ja:"控除には説明が必要です。書面で確認しましょう。",en:"Every deduction needs an explanation: ask in writing.",vi:"Mọi khoản trừ cần giải thích: hãy hỏi bằng văn bản.",ne:"प्रत्येक कटौतीको व्याख्या चाहिन्छ: लिखित रूपमा सोध्नुहोस्।"}}
+];
+function termText(term,field){return (term[field]&&(term[field][LANG]||term[field].pt))||""}
+function findTerm(text,kind){
+  for(const term of PAYSLIP_TERMS){
+    if(kind&&term.kind!==kind)continue;
+    for(const alias of term.match){if(text.includes(alias))return term}
+  }
+  return null;
+}
+
+// ---------- V5.7: parser do texto OCR ----------
+function ocrStrip(s){
+  return (s||"").replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0)).replace(/\s+/g,"");
+}
+function firstAmountAfter(text,idx,maxLen){
+  const seg=text.slice(idx,idx+(maxLen||16));
+  const re=/(\d{1,3}(?:[.,]\d{3})+|\d{2,})/g; let m;
+  while((m=re.exec(seg))){
+    if(seg[m.index+m[0].length]===":")continue; // é horário, não valor
+    const v=Number(m[0].replace(/[.,]/g,""));
+    if(v>0&&v<100000000)return v;
+  }
+  return null;
+}
+function amountForAliases(text,aliases){
+  for(const alias of aliases){
+    const idx=text.indexOf(alias);
+    if(idx<0)continue;
+    const v=firstAmountAfter(text,idx+alias.length,16);
+    if(v!=null)return v;
+  }
+  return null;
+}
+function timeForAliases(text,aliases){
+  for(const alias of aliases){
+    const idx=text.indexOf(alias);
+    if(idx<0)continue;
+    const seg=text.slice(idx+alias.length,idx+alias.length+10);
+    const m=seg.match(/(\d{1,3}):(\d{2})/);
+    if(m)return Number(m[1])+Number(m[2])/60;
+    const n=seg.match(/(\d+(?:[.,]\d+)?)/);
+    if(n){const v=Number(n[1].replace(",","."));if(v>0&&v<1000)return v}
+  }
+  return null;
+}
+function daysForAliases(text,aliases){
+  for(const alias of aliases){
+    const idx=text.indexOf(alias);
+    if(idx<0)continue;
+    const seg=text.slice(idx+alias.length,idx+alias.length+10);
+    const m=seg.match(/(\d+)(?:[.,](\d{3}))?(?![\d])/);
+    if(!m)continue;
+    let v=Number(m[1]);
+    if(m[2]&&v<=31)v=v+Number(m[2])/1000; // "1.000" = 1,000 dia no formato JP
+    else if(v>=1000)v=v/1000;
+    if(v>0&&v<=40)return v;
+  }
+  return null;
+}
+const PS_NO_LINE=new Set(["socialInsTotal"]);
+function parsePayslip(rawText){
+  const text=ocrStrip(rawText);
+  const out={gross:null,net:null,dedTotal:null,days:null,otHours:null,nightHours:null,totalHours:null,earnings:[],deductions:[]};
+  if(!text)return out;
+  out.days=daysForAliases(text,["出勤日数","勤務日数","就労日数"]);
+  out.otHours=timeForAliases(text,["残業時間","時間外労働時間","時間外時間"]);
+  out.nightHours=timeForAliases(text,["深夜時間"]);
+  out.totalHours=timeForAliases(text,["総労働時間","総就労時間","勤務時間合計"]);
+  for(const term of PAYSLIP_TERMS){
+    if(PS_NO_LINE.has(term.id))continue;
+    const v=amountForAliases(text,term.match);
+    if(v==null)continue;
+    const line={label:term.match[0],amount:v,term:term.id};
+    if(term.kind==="earn")out.earnings.push(line);else out.deductions.push(line);
+  }
+  out.dedTotal=amountForAliases(text,["控除合計額","控除合計","控除総額"]);
+  out.net=amountForAliases(text,["差引支給額","差引支給","手取額","手取り金額","手取","銀行振込額","振込額"]);
+  out.gross=amountForAliases(text,["総支給額","支給合計額","総支給金額","支給総額","総支給"]);
+  const sumE=out.earnings.reduce((a,l)=>a+l.amount,0);
+  const sumD=out.deductions.reduce((a,l)=>a+l.amount,0);
+  if(out.dedTotal==null&&sumD>0)out.dedTotal=sumD;
+  if(out.gross==null&&sumE>0)out.gross=sumE;
+  if(out.gross==null&&out.net!=null&&out.dedTotal!=null)out.gross=out.net+out.dedTotal;
+  if(out.net==null&&out.gross!=null&&out.dedTotal!=null)out.net=out.gross-out.dedTotal;
+  return out;
+}
+// ---------- V5.7: OCR (Tesseract.js sob demanda) ----------
+let tesseractLoad=null;
+function loadTesseract(){
+  if(window.Tesseract)return Promise.resolve();
+  if(tesseractLoad)return tesseractLoad;
+  tesseractLoad=new Promise((res,rej)=>{
+    const s=document.createElement("script");
+    s.src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/tesseract.min.js";
+    s.onload=()=>res(); s.onerror=()=>rej(new Error("tesseract load"));
+    document.head.appendChild(s);
+  });
+  return tesseractLoad;
+}
+function payslipPreprocess(file){
+  return new Promise((res,rej)=>{
+    const url=URL.createObjectURL(file);
+    const img=new Image();
+    img.onload=()=>{
+      const w=img.naturalWidth,h=img.naturalHeight;
+      const scale=w>0&&w<1800?Math.min(2,1800/w):1;
+      const c=document.createElement("canvas");
+      c.width=Math.round(w*scale); c.height=Math.round(h*scale);
+      const ctx=c.getContext("2d");
+      try{ctx.filter="grayscale(1) contrast(1.25)"}catch(e){}
+      ctx.drawImage(img,0,0,c.width,c.height);
+      URL.revokeObjectURL(url);
+      res(c);
+    };
+    img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error("image"))};
+    img.src=url;
+  });
+}
+async function runPayslipOcr(file){
+  const panel=$("payslipPanel");
+  panel.classList.remove("hidden");
+  $("payslipReview").classList.add("hidden");
+  $("ocrStatus").classList.remove("hidden");
+  $("ocrFailNote").classList.add("hidden");
+  $("ocrStatusText").textContent=t("ocrEngine");
+  $("ocrBar").style.width="5%";
+  let parsed=null,failed=false;
+  try{
+    await loadTesseract();
+    const worker=await Tesseract.createWorker("jpn",1,{logger:m=>{
+      if(m.status==="recognizing text"){$("ocrStatusText").textContent=t("ocrReading",{pct:Math.round((m.progress||0)*100)});$("ocrBar").style.width=(10+Math.round((m.progress||0)*85))+"%"}
+    }});
+    const canvas=await payslipPreprocess(file);
+    const {data}=await worker.recognize(canvas);
+    await worker.terminate();
+    parsed=parsePayslip(data&&data.text?data.text:"");
+    if(!parsed.gross&&!parsed.net&&!parsed.earnings.length&&!parsed.deductions.length)failed=true;
+  }catch(e){ failed=true; }
+  $("ocrStatus").classList.add("hidden");
+  openPayslipReview(parsed||{gross:null,net:null,days:null,otHours:null,nightHours:null,earnings:[],deductions:[]},failed);
+}
+// ---------- V5.7: tela de conferência ----------
+let psKindOfSelect=null;
+function termOptions(kind,selected){
+  let html=`<option value="">${esc(t("psCustom"))}</option>`;
+  for(const term of PAYSLIP_TERMS){
+    if(term.kind!==kind)continue;
+    html+=`<option value="${term.id}"${term.id===selected?" selected":""}>${esc(termText(term,"name"))}</option>`;
+  }
+  return html;
+}
+function psLineRow(line,kind){
+  const row=document.createElement("div");row.className="psLine";row.dataset.kind=kind;
+  const sel=document.createElement("select");sel.className="psTerm";sel.innerHTML=termOptions(kind,line.term||"");
+  const label=document.createElement("input");label.className="psLabel";label.type="text";label.value=line.label||"";label.placeholder=t("psLineName");
+  const amount=document.createElement("input");amount.className="psAmount";amount.type="number";amount.inputMode="numeric";amount.min="0";amount.value=line.amount!=null?line.amount:"";
+  const del=document.createElement("button");del.type="button";del.className="psDel";del.textContent="✕";
+  del.onclick=()=>{row.remove();updatePsCheck()};
+  sel.onchange=()=>{
+    if(sel.value){const term=PAYSLIP_TERMS.find(x=>x.id===sel.value);if(term)label.value=term.match[0]}
+    updatePsCheck();
+  };
+  label.addEventListener("input",updatePsCheck);
+  amount.addEventListener("input",updatePsCheck);
+  row.append(sel,label,amount,del);
+  return row;
+}
+function renderPsLines(parsed){
+  const eBox=$("psEarnLines"),dBox=$("psDedLines");
+  eBox.innerHTML="";dBox.innerHTML="";
+  (parsed.earnings||[]).forEach(l=>eBox.appendChild(psLineRow(l,"earn")));
+  (parsed.deductions||[]).forEach(l=>dBox.appendChild(psLineRow(l,"ded")));
+}
+function readPsLines(){
+  const out={earnings:[],deductions:[]};
+  document.querySelectorAll("#payslipReview .psLine").forEach(row=>{
+    const term=row.querySelector(".psTerm").value;
+    const label=row.querySelector(".psLabel").value.trim();
+    const amount=Number(row.querySelector(".psAmount").value)||0;
+    if(!label&&!amount)return;
+    const line={label:label||(term?PAYSLIP_TERMS.find(x=>x.id===term)?.match[0]||"":""),amount,term:term||""};
+    if(row.dataset.kind==="earn")out.earnings.push(line);else out.deductions.push(line);
+  });
+  return out;
+}
+function psNum(id){const v=Number(($(id).value||"").replace(",","."));return isNaN(v)?0:v}
+function updatePsCheck(){
+  const lines=readPsLines();
+  const sumE=lines.earnings.reduce((a,l)=>a+l.amount,0);
+  const sumD=lines.deductions.reduce((a,l)=>a+l.amount,0);
+  const g=psNum("psGross"),n=psNum("psNet");
+  const el=$("psCheck");
+  let diff=0;
+  if(g&&sumE)diff=Math.max(diff,Math.abs(g-sumE));
+  if(g&&n)diff=Math.max(diff,Math.abs((g-(sumD||g-n))-n));
+  if(g&&sumE&&!diff&&(!n||Math.abs(g-sumD-n)<1)){el.textContent=t("psCheckOk");el.className="psCheck ok"}
+  else if(diff>0){el.textContent=t("psCheckWarn",{diff:money(diff)});el.className="psCheck warn"}
+  else{el.textContent="";el.className="psCheck"}
+}
+function openPayslipReview(parsed,failed){
+  $("payslipPanel").classList.remove("hidden");
+  $("payslipReview").classList.remove("hidden");
+  $("ocrFailNote").classList.toggle("hidden",!failed);
+  $("psGross").value=parsed.gross!=null?parsed.gross:"";
+  $("psNet").value=parsed.net!=null?parsed.net:"";
+  $("psDays").value=parsed.days!=null?parsed.days:"";
+  $("psOt").value=parsed.otHours!=null?Math.round(parsed.otHours*100)/100:"";
+  $("psNight").value=parsed.nightHours!=null?Math.round(parsed.nightHours*100)/100:"";
+  renderPsLines(parsed);
+  updatePsCheck();
+  $("payslipPanel").scrollIntoView({behavior:"smooth",block:"start"});
+}
+const PS_MANDATORY=new Set(["healthIns","careIns","pension","employmentIns","incomeTax","residentTax"]);
+function savePayslip(){
+  const gross=psNum("psGross"),net=psNum("psNet");
+  if(!gross||!net){alert(t("psNeedValues"));return}
+  const lines=readPsLines();
+  const sumD=lines.deductions.reduce((a,l)=>a+l.amount,0);
+  const dedTotal=sumD>0?sumD:(gross-net);
+  const mandatory=lines.deductions.filter(l=>PS_MANDATORY.has(l.term)).reduce((a,l)=>a+l.amount,0);
+  const bonusLine=lines.earnings.find(l=>l.term==="bonusPay");
+  const ot=psNum("psOt"),night=psNum("psNight");
+  const key=monthlyKey();
+  saveMonthlySnapshot(key,{
+    gross,net,
+    bonus:bonusLine?bonusLine.amount:0,
+    mandatoryDeductions:mandatory,
+    otherDeductions:Math.max(0,dedTotal-mandatory),
+    deductions:dedTotal,
+    updatedAt:Date.now(),
+    mode,deductionMode:$("deductionMode")?.value||"percent",
+    normalHours:0,overtimeHours:ot,offHours:0,offPercent:val("offPercent"),
+    nightHours:night,nightDays:0,
+    source:"payslip",payslipAt:Date.now(),
+    daysWorked:psNum("psDays")||null,
+    raiox:{earnings:lines.earnings,deductions:lines.deductions,savedAt:Date.now()}
+  });
+  $("payslipPanel").classList.add("hidden");
+  renderPayslipCard();renderDashboard();renderHome();
+  alert(t("psSavedMsg"));
+}
+// ---------- V5.7: Raio-X do mês ----------
+function raioxLineHtml(line){
+  const term=line.term?PAYSLIP_TERMS.find(x=>x.id===line.term):null;
+  const name=term?termText(term,"name"):(line.label||"—");
+  const orig=term&&line.label&&line.label!==termText(term,"name")?`<span class="raioxOrig">${esc(line.label)}</span>`:"";
+  const body=term
+    ?`<div class="raioxDesc">${esc(termText(term,"desc"))}</div><div class="raioxCheck">✔️ ${esc(termText(term,"check"))}</div>`
+    :`<div class="raioxDesc">${esc(t("raioxUnknown"))} — ${esc(t("raioxUnknownNote"))}</div>`;
+  return `<div class="raioxLine"><div class="raioxHead"><span class="raioxName">${esc(name)} ${orig}</span><strong>${money(line.amount||0)}</strong></div>${body}</div>`;
+}
+function openRaiox(){
+  const key=monthlyKey();
+  const snap=monthlySnapshot(key);
+  if(!snap||!snap.raiox)return;
+  $("raioxTitle").textContent=t("raioxTitle",{month:monthName(key)});
+  let html=`<div class="raioxTotals"><div><span>${esc(t("resGross"))}</span><strong>${money(snap.gross||0)}</strong></div><div><span>${esc(t("resTotalDed"))}</span><strong>${money(snap.deductions||0)}</strong></div><div><span>${esc(t("resNet"))}</span><strong>${money(snap.net||0)}</strong></div></div>`;
+  if(snap.raiox.earnings.length){html+=`<h3>${esc(t("psEarnTitle"))}</h3>`+snap.raiox.earnings.map(raioxLineHtml).join("")}
+  if(snap.raiox.deductions.length){html+=`<h3>${esc(t("psDedTitle"))}</h3>`+snap.raiox.deductions.map(raioxLineHtml).join("")}
+  $("raioxBody").innerHTML=html;
+  $("raioxPanel").classList.remove("hidden");
+  $("raioxPanel").scrollIntoView({behavior:"smooth",block:"start"});
+}
+// ---------- V5.7: cartão do holerite ----------
+function renderPayslipCard(){
+  const btn=$("payslipBtn");if(!btn)return;
+  const key=monthlyKey();
+  btn.textContent=t("slipBtn",{month:monthName(key)});
+  const snap=monthlySnapshot(key);
+  $("raioxBtn").classList.toggle("hidden",!(snap&&snap.raiox));
+  const chk=$("slipChecked");
+  if(snap&&snap.source==="payslip"&&snap.payslipAt){
+    chk.textContent=t("slipChecked",{date:new Date(snap.payslipAt).toLocaleDateString(LOCALES[LANG])});
+    chk.classList.remove("hidden");
+  }else chk.classList.add("hidden");
+}
+
 function snapshotFor(bases,key){
   try{return JSON.parse(localStorage.getItem(bases.months+"-"+key)||"null")}catch(e){return null}
 }
@@ -1619,6 +2168,7 @@ function renderDashboard(){
   });
   renderCouple();
   renderAnnual();
+  renderPayslipCard();
 }
 function renderPairChart(title,labels,series,format){
   const all=series.flatMap(s=>s.values).filter(v=>typeof v==="number");
@@ -1788,7 +2338,7 @@ function calculate(saveSnapshot=false){
   $("net").textContent=money(net);
   $("rateOut").textContent=money(rate);
   if(saveSnapshot){
-    saveMonthlySnapshot(monthlyKey(),{
+    const snapObj={
       gross,net,bonus,mandatoryDeductions:d.mandatory,otherDeductions:d.other,deductions:d.total,updatedAt:Date.now(),
       mode,deductionMode:$("deductionMode")?.value||"percent",
       normalHours:val("normalHours"),
@@ -1797,7 +2347,10 @@ function calculate(saveSnapshot=false){
       offPercent:val("offPercent"),
       nightHours:val("nightHours"),
       nightDays:val("nightDays")
-    });
+    };
+    const prevSnap=monthlySnapshot(monthlyKey());
+    if(prevSnap&&prevSnap.raiox){snapObj.raiox=prevSnap.raiox;snapObj.payslipAt=prevSnap.payslipAt;if(prevSnap.daysWorked!=null)snapObj.daysWorked=prevSnap.daysWorked}
+    saveMonthlySnapshot(monthlyKey(),snapObj);
     renderDashboard();
   }
   renderHome();
@@ -1847,6 +2400,16 @@ SETTINGS_FIELDS.forEach(id=>{
   }
 })();
 $("calcBtn").onclick=()=>calculate(true);
+$("payslipBtn").onclick=()=>$("payslipFile").click();
+$("payslipFile").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(f)runPayslipOcr(f);e.target.value=""});
+$("psCancel").onclick=()=>$("payslipPanel").classList.add("hidden");
+$("psSave").onclick=savePayslip;
+$("psAddEarn").onclick=()=>{$("psEarnLines").appendChild(psLineRow({label:"",amount:"",term:""},"earn"));updatePsCheck()};
+$("psAddDed").onclick=()=>{$("psDedLines").appendChild(psLineRow({label:"",amount:"",term:""},"ded"));updatePsCheck()};
+$("raioxBtn").onclick=openRaiox;
+$("raioxClose").onclick=()=>$("raioxPanel").classList.add("hidden");
+["psGross","psNet"].forEach(id=>$(id).addEventListener("input",updatePsCheck));
+renderPayslipCard();
 document.querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{if(i.closest(".card")&&i.id!=="dayNote")calculate();if(i.id.startsWith("time"))updateDaySummary()}));
 $("addBreak").onclick=()=>addBreakRow();
 $("dayYukiu").onchange=updateDaySummary;
