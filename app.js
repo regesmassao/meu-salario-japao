@@ -54,6 +54,7 @@ const LOCALES={pt:"pt-BR",ja:"ja-JP",en:"en-US",vi:"vi-VN",ne:"ne-NP"};
 const I18N={
 pt:{
 appSubtitle:"Calculadora e controle de jornada",
+copyrightLine:"© 2026 Reges Massao da Costa — Todos os direitos reservados",
 themeToggle:"Alternar tema",
 navHome:"Início",navCalc:"Calculadora",navWork:"Jornada",navCouple:"Casal",navSettings:"Ajustes",
 homeNetMonth:"Líquido do mês",
@@ -174,6 +175,7 @@ mergeDone:"Backup juntado com sucesso: {days} dia(s) incorporados. Recarregando 
 },
 ja:{
 appSubtitle:"給与計算と勤務管理",
+copyrightLine:"© 2026 Reges Massao da Costa — 無断転載・複製を禁じます",
 themeToggle:"テーマを切り替え",
 navHome:"ホーム",navCalc:"給与計算",navWork:"勤務",navCouple:"カップル",navSettings:"設定",
 homeNetMonth:"今月の手取り",
@@ -294,6 +296,7 @@ mergeDone:"合体が完了しました：{days} 日分を取り込みました�
 },
 en:{
 appSubtitle:"Salary calculator & work log",
+copyrightLine:"© 2026 Reges Massao da Costa — All rights reserved",
 themeToggle:"Toggle theme",
 navHome:"Home",navCalc:"Calculator",navWork:"Work log",navCouple:"Couple",navSettings:"Settings",
 homeNetMonth:"Net pay this month",
@@ -414,6 +417,7 @@ mergeDone:"Backup merged successfully: {days} day(s) added. Reloading the app…
 },
 vi:{
 appSubtitle:"Tính lương & quản lý giờ làm",
+copyrightLine:"© 2026 Reges Massao da Costa — Mọi quyền được bảo lưu",
 themeToggle:"Đổi giao diện",
 navHome:"Trang chủ",navCalc:"Tính lương",navWork:"Giờ làm",navCouple:"Cặp đôi",navSettings:"Cài đặt",
 homeNetMonth:"Lương thực nhận tháng này",
@@ -534,6 +538,7 @@ mergeDone:"Đã gộp sao lưu thành công: thêm {days} ngày. Đang tải l�
 },
 ne:{
 appSubtitle:"तलब क्याल्कुलेटर र कामको रेकर्ड",
+copyrightLine:"© 2026 Reges Massao da Costa — सर्वाधिकार सुरक्षित",
 themeToggle:"थिम बदल्नुहोस्",
 navHome:"गृहपृष्ठ",navCalc:"क्याल्कुलेटर",navWork:"कामको रेकर्ड",navCouple:"जोडी",navSettings:"सेटिङ",
 homeNetMonth:"यो महिनाको खुद तलब",
