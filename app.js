@@ -58,6 +58,8 @@ copyrightLine:"© 2026 Reges Massao da Costa — Todos os direitos reservados",
 employerNameLbl:"🏭 Empresa atual",
 employerNamePh:"Nome da empresa onde você trabalha agora",
 psEmployerLbl:"Empresa deste holerite",
+pairTapHint:"Toque num mês para ver os valores",
+pairCombined:"Juntos",
 slipCardTitle:"🧾 Holerite do mês",
 slipIntro:"Ao receber o holerite, fotografe ele aqui: o app lê os totais, grava o mês com os valores oficiais e explica cada linha.",
 slipBtn:"📷 Ler holerite de {month}",
@@ -214,6 +216,8 @@ copyrightLine:"© 2026 Reges Massao da Costa — 無断転載・複製を禁じ�
 employerNameLbl:"🏭 現在の勤務先",
 employerNamePh:"今働いている会社名",
 psEmployerLbl:"この明細の会社",
+pairTapHint:"月をタップすると金額が表示されます",
+pairCombined:"合計",
 slipCardTitle:"🧾 今月の給与明細",
 slipIntro:"給与明細を受け取ったら写真を撮ってください。合計を読み取り、正式な金額で月を保存し、各項目を説明します。",
 slipBtn:"📷 {month}の明細を読む",
@@ -370,6 +374,8 @@ copyrightLine:"© 2026 Reges Massao da Costa — All rights reserved",
 employerNameLbl:"🏭 Current employer",
 employerNamePh:"Name of the company you work at now",
 psEmployerLbl:"Employer on this payslip",
+pairTapHint:"Tap a month to see the values",
+pairCombined:"Together",
 slipCardTitle:"🧾 This month's payslip",
 slipIntro:"When your payslip arrives, photograph it here: the app reads the totals, saves the month with the official values and explains each line.",
 slipBtn:"📷 Read the {month} payslip",
@@ -526,6 +532,8 @@ copyrightLine:"© 2026 Reges Massao da Costa — Mọi quyền được bảo l�
 employerNameLbl:"🏭 Công ty hiện tại",
 employerNamePh:"Tên công ty bạn đang làm việc",
 psEmployerLbl:"Công ty trên phiếu này",
+pairTapHint:"Chạm vào một tháng để xem số tiền",
+pairCombined:"Tổng cộng",
 slipCardTitle:"🧾 Phiếu lương tháng này",
 slipIntro:"Khi nhận phiếu lương, hãy chụp tại đây: ứng dụng đọc tổng số, lưu tháng với giá trị chính thức và giải thích từng dòng.",
 slipBtn:"📷 Đọc phiếu lương {month}",
@@ -682,6 +690,8 @@ copyrightLine:"© 2026 Reges Massao da Costa — सर्वाधिकार 
 employerNameLbl:"🏭 हालको कम्पनी",
 employerNamePh:"तपाईं अहिले काम गर्ने कम्पनीको नाम",
 psEmployerLbl:"यो पर्चीको कम्पनी",
+pairTapHint:"रकम हेर्न महिनामा ट्याप गर्नुहोस्",
+pairCombined:"जम्मा",
 slipCardTitle:"🧾 यो महिनाको तलब पर्ची",
 slipIntro:"तलब पर्ची पाएपछि यहाँ फोटो खिच्नुहोस्: एपले जम्मा रकम पढ्छ, आधिकारिक मानहरूसहित महिना सुरक्षित गर्छ र प्रत्येक लाइन व्याख्या गर्छ।",
 slipBtn:"📷 {month} को पर्ची पढ्नुहोस्",
@@ -2194,19 +2204,44 @@ function renderDashboard(){
   renderAnnual();
   renderPayslipCard();
 }
-function renderPairChart(title,labels,series,format){
+function renderPairChart(title,labels,series,format,chartId){
   const all=series.flatMap(s=>s.values).filter(v=>typeof v==="number");
   const max=Math.max(...all,1);
   const groups=labels.map((lab,i)=>{
     const cols=series.map(s=>{
       const v=s.values[i];
       const h=v==null?0:Math.max(5,(v/max)*100);
-      return `<div class="pairCol"><div class="barValue">${metricValue(v,format)}</div><div class="pairTrack"><div class="pairFill" style="height:${h}%;background:${s.color}"></div></div></div>`;
+      return `<div class="pairCol"><div class="pairTrack"><div class="pairFill" style="height:${h}%;background:${s.color}"></div></div></div>`;
     }).join("");
-    return `<div class="barItem" data-month="${series[0].keys[i]}" title="${t("viewDaysTitle")}"><div class="pairWrap">${cols}</div><div class="barLabel">${lab}</div></div>`;
+    return `<div class="barItem" data-month="${series[0].keys[i]}" data-chart="${chartId}"><div class="pairWrap">${cols}</div><div class="barLabel">${lab}</div></div>`;
   }).join("");
   const legend=series.map(s=>`<span class="legendItem"><span class="dot" style="background:${s.color}"></span>${esc(s.name)}</span>`).join("");
-  return `<div class="chartBox"><h4>${title}</h4><div class="legend">${legend}</div><div class="bars">${groups}</div></div>`;
+  return `<div class="chartBox"><h4>${title}</h4><div class="legend">${legend}</div><div class="bars">${groups}</div><div class="pairHint">${t("pairTapHint")}</div><div class="pairDetail" id="pd-${chartId}" hidden></div></div>`;
+}
+let coupleCharts=null;
+// Toque num mês dos gráficos do casal: mostra os valores daquele mês
+// (dele, dela e juntos) só naquele gráfico, sem poluir a tela pequena.
+// O botão dentro do detalhe mantém o atalho para os dias do mês.
+function pairTap(chartId,key,el){
+  const data=coupleCharts; if(!data)return;
+  const i=data.months.indexOf(key); if(i<0)return;
+  const field=chartId==="pairGross"?"gross":"net";
+  const box=$("pd-"+chartId); if(!box)return;
+  const parts=data.perEmp.map(({emp,stats})=>{
+    const v=stats[i][field];
+    return `<span class="legendItem"><span class="dot" style="background:${emp.color}"></span>${esc(emp.name)} <strong>${v==null?"—":money(v)}</strong></span>`;
+  });
+  const any=data.perEmp.some(({stats})=>stats[i][field]!=null);
+  const total=data.perEmp.reduce((acc,{stats})=>acc+(stats[i][field]||0),0);
+  box.innerHTML=`<div class="pairDetailHead">${data.labels[i]}</div><div class="pairDetailVals">${parts.join("")}${any?`<span>${t("pairCombined")}: <strong>${money(total)}</strong></span>`:""}</div><button type="button" class="smallBtn pairOpenBtn">${t("viewDaysTitle")} →</button>`;
+  box.hidden=false;
+  const ob=box.querySelector(".pairOpenBtn");
+  if(ob)ob.onclick=()=>openMonth(key);
+  if(el&&el.closest){
+    const cb=el.closest(".chartBox");
+    if(cb)cb.querySelectorAll(".barItem").forEach(b=>b.classList.remove("sel"));
+    el.classList.add("sel");
+  }
 }
 function renderCouple(){
   const box=$("coupleDashboard");
@@ -2221,6 +2256,7 @@ function renderCouple(){
     emp,
     stats:months.map(k=>emp.id===activeEmployee.id?monthStats(k):monthStatsFor(emp,k))
   }));
+  coupleCharts={months,labels,perEmp};
   const sel=perEmp.map(({emp,stats})=>({emp,s:stats[stats.length-1]}));
   const totalNet=sel.reduce((a,{s})=>a+(s.net||0),0);
   const missing=sel.filter(({s})=>s.net==null).map(({emp})=>emp.name);
@@ -2252,13 +2288,13 @@ function renderCouple(){
         <span>${missing.length?t("coupleNoData",{names:missing.map(esc).join(", ")}):t("coupleSumNote")}</span>
       </div>
     </div>
-    ${renderPairChart(t("chartGross"),labels,series("gross"),"money")}
-    ${renderPairChart(t("chartNet"),labels,series("net"),"money")}
+    ${renderPairChart(t("chartGross"),labels,series("gross"),"money","pairGross")}
+    ${renderPairChart(t("chartNet"),labels,series("net"),"money","pairNet")}
     <div class="dashboardNote">${t("coupleNote",{month:monthName(monthlyKey())})}</div>
     <h4 class="empManageTitle">${t("manageTitle")}</h4>
     ${manage}`;
-  box.querySelectorAll("[data-month]").forEach(el=>{
-    el.onclick=()=>openMonth(el.dataset.month);
+  box.querySelectorAll("[data-chart]").forEach(el=>{
+    el.onclick=()=>pairTap(el.dataset.chart,el.dataset.month,el);
   });
   wireEmployeeManage(box);
 }
