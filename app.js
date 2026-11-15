@@ -55,6 +55,9 @@ const I18N={
 pt:{
 appSubtitle:"Calculadora e controle de jornada",
 copyrightLine:"© 2026 Reges Massao da Costa — Todos os direitos reservados",
+employerNameLbl:"🏭 Empresa atual",
+employerNamePh:"Nome da empresa onde você trabalha agora",
+psEmployerLbl:"Empresa deste holerite",
 slipCardTitle:"🧾 Holerite do mês",
 slipIntro:"Ao receber o holerite, fotografe ele aqui: o app lê os totais, grava o mês com os valores oficiais e explica cada linha.",
 slipBtn:"📷 Ler holerite de {month}",
@@ -208,6 +211,9 @@ mergeDone:"Backup juntado com sucesso: {days} dia(s) incorporados. Recarregando 
 ja:{
 appSubtitle:"給与計算と勤務管理",
 copyrightLine:"© 2026 Reges Massao da Costa — 無断転載・複製を禁じます",
+employerNameLbl:"🏭 現在の勤務先",
+employerNamePh:"今働いている会社名",
+psEmployerLbl:"この明細の会社",
 slipCardTitle:"🧾 今月の給与明細",
 slipIntro:"給与明細を受け取ったら写真を撮ってください。合計を読み取り、正式な金額で月を保存し、各項目を説明します。",
 slipBtn:"📷 {month}の明細を読む",
@@ -361,6 +367,9 @@ mergeDone:"合体が完了しました：{days} 日分を取り込みました�
 en:{
 appSubtitle:"Salary calculator & work log",
 copyrightLine:"© 2026 Reges Massao da Costa — All rights reserved",
+employerNameLbl:"🏭 Current employer",
+employerNamePh:"Name of the company you work at now",
+psEmployerLbl:"Employer on this payslip",
 slipCardTitle:"🧾 This month's payslip",
 slipIntro:"When your payslip arrives, photograph it here: the app reads the totals, saves the month with the official values and explains each line.",
 slipBtn:"📷 Read the {month} payslip",
@@ -514,6 +523,9 @@ mergeDone:"Backup merged successfully: {days} day(s) added. Reloading the app…
 vi:{
 appSubtitle:"Tính lương & quản lý giờ làm",
 copyrightLine:"© 2026 Reges Massao da Costa — Mọi quyền được bảo lưu",
+employerNameLbl:"🏭 Công ty hiện tại",
+employerNamePh:"Tên công ty bạn đang làm việc",
+psEmployerLbl:"Công ty trên phiếu này",
 slipCardTitle:"🧾 Phiếu lương tháng này",
 slipIntro:"Khi nhận phiếu lương, hãy chụp tại đây: ứng dụng đọc tổng số, lưu tháng với giá trị chính thức và giải thích từng dòng.",
 slipBtn:"📷 Đọc phiếu lương {month}",
@@ -667,6 +679,9 @@ mergeDone:"Đã gộp sao lưu thành công: thêm {days} ngày. Đang tải l�
 ne:{
 appSubtitle:"तलब क्याल्कुलेटर र कामको रेकर्ड",
 copyrightLine:"© 2026 Reges Massao da Costa — सर्वाधिकार सुरक्षित",
+employerNameLbl:"🏭 हालको कम्पनी",
+employerNamePh:"तपाईं अहिले काम गर्ने कम्पनीको नाम",
+psEmployerLbl:"यो पर्चीको कम्पनी",
 slipCardTitle:"🧾 यो महिनाको तलब पर्ची",
 slipIntro:"तलब पर्ची पाएपछि यहाँ फोटो खिच्नुहोस्: एपले जम्मा रकम पढ्छ, आधिकारिक मानहरूसहित महिना सुरक्षित गर्छ र प्रत्येक लाइन व्याख्या गर्छ।",
 slipBtn:"📷 {month} को पर्ची पढ्नुहोस्",
@@ -1885,6 +1900,7 @@ function openPayslipReview(parsed,failed){
   $("psDays").value=parsed.days!=null?parsed.days:"";
   $("psOt").value=parsed.otHours!=null?Math.round(parsed.otHours*100)/100:"";
   $("psNight").value=parsed.nightHours!=null?Math.round(parsed.nightHours*100)/100:"";
+  $("psEmployer").value=(monthlySnapshot(monthlyKey())?.employer)||($("employerName")?.value||"");
   renderPsLines(parsed);
   updatePsCheck();
   $("payslipPanel").scrollIntoView({behavior:"smooth",block:"start"});
@@ -1900,7 +1916,7 @@ function savePayslip(){
   const bonusLine=lines.earnings.find(l=>l.term==="bonusPay");
   const ot=psNum("psOt"),night=psNum("psNight");
   const key=monthlyKey();
-  saveMonthlySnapshot(key,{
+  const psSnap={
     gross,net,
     bonus:bonusLine?bonusLine.amount:0,
     mandatoryDeductions:mandatory,
@@ -1913,7 +1929,14 @@ function savePayslip(){
     source:"payslip",payslipAt:Date.now(),
     daysWorked:psNum("psDays")||null,
     raiox:{earnings:lines.earnings,deductions:lines.deductions,savedAt:Date.now()}
-  });
+  };
+  const psEmp=(($("psEmployer").value||"").trim())||(monthlySnapshot(key)?.employer||"");
+  if(psEmp){
+    psSnap.employer=psEmp;
+    const empInput=$("employerName");
+    if(empInput&&empInput.value.trim()!==psEmp){empInput.value=psEmp;localStorage.setItem(SETTINGS_PREFIX+"employerName",psEmp)}
+  }
+  saveMonthlySnapshot(key,psSnap);
   $("payslipPanel").classList.add("hidden");
   renderPayslipCard();renderDashboard();renderHome();
   alert(t("psSavedMsg"));
@@ -1949,7 +1972,7 @@ function renderPayslipCard(){
   $("raioxBtn").classList.toggle("hidden",!(snap&&snap.raiox));
   const chk=$("slipChecked");
   if(snap&&snap.source==="payslip"&&snap.payslipAt){
-    chk.textContent=t("slipChecked",{date:new Date(snap.payslipAt).toLocaleDateString(LOCALES[LANG])});
+    chk.textContent=t("slipChecked",{date:new Date(snap.payslipAt).toLocaleDateString(LOCALES[LANG])})+(snap.employer?" · 🏭 "+snap.employer:"");
     chk.classList.remove("hidden");
   }else chk.classList.add("hidden");
 }
@@ -2019,7 +2042,7 @@ function monthStats(key){
     const current=currentCalculatedValues();
     if(current.gross>0){gross=current.gross;net=current.net;}
   }
-  return {key,days,hours,overtime,night,nightDays,gross,net};
+  return {key,days,hours,overtime,night,nightDays,gross,net,employer:snap?.employer||""};
 }
 // Estatísticas de um mês para um funcionário qualquer (usado no painel
 // do casal). As horas vêm dos dias dele; bruto/líquido vêm do snapshot
@@ -2079,7 +2102,7 @@ function monthStatsFor(emp,key){
     const est=estimateFor(emp,{normal,overtime,night,nightDays,offWeighted},new Date(y,m-1,1));
     if(est&&(days>0||est.fromMonthly)){gross=est.gross;net=est.net;}
   }
-  return {key,days,hours,overtime,night,nightDays,gross,net,offWeighted};
+  return {key,days,hours,overtime,night,nightDays,gross,net,offWeighted,employer:snap?.employer||""};
 }
 function changeText(current,previous){
   if(current==null||previous==null||previous===0)return "—";
@@ -2113,6 +2136,7 @@ function renderChart(title,items,format){
       <div class="barValue">${display}</div>
       <div class="barTrack"><div class="barFill" style="height:${h}%"></div></div>
       <div class="barLabel">${x.label}</div>
+      ${x.employer?`<div class="barEmployer" title="${esc(x.employer)}">🏭 ${esc(x.employer)}</div>`:""}
       <div class="barChange">${change}</div>
     </div>`;
   }).join("");
@@ -2140,7 +2164,7 @@ function renderDashboard(){
   }
   const labels=months.map(x=>monthName(x.key));
   const make=(field,format)=>months.map((x,i)=>({
-    label:labels[i],value:x[field],key:x.key,
+    label:labels[i],value:x[field],key:x.key,employer:x.employer||"",
     change:i===0?"—":changeText(x[field],months[i-1][field])
   }));
   const latest=months[months.length-1];
@@ -2350,6 +2374,8 @@ function calculate(saveSnapshot=false){
     };
     const prevSnap=monthlySnapshot(monthlyKey());
     if(prevSnap&&prevSnap.raiox){snapObj.raiox=prevSnap.raiox;snapObj.payslipAt=prevSnap.payslipAt;if(prevSnap.daysWorked!=null)snapObj.daysWorked=prevSnap.daysWorked}
+    const empName=(prevSnap&&prevSnap.employer)||($("employerName")?.value||"").trim();
+    if(empName)snapObj.employer=empName;
     saveMonthlySnapshot(monthlyKey(),snapObj);
     renderDashboard();
   }
@@ -2370,7 +2396,7 @@ $("deductionMode").onchange=()=>{
 // Configurações da calculadora salvas por funcionário. Para o
 // funcionário principal o prefixo é o histórico "msj-", então os
 // valores já salvos (bônus etc.) continuam valendo sem migração.
-const SETTINGS_FIELDS=["hourlyRate","monthlySalary","baseHours","nightPercent","nightFixed","mealMonthly","otherAllowance","summerBonus","winterBonus","deduction","employmentInsurance","incomeTax","advanceSalary","utilities","rentDeduction","otherDeduction","yukiuTotal","offHours","offPercent"];
+const SETTINGS_FIELDS=["hourlyRate","monthlySalary","baseHours","nightPercent","nightFixed","mealMonthly","otherAllowance","summerBonus","winterBonus","deduction","employmentInsurance","incomeTax","advanceSalary","utilities","rentDeduction","otherDeduction","yukiuTotal","offHours","offPercent","employerName"];
 SETTINGS_FIELDS.forEach(id=>{
   const el=$(id); if(!el)return;
   const saved=localStorage.getItem(SETTINGS_PREFIX+id);
