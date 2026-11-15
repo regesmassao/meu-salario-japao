@@ -1,4 +1,4 @@
-const CACHE="msj-v5-7-1";
+const CACHE="msj-v5-7-2";
 const SHELL=["./","index.html","style.css","app.js","manifest.json"];
 
 self.addEventListener("install",e=>{
