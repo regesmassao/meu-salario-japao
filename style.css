@@ -250,3 +250,5 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:10px 0 8px}
 .raioxOrig{font-weight:400;color:var(--muted);font-size:12px}
 .raioxDesc{font-size:13px;margin-top:3px;line-height:1.5}
 .raioxCheck{font-size:12.5px;color:#059669;margin-top:2px;line-height:1.5}
+
+.barEmployer{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70px;margin:0 auto}
