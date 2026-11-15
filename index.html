@@ -14,11 +14,11 @@
 <header class="top">
   <div>
     <h1>Meu Salário Japão 🇯🇵</h1>
-    <p>Calculadora e controle de jornada</p>
+    <p data-i18n="appSubtitle">Calculadora e controle de jornada</p>
   </div>
   <div class="topBtns">
     <button id="empChip" class="empChip" type="button">👤 <span id="empChipName">Reges</span> ▾</button>
-    <button id="themeBtn" class="iconBtn" aria-label="Alternar tema">🌙</button>
+    <button id="themeBtn" class="iconBtn" data-i18n-aria="themeToggle" aria-label="Alternar tema">🌙</button>
   </div>
 </header>
 
@@ -26,36 +26,36 @@
 <section class="screen active" data-screen="inicio" id="screen-inicio">
   <div class="homeHead"><span id="homeMonth"></span></div>
   <div class="heroNet">
-    <span>Líquido do mês</span>
+    <span data-i18n="homeNetMonth">Líquido do mês</span>
     <strong id="homeNet">—</strong>
     <span id="homeNetChange" class="heroChange"></span>
   </div>
   <div class="card punchCard">
-    <div class="punchHead"><span>⏰ Ponto de hoje</span><span id="punchClock" class="punchClock">--:--:--</span></div>
+    <div class="punchHead"><span data-i18n="punchTitle">⏰ Ponto de hoje</span><span id="punchClock" class="punchClock">--:--:--</span></div>
     <p id="punchStatus" class="punchStatus"></p>
     <button id="punchBtn" class="primary punchBtn" type="button">🟢 Registrar entrada</button>
-    <button id="punchStd" class="punchStdBtn hidden" type="button">Lançar o dia pelo horário padrão</button>
+    <button id="punchStd" class="punchStdBtn hidden" type="button" data-i18n="punchStdBtn">Lançar o dia pelo horário padrão</button>
   </div>
   <div class="metricGrid homeStats">
     <div class="metricCard">
-      <div class="metricTitle">💴 Bruto</div>
+      <div class="metricTitle" data-i18n="metricGross">💴 Bruto</div>
       <strong id="homeGross">—</strong>
     </div>
     <div class="metricCard">
-      <div class="metricTitle">📅 Dias trabalhados</div>
+      <div class="metricTitle" data-i18n="metricDays">📅 Dias trabalhados</div>
       <strong id="homeDays">—</strong>
     </div>
     <div class="metricCard">
-      <div class="metricTitle">⏱️ Horas</div>
+      <div class="metricTitle" data-i18n="metricHours">⏱️ Horas</div>
       <strong id="homeHours">—</strong>
     </div>
     <div class="metricCard">
-      <div class="metricTitle">➕ Extras</div>
+      <div class="metricTitle" data-i18n="metricOvertime">➕ Extras</div>
       <strong id="homeOvertime">—</strong>
     </div>
   </div>
   <div class="card yukiuHome">
-    <div class="yukiuHomeHead"><span>🏖️ Yukiu</span><span class="yukiuHomeLeft">restam <strong id="homeYukiuLeft">—</strong></span></div>
+    <div class="yukiuHomeHead"><span data-i18n="yukiuTitle">🏖️ Yukiu</span><span class="yukiuHomeLeft"><span data-i18n="yukiuLeftWord">restam</span> <strong id="homeYukiuLeft">—</strong></span></div>
     <div class="yukiuProgress"><div id="homeYukiuBar"></div></div>
     <p id="homeYukiuText" class="yukiuHomeText"></p>
   </div>
@@ -63,78 +63,78 @@
   <section id="monthlyDashboard" class="card dashboard">
     <div class="sectionHead dashboardHead">
       <div>
-        <h2>📈 Evolução mensal</h2>
-        <p>Comparação automática com o mês anterior.</p>
+        <h2 data-i18n="dashTitle">📈 Evolução mensal</h2>
+        <p data-i18n="dashSubtitle">Comparação automática com o mês anterior.</p>
       </div>
     </div>
-    <div class="empty">Carregando evolução mensal…</div>
+    <div class="empty" data-i18n="loadingDash">Carregando evolução mensal…</div>
   </section>
 
   <div class="card homeCouple" id="homeCouple"></div>
 
   <div id="homeBackupAlert" class="backupAlert hidden">
     <span id="homeBackupText"></span>
-    <button id="homeBackupBtn" type="button">Fazer backup agora</button>
+    <button id="homeBackupBtn" type="button" data-i18n="backupNowBtn">Fazer backup agora</button>
   </div>
 </section>
 
 <section class="screen" data-screen="calculadora" id="screen-calculadora">
 <section class="card">
-  <h2>💴 Calculadora salarial</h2>
+  <h2 data-i18n="calcTitle">💴 Calculadora salarial</h2>
   <div class="tabs">
-    <button class="tab active" data-mode="hourly">💴 Por hora</button>
-    <button class="tab" data-mode="monthly">👔 Mensal / Seishain</button>
+    <button class="tab active" data-mode="hourly" data-i18n="modeHourly">💴 Por hora</button>
+    <button class="tab" data-mode="monthly" data-i18n="modeMonthly">👔 Mensal / Seishain</button>
   </div>
 
   <div id="hourlyBox" class="grid">
-    <label>Valor por hora (¥)<input id="hourlyRate" type="number" inputmode="decimal" value="1230" min="0"></label>
+    <label><span data-i18n="hourlyRate">Valor por hora (¥)</span><input id="hourlyRate" type="number" inputmode="decimal" value="1230" min="0"></label>
   </div>
 
   <div id="monthlyBox" class="grid hidden">
-    <label>Salário mensal (¥)<input id="monthlySalary" type="number" inputmode="decimal" value="250000" min="0"></label>
-    <label>Horas-base / mês<input id="baseHours" type="number" inputmode="decimal" value="160" min="1"></label>
+    <label><span data-i18n="monthlySalary">Salário mensal (¥)</span><input id="monthlySalary" type="number" inputmode="decimal" value="250000" min="0"></label>
+    <label><span data-i18n="baseHours">Horas-base / mês</span><input id="baseHours" type="number" inputmode="decimal" value="160" min="1"></label>
   </div>
 
   <div class="grid">
-    <label>Horas normais<input id="normalHours" type="number" inputmode="decimal" value="160" min="0" step="0.01"></label>
-    <label>Horas extras (25%)<input id="overtimeHours" type="text" inputmode="decimal" value="0h" autocomplete="off"></label>
-    <label>Horas em folga trabalhada<input id="offHours" type="number" inputmode="decimal" value="0" min="0" step="0.01"></label>
-    <label>Adicional da folga — dia todo (%)<input id="offPercent" type="number" inputmode="decimal" value="35" min="0" step="0.01"></label>
-    <label>Adicional noturno (%)<input id="nightPercent" type="number" inputmode="decimal" value="25" min="0" step="0.01"></label>
-    <label>Horas noturnas<input id="nightHours" type="number" inputmode="decimal" value="0" min="0" step="0.01"></label>
-    <label>Adicional noturno por dia (¥)<input id="nightFixed" type="number" inputmode="decimal" value="1500" min="0"></label>
-    <label>Dias de trabalho noturno<input id="nightDays" type="number" inputmode="decimal" value="0" min="0"></label>
-    <label>Refeição / benefício mensal (¥)<input id="mealMonthly" type="number" inputmode="decimal" value="3500" min="0"></label>
-    <label>Outros adicionais (¥)<input id="otherAllowance" type="number" inputmode="decimal" value="0" min="0"></label>
-    <label>Bônus de verão (¥)<input id="summerBonus" type="number" inputmode="decimal" value="0" min="0"></label>
-    <label>Bônus de verão cai em<select id="bonusSummerMonth"><option value="1">janeiro</option><option value="2">fevereiro</option><option value="3">março</option><option value="4">abril</option><option value="5">maio</option><option value="6">junho</option><option value="7" selected>julho</option><option value="8">agosto</option><option value="9">setembro</option><option value="10">outubro</option><option value="11">novembro</option><option value="12">dezembro</option></select></label>
-    <label>Bônus de inverno (¥)<input id="winterBonus" type="number" inputmode="decimal" value="0" min="0"></label>
-    <label>Bônus de inverno cai em<select id="bonusWinterMonth"><option value="1">janeiro</option><option value="2">fevereiro</option><option value="3">março</option><option value="4">abril</option><option value="5">maio</option><option value="6">junho</option><option value="7">julho</option><option value="8">agosto</option><option value="9">setembro</option><option value="10">outubro</option><option value="11">novembro</option><option value="12" selected>dezembro</option></select></label>
-    <label>Modo de descontos<select id="deductionMode"><option value="percent">Estimativa (%)</option><option value="detailed">Detalhado (¥)</option></select></label>
-    <label>Descontos estimados (%)<input id="deduction" type="number" inputmode="decimal" value="18" min="0" max="100" step="0.1"></label>
+    <label><span data-i18n="normalHours">Horas normais</span><input id="normalHours" type="number" inputmode="decimal" value="160" min="0" step="0.01"></label>
+    <label><span data-i18n="overtimeHours">Horas extras (25%)</span><input id="overtimeHours" type="text" inputmode="decimal" value="0h" autocomplete="off"></label>
+    <label><span data-i18n="offHours">Horas em folga trabalhada</span><input id="offHours" type="number" inputmode="decimal" value="0" min="0" step="0.01"></label>
+    <label><span data-i18n="offPercent">Adicional da folga — dia todo (%)</span><input id="offPercent" type="number" inputmode="decimal" value="35" min="0" step="0.01"></label>
+    <label><span data-i18n="nightPercent">Adicional noturno (%)</span><input id="nightPercent" type="number" inputmode="decimal" value="25" min="0" step="0.01"></label>
+    <label><span data-i18n="nightHours">Horas noturnas</span><input id="nightHours" type="number" inputmode="decimal" value="0" min="0" step="0.01"></label>
+    <label><span data-i18n="nightFixed">Adicional noturno por dia (¥)</span><input id="nightFixed" type="number" inputmode="decimal" value="1500" min="0"></label>
+    <label><span data-i18n="nightDays">Dias de trabalho noturno</span><input id="nightDays" type="number" inputmode="decimal" value="0" min="0"></label>
+    <label><span data-i18n="mealMonthly">Refeição / benefício mensal (¥)</span><input id="mealMonthly" type="number" inputmode="decimal" value="3500" min="0"></label>
+    <label><span data-i18n="otherAllowance">Outros adicionais (¥)</span><input id="otherAllowance" type="number" inputmode="decimal" value="0" min="0"></label>
+    <label><span data-i18n="summerBonus">Bônus de verão (¥)</span><input id="summerBonus" type="number" inputmode="decimal" value="0" min="0"></label>
+    <label><span data-i18n="summerBonusMonth">Bônus de verão cai em</span><select id="bonusSummerMonth"><option value="1" data-i18n="month1">janeiro</option><option value="2" data-i18n="month2">fevereiro</option><option value="3" data-i18n="month3">março</option><option value="4" data-i18n="month4">abril</option><option value="5" data-i18n="month5">maio</option><option value="6" data-i18n="month6">junho</option><option value="7" selected data-i18n="month7">julho</option><option value="8" data-i18n="month8">agosto</option><option value="9" data-i18n="month9">setembro</option><option value="10" data-i18n="month10">outubro</option><option value="11" data-i18n="month11">novembro</option><option value="12" data-i18n="month12">dezembro</option></select></label>
+    <label><span data-i18n="winterBonus">Bônus de inverno (¥)</span><input id="winterBonus" type="number" inputmode="decimal" value="0" min="0"></label>
+    <label><span data-i18n="winterBonusMonth">Bônus de inverno cai em</span><select id="bonusWinterMonth"><option value="1" data-i18n="month1">janeiro</option><option value="2" data-i18n="month2">fevereiro</option><option value="3" data-i18n="month3">março</option><option value="4" data-i18n="month4">abril</option><option value="5" data-i18n="month5">maio</option><option value="6" data-i18n="month6">junho</option><option value="7" data-i18n="month7">julho</option><option value="8" data-i18n="month8">agosto</option><option value="9" data-i18n="month9">setembro</option><option value="10" data-i18n="month10">outubro</option><option value="11" data-i18n="month11">novembro</option><option value="12" selected data-i18n="month12">dezembro</option></select></label>
+    <label><span data-i18n="deductionMode">Modo de descontos</span><select id="deductionMode"><option value="percent" data-i18n="dedModePercent">Estimativa (%)</option><option value="detailed" data-i18n="dedModeDetailed">Detalhado (¥)</option></select></label>
+    <label><span data-i18n="deductionPct">Descontos estimados (%)</span><input id="deduction" type="number" inputmode="decimal" value="18" min="0" max="100" step="0.1"></label>
   </div>
 
   <div id="detailedDeductions" class="grid hidden deductionBox">
-    <div class="fullWidth"><strong>🧾 Descontos detalhados</strong><small>Use esta opção quando quiser reproduzir o holerite real.</small></div>
-    <label>Seguro emprego (¥)<input id="employmentInsurance" type="number" inputmode="decimal" value="0" min="0"></label>
-    <label>Imposto de renda (¥)<input id="incomeTax" type="number" inputmode="decimal" value="0" min="0"></label>
-    <label>Salário adiantado (¥)<input id="advanceSalary" type="number" inputmode="decimal" value="0" min="0"></label>
-    <label>Água / luz / gás (¥)<input id="utilities" type="number" inputmode="decimal" value="0" min="0"></label>
-    <label>Aluguel (¥)<input id="rentDeduction" type="number" inputmode="decimal" value="0" min="0"></label>
-    <label>Outros descontos (¥)<input id="otherDeduction" type="number" inputmode="decimal" value="0" min="0"></label>
+    <div class="fullWidth"><strong data-i18n="detailedTitle">🧾 Descontos detalhados</strong><small data-i18n="detailedHint">Use esta opção quando quiser reproduzir o holerite real.</small></div>
+    <label><span data-i18n="employmentInsurance">Seguro emprego (¥)</span><input id="employmentInsurance" type="number" inputmode="decimal" value="0" min="0"></label>
+    <label><span data-i18n="incomeTax">Imposto de renda (¥)</span><input id="incomeTax" type="number" inputmode="decimal" value="0" min="0"></label>
+    <label><span data-i18n="advanceSalary">Salário adiantado (¥)</span><input id="advanceSalary" type="number" inputmode="decimal" value="0" min="0"></label>
+    <label><span data-i18n="utilities">Água / luz / gás (¥)</span><input id="utilities" type="number" inputmode="decimal" value="0" min="0"></label>
+    <label><span data-i18n="rentDeduction">Aluguel (¥)</span><input id="rentDeduction" type="number" inputmode="decimal" value="0" min="0"></label>
+    <label><span data-i18n="otherDeduction">Outros descontos (¥)</span><input id="otherDeduction" type="number" inputmode="decimal" value="0" min="0"></label>
   </div>
 
   <div class="result">
-    <div><span>Folga trabalhada</span><strong id="offOut">¥0</strong></div>
-    <div><span>Bônus do mês (parcela)</span><strong id="bonusOut">¥0</strong></div>
-    <div><span>Bruto mensal</span><strong id="gross">¥0</strong></div>
+    <div><span data-i18n="resOff">Folga trabalhada</span><strong id="offOut">¥0</strong></div>
+    <div><span data-i18n="resBonus">Bônus do mês (parcela)</span><strong id="bonusOut">¥0</strong></div>
+    <div><span data-i18n="resGross">Bruto mensal</span><strong id="gross">¥0</strong></div>
     <div><span id="mandatoryLabel">Descontos obrigatórios</span><strong id="mandatoryDeductions">¥0</strong></div>
-    <div><span>Outros descontos</span><strong id="otherDeductions">¥0</strong></div>
-    <div><span>Total de descontos</span><strong id="deductions">¥0</strong></div>
-    <div><span>Líquido estimado</span><strong id="net">¥0</strong></div>
-    <div><span>Hora-base calculada</span><strong id="rateOut">¥0</strong></div>
+    <div><span data-i18n="resOtherDed">Outros descontos</span><strong id="otherDeductions">¥0</strong></div>
+    <div><span data-i18n="resTotalDed">Total de descontos</span><strong id="deductions">¥0</strong></div>
+    <div><span data-i18n="resNet">Líquido estimado</span><strong id="net">¥0</strong></div>
+    <div><span data-i18n="resRate">Hora-base calculada</span><strong id="rateOut">¥0</strong></div>
   </div>
-  <button id="calcBtn" class="primary">Calcular</button>
+  <button id="calcBtn" class="primary" data-i18n="calcBtn">Calcular</button>
 </section>
 </section>
 
@@ -142,8 +142,8 @@
 <section class="card">
   <div class="sectionHead">
     <div>
-      <h2>📅 Controle de Jornada</h2>
-      <p>Registre entrada, intervalo e saída de cada dia.</p>
+      <h2 data-i18n="workTitle">📅 Controle de Jornada</h2>
+      <p data-i18n="workSubtitle">Registre entrada, intervalo e saída de cada dia.</p>
     </div>
     <div class="monthNav">
       <button id="prevMonth" class="smallBtn">‹</button>
@@ -153,27 +153,27 @@
   </div>
 
   <div class="yukiuBox">
-    <label>Dias de yukiu cadastrados<input id="yukiuTotal" type="number" inputmode="decimal" value="0" min="0" step="0.5"></label>
+    <label><span data-i18n="yukiuTotalLabel">Dias de yukiu cadastrados</span><input id="yukiuTotal" type="number" inputmode="decimal" value="0" min="0" step="0.5"></label>
     <p id="yukiuStatus" class="yukiuStatus"></p>
-    <p class="yukiuNote">Marque o yukiu no editor do dia (toque no dia no calendário): o saldo diminui sozinho. Se apagar ou desmarcar o dia, o saldo volta.</p>
+    <p class="yukiuNote" data-i18n="yukiuNote">Marque o yukiu no editor do dia (toque no dia no calendário): o saldo diminui sozinho. Se apagar ou desmarcar o dia, o saldo volta.</p>
   </div>
 
   <div class="yukiuBox stdBox">
-    <div class="breaksHead stdHead"><strong>⏰ Horário padrão — registro rápido</strong></div>
+    <div class="breaksHead stdHead"><strong data-i18n="stdTitle">⏰ Horário padrão — registro rápido</strong></div>
     <div class="grid">
-      <label>Entrada<input id="stdIn" type="time"></label>
-      <label>Saída<input id="stdOut" type="time"></label>
+      <label><span data-i18n="labelIn">Entrada</span><input id="stdIn" type="time"></label>
+      <label><span data-i18n="labelOut">Saída</span><input id="stdOut" type="time"></label>
     </div>
     <div class="breaksHead">
-      <strong>Intervalos padrão</strong>
-      <button id="addStdBreak" type="button" class="smallBtn">+ Adicionar intervalo</button>
+      <strong data-i18n="stdBreaksTitle">Intervalos padrão</strong>
+      <button id="addStdBreak" type="button" class="smallBtn" data-i18n="addBreakBtn">+ Adicionar intervalo</button>
     </div>
     <div id="stdBreaksList"></div>
-    <p class="yukiuNote">Salvo automaticamente. Estes horários e intervalos entram sozinhos quando você bate o ponto (entrada/saída pelo relógio) ou lança o dia pelo horário padrão na tela Início. Cada funcionário tem o seu.</p>
+    <p class="yukiuNote" data-i18n="stdNote">Salvo automaticamente. Estes horários e intervalos entram sozinhos quando você bate o ponto (entrada/saída pelo relógio) ou lança o dia pelo horário padrão na tela Início. Cada funcionário tem o seu.</p>
   </div>
 
   <div class="calendar">
-    <div class="week"><span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span></div>
+    <div class="week"><span data-i18n="wd0">Dom</span><span data-i18n="wd1">Seg</span><span data-i18n="wd2">Ter</span><span data-i18n="wd3">Qua</span><span data-i18n="wd4">Qui</span><span data-i18n="wd5">Sex</span><span data-i18n="wd6">Sáb</span></div>
     <div id="calendarGrid" class="days"></div>
   </div>
 
@@ -183,39 +183,39 @@
       <button id="closeEditor" class="smallBtn">✕</button>
     </div>
     <div class="grid">
-      <label>Entrada<input id="timeIn" type="time"></label>
-      <label>Saída<input id="timeOut" type="time"></label>
+      <label><span data-i18n="labelIn">Entrada</span><input id="timeIn" type="time"></label>
+      <label><span data-i18n="labelOut">Saída</span><input id="timeOut" type="time"></label>
     </div>
-    <label>🏖️ Yukiu neste dia
+    <label><span data-i18n="dayYukiuLabel">🏖️ Yukiu neste dia</span>
       <select id="dayYukiu">
-        <option value="0">Não</option>
-        <option value="1">Dia inteiro</option>
-        <option value="0.5">Meio dia</option>
+        <option value="0" data-i18n="yukiuNo">Não</option>
+        <option value="1" data-i18n="yukiuFull">Dia inteiro</option>
+        <option value="0.5" data-i18n="yukiuHalf">Meio dia</option>
       </select>
     </label>
-    <label>💪 Tipo do dia
+    <label><span data-i18n="dayOffLabel">💪 Tipo do dia</span>
       <select id="dayOff">
-        <option value="">Dia normal</option>
-        <option value="0">Folga trabalhada — paga como dia normal</option>
-        <option value="25">Folga trabalhada — +25% o dia todo</option>
-        <option value="35">Folga trabalhada — +35% o dia todo</option>
+        <option value="" data-i18n="offNormal">Dia normal</option>
+        <option value="0" data-i18n="offAsNormal">Folga trabalhada — paga como dia normal</option>
+        <option value="25" data-i18n="off25">Folga trabalhada — +25% o dia todo</option>
+        <option value="35" data-i18n="off35">Folga trabalhada — +35% o dia todo</option>
       </select>
     </label>
     <div class="breaksHead">
-      <strong>⏸️ Intervalos (kyukei) — não remunerados</strong>
-      <button id="addBreak" type="button" class="smallBtn">+ Adicionar intervalo</button>
+      <strong data-i18n="breaksTitle">⏸️ Intervalos (kyukei) — não remunerados</strong>
+      <button id="addBreak" type="button" class="smallBtn" data-i18n="addBreakBtn">+ Adicionar intervalo</button>
     </div>
     <div id="breaksList"></div>
-    <label>Observação (opcional)<input id="dayNote" type="text" maxlength="100" placeholder="Ex.: turno noturno"></label>
+    <label><span data-i18n="noteLabel">Observação (opcional)</span><input id="dayNote" type="text" maxlength="100" data-i18n-ph="notePlaceholder" placeholder="Ex.: turno noturno"></label>
     <div id="daySummary" class="daySummary"></div>
     <div class="actions">
-      <button id="saveDay" class="primary">💾 Salvar dia</button>
-      <button id="deleteDay" class="danger">🗑️ Excluir</button>
+      <button id="saveDay" class="primary" data-i18n="saveDayBtn">💾 Salvar dia</button>
+      <button id="deleteDay" class="danger" data-i18n="deleteBtn">🗑️ Excluir</button>
     </div>
   </div>
 
   <div class="historyHead">
-    <h3>📋 Histórico do mês</h3>
+    <h3 data-i18n="historyTitle">📋 Histórico do mês</h3>
     <span id="monthTotals"></span>
   </div>
   <div id="history" class="history"></div>
@@ -224,14 +224,14 @@
 
 <section class="screen" data-screen="casal" id="screen-casal">
 <section id="coupleDashboard" class="card dashboard">
-  <div class="empty">Carregando funcionários…</div>
+  <div class="empty" data-i18n="loadingEmployees">Carregando funcionários…</div>
 </section>
 
 <section class="card dashboard" id="annualCard">
   <div class="sectionHead dashboardHead">
     <div>
-      <h2>📆 Resumo anual</h2>
-      <p>Totais do ano por funcionário — útil na declaração de fim de ano.</p>
+      <h2 data-i18n="annualTitle">📆 Resumo anual</h2>
+      <p data-i18n="annualSubtitle">Totais do ano por funcionário — útil na declaração de fim de ano.</p>
     </div>
     <div class="monthNav">
       <button id="prevYear" class="smallBtn">‹</button>
@@ -245,25 +245,43 @@
 
 <section class="screen" data-screen="ajustes" id="screen-ajustes">
 <section class="card employeeBar">
-  <label class="employeeLabel">👤 Funcionário ativo
+  <label class="employeeLabel"><span data-i18n="activeEmployeeLabel">👤 Funcionário ativo</span>
     <select id="employeeSelect"></select>
   </label>
-  <p class="employeeNote">Tudo o que você preencher — calculadora e controle de jornada — fica salvo para este funcionário. Para lançar os dados da outra pessoa, troque o funcionário aqui.</p>
-  <h4 class="empManageTitle">⚙️ Gerenciar funcionários</h4>
+  <p class="employeeNote" data-i18n="employeeNote">Tudo o que você preencher — calculadora e controle de jornada — fica salvo para este funcionário. Para lançar os dados da outra pessoa, troque o funcionário aqui.</p>
+  <h4 class="empManageTitle" data-i18n="manageTitle">⚙️ Gerenciar funcionários</h4>
   <div id="employeeManage"></div>
 </section>
 
 <section class="card">
   <div class="sectionHead">
     <div>
-      <h2>💾 Backup dos dados</h2>
-      <p>Seus dias registrados e configurações ficam salvos só neste aparelho. Exporte um arquivo de backup e guarde em local seguro (Arquivos, e-mail ou nuvem). Se um dia precisar, importe o arquivo e tudo volta como estava.</p>
+      <h2 data-i18n="langTitle">🌐 Idioma</h2>
+      <p data-i18n="langNote">O idioma escolhido vale só para este aparelho.</p>
+    </div>
+  </div>
+  <label class="employeeLabel"><span data-i18n="langLabel">Idioma do aplicativo</span>
+    <select id="langSelect">
+      <option value="pt">Português</option>
+      <option value="ja">日本語</option>
+      <option value="en">English</option>
+      <option value="vi">Tiếng Việt</option>
+      <option value="ne">नेपाली</option>
+    </select>
+  </label>
+</section>
+
+<section class="card">
+  <div class="sectionHead">
+    <div>
+      <h2 data-i18n="backupTitle">💾 Backup dos dados</h2>
+      <p data-i18n="backupDesc">Seus dias registrados e configurações ficam salvos só neste aparelho. Exporte um arquivo de backup e guarde em local seguro (Arquivos, e-mail ou nuvem). Se um dia precisar, importe o arquivo e tudo volta como estava.</p>
     </div>
   </div>
   <div class="actions">
-    <button id="exportBackup" class="primary" type="button">⬇️ Exportar backup</button>
-    <button id="importBackup" type="button">⬆️ Importar backup</button>
-    <button id="mergeBackup" type="button">🔀 Juntar backup de outro celular</button>
+    <button id="exportBackup" class="primary" type="button" data-i18n="exportBtn">⬇️ Exportar backup</button>
+    <button id="importBackup" type="button" data-i18n="importBtn">⬆️ Importar backup</button>
+    <button id="mergeBackup" type="button" data-i18n="mergeBtn">🔀 Juntar backup de outro celular</button>
   </div>
   <input id="importFile" type="file" accept="application/json,.json" class="hidden">
   <input id="mergeFile" type="file" accept="application/json,.json" class="hidden">
@@ -271,16 +289,16 @@
   <p id="backupReminder" class="backupReminder"></p>
 </section>
 
-<footer>Meu Salário Japão 🇯🇵 — V5.5.1</footer>
+<footer>Meu Salário Japão 🇯🇵 — V5.6</footer>
 </section>
 </main>
 
 <nav class="tabbar" aria-label="Navegação principal">
-  <button type="button" class="navTab active" data-screen="inicio"><span class="navIcon">🏠</span><span>Início</span></button>
-  <button type="button" class="navTab" data-screen="calculadora"><span class="navIcon">💴</span><span>Calculadora</span></button>
-  <button type="button" class="navTab" data-screen="jornada"><span class="navIcon">📅</span><span>Jornada</span></button>
-  <button type="button" class="navTab" data-screen="casal"><span class="navIcon">👥</span><span>Casal</span></button>
-  <button type="button" class="navTab" data-screen="ajustes"><span class="navIcon">⚙️</span><span>Ajustes</span></button>
+  <button type="button" class="navTab active" data-screen="inicio"><span class="navIcon">🏠</span><span data-i18n="navHome">Início</span></button>
+  <button type="button" class="navTab" data-screen="calculadora"><span class="navIcon">💴</span><span data-i18n="navCalc">Calculadora</span></button>
+  <button type="button" class="navTab" data-screen="jornada"><span class="navIcon">📅</span><span data-i18n="navWork">Jornada</span></button>
+  <button type="button" class="navTab" data-screen="casal"><span class="navIcon">👥</span><span data-i18n="navCouple">Casal</span></button>
+  <button type="button" class="navTab" data-screen="ajustes"><span class="navIcon">⚙️</span><span data-i18n="navSettings">Ajustes</span></button>
 </nav>
 
 <script src="app.js"></script>
