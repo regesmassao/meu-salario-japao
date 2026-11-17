@@ -210,7 +210,29 @@ mergeNoData:"Este arquivo não tem dados de funcionário para juntar.",
 mergeNewTag:" (novo — será criado)",
 mergeLine:"• {name}: {days} dia(s){tag}",
 mergeConfirm:"Juntar o backup de {when} com os dados deste aparelho?\n\n{desc}\n\nOs dias entram no funcionário de mesmo nome. Se o mesmo dia existir nos dois aparelhos, vale a cópia do arquivo. Nenhum dado atual é apagado.",
-mergeDone:"Backup juntado com sucesso: {days} dia(s) incorporados. Recarregando o app…"
+mergeDone:"Backup juntado com sucesso: {days} dia(s) incorporados. Recarregando o app…",
+driveTitle:"☁️ Nuvem (Google Drive)",
+driveDesc:"Guarde o backup num arquivo no SEU Google Drive, usando a sua ponte (script). O app fala só com o seu script: enviar manda o backup atual pra nuvem; baixar junta o backup da nuvem com os dados deste aparelho, sem apagar nada.",
+driveUrlLbl:"Link do script",
+driveUrlPh:"Cole o link do script (termina em /exec)",
+driveKeyLbl:"Chave secreta",
+driveKeyPh:"A mesma chave colocada no script",
+driveSaveBtn:"Salvar link e chave",
+driveSaved:"✔️ Link e chave salvos neste aparelho.",
+driveUpBtn:"⬆️ Enviar backup pra nuvem",
+driveDownBtn:"⬇️ Baixar da nuvem e juntar",
+driveSyncLine:"Envio: {up} · Baixa: {down}",
+driveNever:"nunca",
+driveNeedConfig:"Primeiro cole o link do script e a chave secreta, e toque em Salvar.",
+driveSending:"Enviando pra nuvem…",
+driveUpDone:"✔️ Backup enviado pra nuvem com {days} dia(s).",
+driveReading:"Consultando a nuvem…",
+driveNoRemote:"Ainda não há backup na nuvem. Envie o primeiro pelo botão de enviar.",
+driveUnauthorized:"❌ O script recusou a chave. Confira se a chave salva aqui é igual à chave do script.",
+driveNetError:"❌ Não consegui falar com o script. Confira o link e a conexão com a internet.",
+driveBadData:"❌ O que veio da nuvem não é um backup válido. Nada foi alterado.",
+driveNewer:"☁️ Há um backup mais novo na nuvem (de {date}). Se quiser trazer pra este aparelho, toque em “Baixar da nuvem e juntar”.",
+driveDismiss:"Fechar aviso"
 },
 ja:{
 appSubtitle:"給与計算と勤務管理",
@@ -370,7 +392,29 @@ mergeNoData:"このファイルには合体できる従業員のデータがあ�
 mergeNewTag:"（新規 — 作成されます）",
 mergeLine:"• {name}：{days} 日{tag}",
 mergeConfirm:"{when} のバックアップをこの端末のデータに合体しますか？\n\n{desc}\n\n日は同名の従業員に入ります。同じ日が両方にある場合はファイル側が優先されます。現在のデータは削除されません。",
-mergeDone:"合体が完了しました：{days} 日分を取り込みました。アプリを再読み込みします…"
+mergeDone:"合体が完了しました：{days} 日分を取り込みました。アプリを再読み込みします…",
+driveTitle:"☁️ クラウド (Google Drive)",
+driveDesc:"あなたの Google ドライブ内のファイルに、あなたのブリッジ（スクリプト）経由でバックアップを保存します。アプリが通信するのはあなたのスクリプトだけです。送信すると現在のバックアップがクラウドへ送られ、ダウンロードするとクラウドのバックアップをこの端末のデータに合体します（何も削除されません）。",
+driveUrlLbl:"スクリプトのリンク",
+driveUrlPh:"スクリプトのリンクを貼り付け（末尾は /exec）",
+driveKeyLbl:"秘密キー",
+driveKeyPh:"スクリプトに入れたのと同じキー",
+driveSaveBtn:"リンクとキーを保存",
+driveSaved:"✔️ リンクとキーをこの端末に保存しました。",
+driveUpBtn:"⬆️ バックアップをクラウドへ送信",
+driveDownBtn:"⬇️ クラウドからダウンロードして合体",
+driveSyncLine:"送信: {up} · 取得: {down}",
+driveNever:"まだ",
+driveNeedConfig:"まずスクリプトのリンクと秘密キーを貼り付けて「保存」を押してください。",
+driveSending:"クラウドへ送信中…",
+driveUpDone:"✔️ バックアップをクラウドへ送信しました（{days} 日分）。",
+driveReading:"クラウドを確認中…",
+driveNoRemote:"クラウドにはまだバックアップがありません。送信ボタンで最初のバックアップを送ってください。",
+driveUnauthorized:"❌ スクリプトにキーを拒否されました。保存したキーがスクリプトのキーと同じか確認してください。",
+driveNetError:"❌ スクリプトに接続できませんでした。リンクとインターネット接続を確認してください。",
+driveBadData:"❌ クラウドから来たデータは有効なバックアップではありません。何も変更されていません。",
+driveNewer:"☁️ クラウドにもっと新しいバックアップがあります（{date}）。この端末に取り込む場合は「クラウドからダウンロードして合体」を押してください。",
+driveDismiss:"お知らせを閉じる"
 },
 en:{
 appSubtitle:"Salary calculator & work log",
@@ -530,7 +574,29 @@ mergeNoData:"This file has no employee data to merge.",
 mergeNewTag:" (new — will be created)",
 mergeLine:"• {name}: {days} day(s){tag}",
 mergeConfirm:"Merge the backup from {when} with this device's data?\n\n{desc}\n\nThe days go to the employee with the same name. If the same day exists on both devices, the file's copy wins. No current data is deleted.",
-mergeDone:"Backup merged successfully: {days} day(s) added. Reloading the app…"
+mergeDone:"Backup merged successfully: {days} day(s) added. Reloading the app…",
+driveTitle:"☁️ Cloud (Google Drive)",
+driveDesc:"Keep the backup in a file in YOUR Google Drive, through your own bridge (script). The app talks only to your script: sending uploads the current backup to the cloud; downloading merges the cloud backup with this device's data, deleting nothing.",
+driveUrlLbl:"Script link",
+driveUrlPh:"Paste the script link (ends in /exec)",
+driveKeyLbl:"Secret key",
+driveKeyPh:"The same key you put in the script",
+driveSaveBtn:"Save link and key",
+driveSaved:"✔️ Link and key saved on this device.",
+driveUpBtn:"⬆️ Send backup to the cloud",
+driveDownBtn:"⬇️ Download from cloud and merge",
+driveSyncLine:"Sent: {up} · Downloaded: {down}",
+driveNever:"never",
+driveNeedConfig:"First paste the script link and the secret key, then tap Save.",
+driveSending:"Sending to the cloud…",
+driveUpDone:"✔️ Backup sent to the cloud with {days} day(s).",
+driveReading:"Checking the cloud…",
+driveNoRemote:"There is no backup in the cloud yet. Send the first one with the send button.",
+driveUnauthorized:"❌ The script refused the key. Check that the saved key matches the key in the script.",
+driveNetError:"❌ Couldn't reach the script. Check the link and your internet connection.",
+driveBadData:"❌ What came from the cloud is not a valid backup. Nothing was changed.",
+driveNewer:"☁️ There is a newer backup in the cloud (from {date}). To bring it to this device, tap “Download from cloud and merge”.",
+driveDismiss:"Dismiss notice"
 },
 vi:{
 appSubtitle:"Tính lương & quản lý giờ làm",
@@ -690,7 +756,29 @@ mergeNoData:"Tệp này không có dữ liệu nhân viên để gộp.",
 mergeNewTag:" (mới — sẽ được tạo)",
 mergeLine:"• {name}: {days} ngày{tag}",
 mergeConfirm:"Gộp bản sao lưu từ {when} với dữ liệu của thiết bị này?\n\n{desc}\n\nCác ngày sẽ vào nhân viên có cùng tên. Nếu cùng một ngày có ở cả hai thiết bị, bản trong tệp sẽ được dùng. Không có dữ liệu hiện tại nào bị xóa.",
-mergeDone:"Đã gộp sao lưu thành công: thêm {days} ngày. Đang tải lại ứng dụng…"
+mergeDone:"Đã gộp sao lưu thành công: thêm {days} ngày. Đang tải lại ứng dụng…",
+driveTitle:"☁️ Đám mây (Google Drive)",
+driveDesc:"Giữ bản sao lưu trong một tệp trên Google Drive CỦA BẠN, qua cầu nối (script) của bạn. Ứng dụng chỉ liên lạc với script của bạn: gửi lên sẽ tải bản sao lưu hiện tại lên đám mây; tải về sẽ gộp bản sao lưu trên đám mây với dữ liệu của thiết bị này, không xóa gì cả.",
+driveUrlLbl:"Liên kết script",
+driveUrlPh:"Dán liên kết script (kết thúc bằng /exec)",
+driveKeyLbl:"Khóa bí mật",
+driveKeyPh:"Cùng khóa đã đặt trong script",
+driveSaveBtn:"Lưu liên kết và khóa",
+driveSaved:"✔️ Đã lưu liên kết và khóa trên thiết bị này.",
+driveUpBtn:"⬆️ Gửi sao lưu lên đám mây",
+driveDownBtn:"⬇️ Tải từ đám mây về và gộp",
+driveSyncLine:"Đã gửi: {up} · Đã tải: {down}",
+driveNever:"chưa bao giờ",
+driveNeedConfig:"Trước tiên hãy dán liên kết script và khóa bí mật, rồi nhấn Lưu.",
+driveSending:"Đang gửi lên đám mây…",
+driveUpDone:"✔️ Đã gửi sao lưu lên đám mây với {days} ngày.",
+driveReading:"Đang kiểm tra đám mây…",
+driveNoRemote:"Chưa có sao lưu trên đám mây. Hãy gửi bản đầu tiên bằng nút gửi.",
+driveUnauthorized:"❌ Script đã từ chối khóa. Kiểm tra khóa đã lưu có giống khóa trong script không.",
+driveNetError:"❌ Không liên lạc được với script. Kiểm tra liên kết và kết nối internet.",
+driveBadData:"❌ Dữ liệu từ đám mây không phải sao lưu hợp lệ. Không có gì thay đổi.",
+driveNewer:"☁️ Có bản sao lưu mới hơn trên đám mây (từ {date}). Muốn đưa về thiết bị này, nhấn “Tải từ đám mây về và gộp”.",
+driveDismiss:"Đóng thông báo"
 },
 ne:{
 appSubtitle:"तलब क्याल्कुलेटर र कामको रेकर्ड",
@@ -850,7 +938,29 @@ mergeNoData:"यो फाइलमा मिलाउने कर्मचा�
 mergeNewTag:" (नयाँ — सिर्जना हुनेछ)",
 mergeLine:"• {name}: {days} दिन{tag}",
 mergeConfirm:"{when} को ब्याकअप यो उपकरणको डेटासँग मिलाउने?\n\n{desc}\n\nदिनहरू उही नामको कर्मचारीमा जान्छन्। एउटै दिन दुवै उपकरणमा भए, फाइलको प्रति मान्य हुन्छ। हालको कुनै डेटा मेटिँदैन।",
-mergeDone:"ब्याकअप सफलतापूर्वक मिल्यो: {days} दिन थपियो। एप पुनः लोड हुँदैछ…"
+mergeDone:"ब्याकअप सफलतापूर्वक मिल्यो: {days} दिन थपियो। एप पुनः लोड हुँदैछ…",
+driveTitle:"☁️ क्लाउड (Google Drive)",
+driveDesc:"तपाईंको आफ्नै ब्रिज (स्क्रिप्ट) मार्फत तपाईंको Google Drive मा रहेको फाइलमा ब्याकअप राख्नुहोस्। एपले तपाईंको स्क्रिप्टसँग मात्र कुरा गर्छ: पठाउँदा हालको ब्याकअप क्लाउडमा जान्छ; डाउनलोड गर्दा क्लाउडको ब्याकअप यो उपकरणको डेटासँग मिल्छ, केही पनि मेटिँदैन।",
+driveUrlLbl:"स्क्रिप्टको लिङ्क",
+driveUrlPh:"स्क्रिप्टको लिङ्क टाँस्नुहोस् (/exec मा सकिन्छ)",
+driveKeyLbl:"गोप्य कुञ्जी",
+driveKeyPh:"स्क्रिप्टमा राखेको उही कुञ्जी",
+driveSaveBtn:"लिङ्क र कुञ्जी बचत गर्नुहोस्",
+driveSaved:"✔️ लिङ्क र कुञ्जी यो उपकरणमा बचत भयो।",
+driveUpBtn:"⬆️ ब्याकअप क्लाउडमा पठाउनुहोस्",
+driveDownBtn:"⬇️ क्लाउडबाट डाउनलोड गरेर मिलाउनुहोस्",
+driveSyncLine:"पठाएको: {up} · डाउनलोड: {down}",
+driveNever:"कहिल्यै छैन",
+driveNeedConfig:"पहिले स्क्रिप्टको लिङ्क र गोप्य कुञ्जी टाँसेर बचत थिच्नुहोस्।",
+driveSending:"क्लाउडमा पठाउँदै…",
+driveUpDone:"✔️ {days} दिनसहित ब्याकअप क्लाउडमा पठाइयो।",
+driveReading:"क्लाउड जाँच गर्दै…",
+driveNoRemote:"क्लाउडमा अझै ब्याकअप छैन। पठाउने बटनले पहिलो पठाउनुहोस्।",
+driveUnauthorized:"❌ स्क्रिप्टले कुञ्जी अस्वीकार गर्यो। बचत गरेको कुञ्जी स्क्रिप्टको कुञ्जीसँग मिल्छ कि जाँच्नुहोस्।",
+driveNetError:"❌ स्क्रिप्टसँग कुरा गर्न सकिएन। लिङ्क र इन्टरनेट जाँच्नुहोस्।",
+driveBadData:"❌ क्लाउडबाट आएको डेटा मान्य ब्याकअप होइन। केही परिवर्तन भएन।",
+driveNewer:"☁️ क्लाउडमा नयाँ ब्याकअप छ ({date} को)। यो उपकरणमा ल्याउन “क्लाउडबाट डाउनलोड गरेर मिलाउनुहोस्” थिच्नुहोस्।",
+driveDismiss:"सूचना बन्द गर्नुहोस्"
 }
 };
 let LANG=localStorage.getItem(LANG_KEY)||"pt";
@@ -1252,11 +1362,16 @@ function renderAnnual(){
 // O backup guarda as chaves e valores exatamente como estão, para a
 // restauração ser fiel ao original.
 const BACKUP_PREFIX="msj-";
+// Chaves da nuvem (V6.0): link/chave do script-ponte e marcas de
+// sincronização são DESTE aparelho — nunca entram no backup (a chave
+// secreta não pode viajar dentro de um arquivo exportado) e nunca
+// são tocadas pelas importações.
+const DRIVE_KEYS=["msj-driveUrl","msj-driveKey","msj-driveLastUp","msj-driveLastDown","msj-driveRemoteAt"];
 function collectBackup(){
   const data={};
   for(let i=0;i<localStorage.length;i++){
     const k=localStorage.key(i);
-    if(k&&k.startsWith(BACKUP_PREFIX))data[k]=localStorage.getItem(k);
+    if(k&&k.startsWith(BACKUP_PREFIX)&&!DRIVE_KEYS.includes(k))data[k]=localStorage.getItem(k);
   }
   return {app:"meu-salario-japao",version:1,exportedAt:new Date().toISOString(),data};
 }
@@ -1268,14 +1383,20 @@ function applyBackup(backup){
   if(!backup||typeof backup!=="object"||!backup.data||typeof backup.data!=="object"){
     throw new Error("invalid backup");
   }
-  const keys=Object.keys(backup.data).filter(k=>k.startsWith(BACKUP_PREFIX));
+  // Defesa extra (V6.0): as chaves da nuvem deste aparelho são
+  // preservadas na troca e as que vierem dentro do arquivo são
+  // descartadas — a configuração da nuvem é de cada aparelho.
+  const savedDrive={};
+  DRIVE_KEYS.forEach(k=>{const v=localStorage.getItem(k);if(v!=null)savedDrive[k]=v;});
+  const keys=Object.keys(backup.data).filter(k=>k.startsWith(BACKUP_PREFIX)&&!DRIVE_KEYS.includes(k));
   const current=[];
   for(let i=0;i<localStorage.length;i++){
     const k=localStorage.key(i);
-    if(k&&k.startsWith(BACKUP_PREFIX))current.push(k);
+    if(k&&k.startsWith(BACKUP_PREFIX)&&!DRIVE_KEYS.includes(k))current.push(k);
   }
   current.forEach(k=>localStorage.removeItem(k));
   keys.forEach(k=>localStorage.setItem(k,String(backup.data[k])));
+  Object.keys(savedDrive).forEach(k=>localStorage.setItem(k,savedDrive[k]));
   return keys.length;
 }
 function exportBackup(){
@@ -1384,6 +1505,155 @@ function importMergeFile(file){
     }
   };
   reader.readAsText(file);
+}
+// ---------- Nuvem: backup no Google Drive (V6.0) ----------
+// Uma ponte em Apps Script, na conta Google do próprio usuário,
+// guarda UM arquivo de backup no Drive dele. O app fala com a
+// ponte por fetch: GET ?key=&action=read devolve {ok, exists,
+// updatedAt, data}; POST ?key=&action=write (corpo = o JSON do
+// backup, como texto puro, pra não disparar preflight de CORS)
+// devolve {ok, updatedAt}. Link e chave ficam salvos só neste
+// aparelho (chaves msj-drive*, fora de qualquer backup).
+function driveConfig(){
+  return {
+    url:String(localStorage.getItem("msj-driveUrl")||"").trim(),
+    key:String(localStorage.getItem("msj-driveKey")||"").trim()
+  };
+}
+function driveApiUrl(action){
+  const c=driveConfig();
+  const sep=c.url.includes("?")?"&":"?";
+  return c.url+sep+"key="+encodeURIComponent(c.key)+"&action="+action;
+}
+function driveSetStatus(msg){
+  const el=$("driveStatus");
+  if(el)el.textContent=msg;
+}
+function driveFmtWhen(ts){
+  const n=Number(ts||0);
+  return n>0?new Date(n).toLocaleString(LOCALES[LANG]):t("driveNever");
+}
+function driveRenderSync(){
+  const el=$("driveSync");
+  if(!el)return;
+  el.textContent=t("driveSyncLine",{
+    up:driveFmtWhen(localStorage.getItem("msj-driveLastUp")),
+    down:driveFmtWhen(localStorage.getItem("msj-driveLastDown"))
+  });
+}
+function driveSaveConfig(){
+  localStorage.setItem("msj-driveUrl",String($("driveUrl").value||"").trim());
+  localStorage.setItem("msj-driveKey",String($("driveKey").value||"").trim());
+  driveSetStatus(t("driveSaved"));
+  driveCheckOnOpen();
+}
+async function driveFetchJson(url,options){
+  let res;
+  try{
+    res=await fetch(url,options);
+  }catch(e){
+    throw new Error("network");
+  }
+  let body=null;
+  try{body=await res.json();}catch(e){body=null;}
+  if(!body||body.ok!==true){
+    if(body&&body.error==="unauthorized")throw new Error("unauthorized");
+    throw new Error("network");
+  }
+  return body;
+}
+function driveErrorStatus(e){
+  driveSetStatus(e&&e.message==="unauthorized"?t("driveUnauthorized"):t("driveNetError"));
+}
+async function driveReadRemote(){
+  return driveFetchJson(driveApiUrl("read"),{method:"GET"});
+}
+async function driveUpload(){
+  const c=driveConfig();
+  if(!c.url||!c.key){driveSetStatus(t("driveNeedConfig"));return;}
+  driveSetStatus(t("driveSending"));
+  // Como no exportar: a data do último backup é marcada ANTES de
+  // montar o backup, pra ela viajar dentro do próprio arquivo.
+  localStorage.setItem("msj-lastBackupAt",String(Date.now()));
+  const backup=collectBackup();
+  try{
+    const r=await driveFetchJson(driveApiUrl("write"),{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(backup)
+    });
+    localStorage.setItem("msj-driveLastUp",String(Date.now()));
+    if(r.updatedAt)localStorage.setItem("msj-driveRemoteAt",String(r.updatedAt));
+    driveSetStatus(t("driveUpDone",{days:countBackupDays(backup.data)}));
+    driveRenderSync();
+    renderBackupReminder();
+    driveHideNotice();
+  }catch(e){
+    driveErrorStatus(e);
+  }
+}
+async function driveDownload(){
+  const c=driveConfig();
+  if(!c.url||!c.key){driveSetStatus(t("driveNeedConfig"));return;}
+  driveSetStatus(t("driveReading"));
+  let r;
+  try{
+    r=await driveReadRemote();
+  }catch(e){
+    driveErrorStatus(e);
+    return;
+  }
+  if(!r.exists||!r.data){driveSetStatus(t("driveNoRemote"));return;}
+  const backup=r.data;
+  if(!backup||typeof backup!=="object"||backup.app!=="meu-salario-japao"||!backup.data||typeof backup.data!=="object"){
+    driveSetStatus(t("driveBadData"));
+    return;
+  }
+  // Mesmo fluxo do "juntar backup de outro celular": mostra o
+  // resumo, pede confirmação e incorpora SEM apagar nada local.
+  let plan;
+  try{
+    plan=planMerge(backup);
+  }catch(e){
+    driveSetStatus(t("driveBadData"));
+    return;
+  }
+  if(!plan.length){alert(t("mergeNoData"));driveSetStatus("");return;}
+  const when=backup.exportedAt?new Date(backup.exportedAt).toLocaleDateString(LOCALES[LANG]):t("unknownDate");
+  const desc=plan.map(p=>{
+    const found=employees.some(e=>mergeNormName(e.name)===mergeNormName(p.emp.name));
+    return t("mergeLine",{name:p.emp.name,days:p.days.length,tag:found?"":t("mergeNewTag")});
+  }).join("\n");
+  if(!confirm(t("mergeConfirm",{when,desc}))){driveSetStatus("");return;}
+  const res=applyMerge(backup);
+  localStorage.setItem("msj-driveLastDown",String(Date.now()));
+  if(r.updatedAt)localStorage.setItem("msj-driveRemoteAt",String(r.updatedAt));
+  driveSetStatus(t("mergeDone",{days:res.totalDays}));
+  setTimeout(()=>location.reload(),600);
+}
+function driveShowNotice(iso){
+  const box=$("driveNotice"),txt=$("driveNoticeText");
+  if(!box||!txt)return;
+  const d=iso?new Date(iso):null;
+  txt.textContent=t("driveNewer",{date:d&&!isNaN(d)?d.toLocaleString(LOCALES[LANG]):String(iso||"")});
+  box.classList.remove("hidden");
+}
+function driveHideNotice(){
+  const box=$("driveNotice");
+  if(box)box.classList.add("hidden");
+}
+async function driveCheckOnOpen(){
+  const c=driveConfig();
+  if(!c.url||!c.key)return;
+  let r;
+  try{
+    r=await driveReadRemote();
+  }catch(e){
+    return; // silencioso: abrir o app nunca mostra erro da nuvem
+  }
+  if(!r.exists||!r.updatedAt)return;
+  const known=String(localStorage.getItem("msj-driveRemoteAt")||"");
+  if(String(r.updatedAt)!==known)driveShowNotice(r.updatedAt);
 }
 function keyFor(y,m,d){return `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`}
 function parseKey(key){const [y,m,d]=key.split("-").map(Number);return {y,m:m-1,d}}
@@ -2524,6 +2794,14 @@ $("mergeFile").addEventListener("change",e=>{
   if(f)importMergeFile(f);
   e.target.value="";
 });
+$("driveUrl").value=localStorage.getItem("msj-driveUrl")||"";
+$("driveKey").value=localStorage.getItem("msj-driveKey")||"";
+$("driveSave").onclick=driveSaveConfig;
+$("driveUp").onclick=()=>{driveUpload()};
+$("driveDown").onclick=()=>{driveDownload()};
+$("driveNoticeClose").onclick=driveHideNotice;
+driveRenderSync();
+driveCheckOnOpen();
 $("themeBtn").onclick=()=>{document.body.classList.toggle("dark");localStorage.setItem("msj-theme",document.body.classList.contains("dark")?"dark":"light")};
 if(localStorage.getItem("msj-theme")==="dark")document.body.classList.add("dark");
 document.querySelectorAll(".navTab").forEach(b=>b.onclick=()=>showScreen(b.dataset.screen));

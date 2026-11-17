@@ -259,3 +259,9 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:10px 0 8px}
 .pairDetailHead{font-weight:700;font-size:13px;margin-bottom:4px}
 .pairDetailVals{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;font-size:13px;margin-bottom:8px}
 .barItem.sel{background:rgba(37,99,235,.12);border-radius:10px}
+
+/* ---------- Nuvem / Google Drive (V6.0) ---------- */
+.driveFields{grid-template-columns:1fr;margin-top:12px}
+.driveNotice{margin:12px 0 0;background:#e0f2fe;border:1.5px solid #38bdf8;color:#075985;border-radius:14px;padding:11px 13px;font-size:13px;font-weight:600;display:flex;gap:9px;align-items:center;justify-content:space-between}
+.dark .driveNotice{background:#082f3f;color:#bae6fd;border-color:#0369a1}
+.driveNotice button{border:0;background:transparent;color:inherit;font-size:15px;font-weight:700;cursor:pointer;padding:2px 6px}

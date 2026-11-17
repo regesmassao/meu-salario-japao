@@ -335,7 +335,31 @@
   <p id="backupReminder" class="backupReminder"></p>
 </section>
 
-<footer>Meu Salário Japão 🇯🇵 — V5.7.3<br><span data-i18n="copyrightLine">© 2026 Reges Massao da Costa — Todos os direitos reservados</span></footer>
+<section class="card">
+  <div class="sectionHead">
+    <div>
+      <h2 data-i18n="driveTitle">☁️ Nuvem (Google Drive)</h2>
+      <p data-i18n="driveDesc">Guarde o backup num arquivo no SEU Google Drive, usando a sua ponte (script). O app fala só com o seu script: enviar manda o backup atual pra nuvem; baixar junta o backup da nuvem com os dados deste aparelho, sem apagar nada.</p>
+    </div>
+  </div>
+  <div id="driveNotice" class="driveNotice hidden">
+    <span id="driveNoticeText"></span>
+    <button id="driveNoticeClose" type="button" data-i18n-aria="driveDismiss" aria-label="Fechar aviso">✕</button>
+  </div>
+  <div class="grid driveFields">
+    <label><span data-i18n="driveUrlLbl">Link do script</span><input id="driveUrl" type="url" data-i18n-ph="driveUrlPh" placeholder="Cole o link do script (termina em /exec)"></label>
+    <label><span data-i18n="driveKeyLbl">Chave secreta</span><input id="driveKey" type="text" data-i18n-ph="driveKeyPh" placeholder="A mesma chave colocada no script"></label>
+  </div>
+  <div class="actions">
+    <button id="driveSave" type="button" data-i18n="driveSaveBtn">Salvar link e chave</button>
+    <button id="driveUp" class="primary" type="button" data-i18n="driveUpBtn">⬆️ Enviar backup pra nuvem</button>
+    <button id="driveDown" type="button" data-i18n="driveDownBtn">⬇️ Baixar da nuvem e juntar</button>
+  </div>
+  <p id="driveStatus"></p>
+  <p id="driveSync" class="backupReminder"></p>
+</section>
+
+<footer>Meu Salário Japão 🇯🇵 — V6.0<br><span data-i18n="copyrightLine">© 2026 Reges Massao da Costa — Todos os direitos reservados</span></footer>
 </section>
 </main>
 
