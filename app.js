@@ -232,7 +232,8 @@ driveUnauthorized:"❌ O script recusou a chave. Confira se a chave salva aqui �
 driveNetError:"❌ Não consegui falar com o script. Confira o link e a conexão com a internet.",
 driveBadData:"❌ O que veio da nuvem não é um backup válido. Nada foi alterado.",
 driveNewer:"☁️ Há um backup mais novo na nuvem (de {date}). Se quiser trazer pra este aparelho, toque em “Baixar da nuvem e juntar”.",
-driveDismiss:"Fechar aviso"
+driveDismiss:"Fechar aviso",
+homeDashTitle:"Painel do mês",homeDashSub:"Resumo interativo: toque nas barras e na composição.",kpiAccumulated:"💴 Acumulado do mês",dashCalcHint:"Toque num mês para abri-lo na calculadora",compTitle:"🧩 Composição do mês (jornada)",compBase:"Base",compOvertime:"Horas extras",compNight:"Adicional noturno",compOff:"Folga trabalhada",compTapHint:"Toque numa parte para ver o valor",compEmpty:"Sem dias lançados neste mês."
 },
 ja:{
 appSubtitle:"給与計算と勤務管理",
@@ -414,7 +415,8 @@ driveUnauthorized:"❌ スクリプトにキーを拒否されました。保存
 driveNetError:"❌ スクリプトに接続できませんでした。リンクとインターネット接続を確認してください。",
 driveBadData:"❌ クラウドから来たデータは有効なバックアップではありません。何も変更されていません。",
 driveNewer:"☁️ クラウドにもっと新しいバックアップがあります（{date}）。この端末に取り込む場合は「クラウドからダウンロードして合体」を押してください。",
-driveDismiss:"お知らせを閉じる"
+driveDismiss:"お知らせを閉じる",
+homeDashTitle:"今月のパネル",homeDashSub:"インタラクティブな概要：バーと構成をタップできます。",kpiAccumulated:"💴 月の累計",dashCalcHint:"月をタップすると給料計算で開きます",compTitle:"🧩 今月の構成（勤務）",compBase:"基本給",compOvertime:"残業代",compNight:"深夜手当",compOff:"休日出勤",compTapHint:"部分をタップすると金額が表示されます",compEmpty:"この月の勤務記録はまだありません。"
 },
 en:{
 appSubtitle:"Salary calculator & work log",
@@ -596,7 +598,8 @@ driveUnauthorized:"❌ The script refused the key. Check that the saved key matc
 driveNetError:"❌ Couldn't reach the script. Check the link and your internet connection.",
 driveBadData:"❌ What came from the cloud is not a valid backup. Nothing was changed.",
 driveNewer:"☁️ There is a newer backup in the cloud (from {date}). To bring it to this device, tap “Download from cloud and merge”.",
-driveDismiss:"Dismiss notice"
+driveDismiss:"Dismiss notice",
+homeDashTitle:"Month panel",homeDashSub:"Interactive summary: tap the bars and the breakdown.",kpiAccumulated:"💴 Month so far",dashCalcHint:"Tap a month to open it in the calculator",compTitle:"🧩 Month breakdown (work log)",compBase:"Base",compOvertime:"Overtime",compNight:"Night premium",compOff:"Worked day off",compTapHint:"Tap a part to see its value",compEmpty:"No work days logged this month."
 },
 vi:{
 appSubtitle:"Tính lương & quản lý giờ làm",
@@ -778,7 +781,8 @@ driveUnauthorized:"❌ Script đã từ chối khóa. Kiểm tra khóa đã lưu
 driveNetError:"❌ Không liên lạc được với script. Kiểm tra liên kết và kết nối internet.",
 driveBadData:"❌ Dữ liệu từ đám mây không phải sao lưu hợp lệ. Không có gì thay đổi.",
 driveNewer:"☁️ Có bản sao lưu mới hơn trên đám mây (từ {date}). Muốn đưa về thiết bị này, nhấn “Tải từ đám mây về và gộp”.",
-driveDismiss:"Đóng thông báo"
+driveDismiss:"Đóng thông báo",
+homeDashTitle:"Bảng tổng quan tháng",homeDashSub:"Tóm tắt tương tác: chạm vào cột và cơ cấu.",kpiAccumulated:"💴 Lũy kế tháng",dashCalcHint:"Chạm vào tháng để mở trong phần tính lương",compTitle:"🧩 Cơ cấu tháng (giờ làm)",compBase:"Lương cơ bản",compOvertime:"Tăng ca",compNight:"Phụ cấp đêm",compOff:"Ngày nghỉ đi làm",compTapHint:"Chạm vào một phần để xem số tiền",compEmpty:"Chưa có ngày làm nào trong tháng này."
 },
 ne:{
 appSubtitle:"तलब क्याल्कुलेटर र कामको रेकर्ड",
@@ -960,7 +964,8 @@ driveUnauthorized:"❌ स्क्रिप्टले कुञ्जी अ�
 driveNetError:"❌ स्क्रिप्टसँग कुरा गर्न सकिएन। लिङ्क र इन्टरनेट जाँच्नुहोस्।",
 driveBadData:"❌ क्लाउडबाट आएको डेटा मान्य ब्याकअप होइन। केही परिवर्तन भएन।",
 driveNewer:"☁️ क्लाउडमा नयाँ ब्याकअप छ ({date} को)। यो उपकरणमा ल्याउन “क्लाउडबाट डाउनलोड गरेर मिलाउनुहोस्” थिच्नुहोस्।",
-driveDismiss:"सूचना बन्द गर्नुहोस्"
+driveDismiss:"सूचना बन्द गर्नुहोस्",
+homeDashTitle:"महिनाको प्यानल",homeDashSub:"अन्तरक्रियात्मक सारांश: बार र रचना छुनुहोस्।",kpiAccumulated:"💴 महिनाको जम्मा",dashCalcHint:"महिना छुनुहोस् — तलब गणनामा खुल्छ",compTitle:"🧩 महिनाको रचना (कामको रेकर्ड)",compBase:"आधार तलब",compOvertime:"ओभरटाइम",compNight:"राति भत्ता",compOff:"बिदामा काम",compTapHint:"भाग छुनुहोस् — रकम देखिन्छ",compEmpty:"यस महिना कुनै कामको दिन छैन।"
 }
 };
 let LANG=localStorage.getItem(LANG_KEY)||"pt";
@@ -1069,6 +1074,7 @@ function renderHome(){
   $("homeYukiuBar").style.width=total>0?`${Math.min(100,(used/total)*100)}%`:"0%";
   renderPunch();
   renderBackupReminder();
+  renderHomeDash();
 }
 // ---------- Registro rápido de hoje (V5.1) ----------
 // Horário padrão por funcionário (entrada, saída e intervalos),
@@ -2496,6 +2502,90 @@ function renderDashboard(){
   renderCouple();
   renderAnnual();
   renderPayslipCard();
+  renderHomeDash();
+}
+// ---------- Painel Salro da Início (V6.1) ----------
+// KPIs do mês exibido, líquido dos últimos 6 meses (o toque abre o
+// mês na Calculadora) e a composição do mês, somando dia a dia os
+// mesmos componentes que o dayPay usa (base, extras, folga e
+// noturno) — o total é a soma dos dayPay, igual ao "Acumulado do
+// mês" da Jornada. Nada de lógica nova de cálculo: só agregação.
+function monthComposition(key){
+  const [y,m]=key.split("-").map(Number);
+  const count=new Date(y,m,0).getDate();
+  const rate=hourlyRate();
+  let base=0,overtime=0,off=0,night=0,total=0;
+  for(let d=1;d<=count;d++){
+    const data=dayData(`${key}-${String(d).padStart(2,"0")}`);
+    if(!data)continue;
+    const c=calcDay(data);
+    if(!c.worked)continue;
+    base+=(c.normal||0)*rate;
+    overtime+=(c.overtime||0)*rate*1.25;
+    off+=(c.off||0)*rate*(1+(c.offRate||0)/100);
+    night+=(c.night||0)*rate*(val("nightPercent")/100)+(c.nightDay?val("nightFixed"):0);
+    total+=dayPay(c);
+  }
+  return {base,overtime,off,night,total};
+}
+function openMonthCalc(key){
+  // Toque num mês do painel da Início: o mês vira o exibido e a
+  // Calculadora abre nele (holerite e contexto do mês escolhido).
+  const [y,m]=key.split("-").map(Number);
+  viewDate=new Date(y,m-1,1);
+  renderCalendar();
+  renderDashboard();
+  showScreen("calculadora");
+  window.scrollTo(0,0);
+}
+function renderHomeDash(){
+  const body=$("homeDashBody");
+  if(!body)return;
+  const key=monthlyKey();
+  const s=monthStats(key);
+  const prev=monthStats(monthlyKey(new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1)));
+  const comp=monthComposition(key);
+  const months=[];
+  for(let i=5;i>=0;i--){
+    const d=new Date(viewDate.getFullYear(),viewDate.getMonth()-i,1);
+    months.push(monthStats(monthlyKey(d)));
+  }
+  const max=Math.max(...months.map(x=>x.net||0),1);
+  const bars=months.map(x=>{
+    const h=x.net==null?0:Math.max(5,(x.net/max)*100);
+    return `<div class="barItem dashBar" data-dmonth="${x.key}" title="${t("chartNet")}">
+      <div class="barValue">${x.net==null?"—":money(x.net)}</div>
+      <div class="barTrack"><div class="barFill${x.key===key?" now":""}" style="height:${h}%"></div></div>
+      <div class="barLabel">${monthName(x.key)}</div>
+    </div>`;
+  }).join("");
+  const parts=[
+    {id:"base",label:t("compBase"),value:comp.base,color:"#FBE5BF"},
+    {id:"overtime",label:t("compOvertime"),value:comp.overtime,color:"#CD9264"},
+    {id:"night",label:t("compNight"),value:comp.night,color:"#5f7ba6"},
+    {id:"off",label:t("compOff"),value:comp.off,color:"#8a6a4a"}
+  ];
+  const compTotal=parts.reduce((a,p)=>a+p.value,0);
+  const stack=compTotal>0?`<div class="compStack">${parts.filter(p=>p.value>0).map(p=>`<span style="width:${(p.value/compTotal)*100}%;background:${p.color}"></span>`).join("")}</div>`:"";
+  const rows=parts.map(p=>{
+    const pct=compTotal>0?Math.round((p.value/compTotal)*100):0;
+    return `<div class="compRow" data-comp="${p.id}"><span class="dot" style="background:${p.color}"></span><span>${p.label}</span><span class="compPct">${pct}%</span><span class="compVal">${money(p.value)}</span></div>`;
+  }).join("");
+  body.innerHTML=`
+    <div class="metricGrid dashKpis">
+      <div class="metricCard kpiAccent"><div class="dashKpiLabel">${t("metricNetMonth")}</div><strong>${s.net==null?"—":money(s.net)}</strong><span>${(s.net!=null&&prev.net!=null)?`${changeText(s.net,prev.net)} ${t("vsPrevMonth")}`:monthName(key)}</span></div>
+      <div class="metricCard"><div class="dashKpiLabel">${t("metricDaysWorked")}</div><strong>${s.days}</strong><span>${monthName(key)}</span></div>
+      <div class="metricCard"><div class="dashKpiLabel">${t("metricOt")}</div><strong>${fmtHours(s.overtime)}</strong><span>${monthName(key)}</span></div>
+      <div class="metricCard"><div class="dashKpiLabel">${t("kpiAccumulated")}</div><strong>${comp.total>0?money(comp.total):"—"}</strong><span>${monthName(key)}</span></div>
+    </div>
+    <div class="chartBox"><h4>${t("chartNet")}</h4><div class="bars dashBars">${bars}</div><div class="pairHint">${t("dashCalcHint")}</div></div>
+    <div class="chartBox"><h4>${t("compTitle")}</h4>${compTotal>0?stack+rows:`<div class="empty">${t("compEmpty")}</div>`}<div class="pairHint">${t("compTapHint")}</div></div>`;
+  body.querySelectorAll("[data-dmonth]").forEach(el=>{
+    el.onclick=()=>openMonthCalc(el.dataset.dmonth);
+  });
+  body.querySelectorAll("[data-comp]").forEach(el=>{
+    el.onclick=()=>el.classList.toggle("sel");
+  });
 }
 function renderPairChart(title,labels,series,format,chartId){
   const all=series.flatMap(s=>s.values).filter(v=>typeof v==="number");
