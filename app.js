@@ -1,4 +1,5 @@
 const $=id=>document.getElementById(id);
+const parseNum=s=>{s=String(s==null?"":s).trim();if(s.includes(",")&&s.includes("."))s=s.replace(/\./g,"").replace(",",".");else if(s.includes(","))s=s.replace(",",".");return s;};
 const val=id=>{
   const el=$(id);
   if(!el)return 0;
@@ -7,7 +8,7 @@ const val=id=>{
     const m=raw.match(/^(\d+)h(?:\s*(\d+)min)?$/i);
     if(m)return Number(m[1])+(Number(m[2]||0)/60);
   }
-  const n=Number(raw||0);
+  const n=Number(parseNum(raw));
   return Number.isFinite(n)?n:0;
 };
 let mode="hourly";
@@ -2156,7 +2157,7 @@ function psLineRow(line,kind){
   const row=document.createElement("div");row.className="psLine";row.dataset.kind=kind;
   const sel=document.createElement("select");sel.className="psTerm";sel.innerHTML=termOptions(kind,line.term||"");
   const label=document.createElement("input");label.className="psLabel";label.type="text";label.value=line.label||"";label.placeholder=t("psLineName");
-  const amount=document.createElement("input");amount.className="psAmount";amount.type="number";amount.inputMode="numeric";amount.min="0";amount.value=line.amount!=null?line.amount:"";
+  const amount=document.createElement("input");amount.className="psAmount";amount.type="text";amount.inputMode="numeric";amount.min="0";amount.value=line.amount!=null?line.amount:"";
   const del=document.createElement("button");del.type="button";del.className="psDel";del.textContent="✕";
   del.onclick=()=>{row.remove();updatePsCheck()};
   sel.onchange=()=>{
@@ -2362,7 +2363,7 @@ function storedNum(prefix,id){
     const m=raw.match(/^(\d+)h(?:\s*(\d+)min)?$/i);
     if(m)return Number(m[1])+(Number(m[2]||0)/60);
   }
-  const n=Number(raw||0);
+  const n=Number(parseNum(raw));
   return Number.isFinite(n)?n:0;
 }
 function estimateFor(emp,agg,date){

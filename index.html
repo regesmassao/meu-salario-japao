@@ -98,41 +98,41 @@
   </div>
 
   <div id="hourlyBox" class="grid">
-    <label><span data-i18n="hourlyRate">Valor por hora (¥)</span><input id="hourlyRate" type="number" inputmode="decimal" value="1230" min="0"></label>
+    <label><span data-i18n="hourlyRate">Valor por hora (¥)</span><input id="hourlyRate" type="text" inputmode="decimal" value="1230" min="0"></label>
   </div>
 
   <div id="monthlyBox" class="grid hidden">
-    <label><span data-i18n="monthlySalary">Salário mensal (¥)</span><input id="monthlySalary" type="number" inputmode="decimal" value="250000" min="0"></label>
-    <label><span data-i18n="baseHours">Horas-base / mês</span><input id="baseHours" type="number" inputmode="decimal" value="160" min="1"></label>
+    <label><span data-i18n="monthlySalary">Salário mensal (¥)</span><input id="monthlySalary" type="text" inputmode="decimal" value="250000" min="0"></label>
+    <label><span data-i18n="baseHours">Horas-base / mês</span><input id="baseHours" type="text" inputmode="decimal" value="160" min="1"></label>
   </div>
 
   <div class="grid">
-    <label><span data-i18n="normalHours">Horas normais</span><input id="normalHours" type="number" inputmode="decimal" value="160" min="0" step="0.01"></label>
+    <label><span data-i18n="normalHours">Horas normais</span><input id="normalHours" type="text" inputmode="decimal" value="160" min="0" step="0.01"></label>
     <label><span data-i18n="overtimeHours">Horas extras (25%)</span><input id="overtimeHours" type="text" inputmode="decimal" value="0h" autocomplete="off"></label>
-    <label><span data-i18n="offHours">Horas em folga trabalhada</span><input id="offHours" type="number" inputmode="decimal" value="0" min="0" step="0.01"></label>
-    <label><span data-i18n="offPercent">Adicional da folga — dia todo (%)</span><input id="offPercent" type="number" inputmode="decimal" value="35" min="0" step="0.01"></label>
-    <label><span data-i18n="nightPercent">Adicional noturno (%)</span><input id="nightPercent" type="number" inputmode="decimal" value="25" min="0" step="0.01"></label>
-    <label><span data-i18n="nightHours">Horas noturnas</span><input id="nightHours" type="number" inputmode="decimal" value="0" min="0" step="0.01"></label>
-    <label><span data-i18n="nightFixed">Adicional noturno por dia (¥)</span><input id="nightFixed" type="number" inputmode="decimal" value="1500" min="0"></label>
-    <label><span data-i18n="nightDays">Dias de trabalho noturno</span><input id="nightDays" type="number" inputmode="decimal" value="0" min="0"></label>
-    <label><span data-i18n="mealMonthly">Refeição / benefício mensal (¥)</span><input id="mealMonthly" type="number" inputmode="decimal" value="3500" min="0"></label>
-    <label><span data-i18n="otherAllowance">Outros adicionais (¥)</span><input id="otherAllowance" type="number" inputmode="decimal" value="0" min="0"></label>
-    <label><span data-i18n="summerBonus">Bônus de verão (¥)</span><input id="summerBonus" type="number" inputmode="decimal" value="0" min="0"></label>
+    <label><span data-i18n="offHours">Horas em folga trabalhada</span><input id="offHours" type="text" inputmode="decimal" value="0" min="0" step="0.01"></label>
+    <label><span data-i18n="offPercent">Adicional da folga — dia todo (%)</span><input id="offPercent" type="text" inputmode="decimal" value="35" min="0" step="0.01"></label>
+    <label><span data-i18n="nightPercent">Adicional noturno (%)</span><input id="nightPercent" type="text" inputmode="decimal" value="25" min="0" step="0.01"></label>
+    <label><span data-i18n="nightHours">Horas noturnas</span><input id="nightHours" type="text" inputmode="decimal" value="0" min="0" step="0.01"></label>
+    <label><span data-i18n="nightFixed">Adicional noturno por dia (¥)</span><input id="nightFixed" type="text" inputmode="decimal" value="1500" min="0"></label>
+    <label><span data-i18n="nightDays">Dias de trabalho noturno</span><input id="nightDays" type="text" inputmode="decimal" value="0" min="0"></label>
+    <label><span data-i18n="mealMonthly">Refeição / benefício mensal (¥)</span><input id="mealMonthly" type="text" inputmode="decimal" value="3500" min="0"></label>
+    <label><span data-i18n="otherAllowance">Outros adicionais (¥)</span><input id="otherAllowance" type="text" inputmode="decimal" value="0" min="0"></label>
+    <label><span data-i18n="summerBonus">Bônus de verão (¥)</span><input id="summerBonus" type="text" inputmode="decimal" value="0" min="0"></label>
     <label><span data-i18n="summerBonusMonth">Bônus de verão cai em</span><select id="bonusSummerMonth"><option value="1" data-i18n="month1">janeiro</option><option value="2" data-i18n="month2">fevereiro</option><option value="3" data-i18n="month3">março</option><option value="4" data-i18n="month4">abril</option><option value="5" data-i18n="month5">maio</option><option value="6" data-i18n="month6">junho</option><option value="7" selected data-i18n="month7">julho</option><option value="8" data-i18n="month8">agosto</option><option value="9" data-i18n="month9">setembro</option><option value="10" data-i18n="month10">outubro</option><option value="11" data-i18n="month11">novembro</option><option value="12" data-i18n="month12">dezembro</option></select></label>
-    <label><span data-i18n="winterBonus">Bônus de inverno (¥)</span><input id="winterBonus" type="number" inputmode="decimal" value="0" min="0"></label>
+    <label><span data-i18n="winterBonus">Bônus de inverno (¥)</span><input id="winterBonus" type="text" inputmode="decimal" value="0" min="0"></label>
     <label><span data-i18n="winterBonusMonth">Bônus de inverno cai em</span><select id="bonusWinterMonth"><option value="1" data-i18n="month1">janeiro</option><option value="2" data-i18n="month2">fevereiro</option><option value="3" data-i18n="month3">março</option><option value="4" data-i18n="month4">abril</option><option value="5" data-i18n="month5">maio</option><option value="6" data-i18n="month6">junho</option><option value="7" data-i18n="month7">julho</option><option value="8" data-i18n="month8">agosto</option><option value="9" data-i18n="month9">setembro</option><option value="10" data-i18n="month10">outubro</option><option value="11" data-i18n="month11">novembro</option><option value="12" selected data-i18n="month12">dezembro</option></select></label>
     <label><span data-i18n="deductionMode">Modo de descontos</span><select id="deductionMode"><option value="percent" data-i18n="dedModePercent">Estimativa (%)</option><option value="detailed" data-i18n="dedModeDetailed">Detalhado (¥)</option></select></label>
-    <label><span data-i18n="deductionPct">Descontos estimados (%)</span><input id="deduction" type="number" inputmode="decimal" value="18" min="0" max="100" step="0.1"></label>
+    <label><span data-i18n="deductionPct">Descontos estimados (%)</span><input id="deduction" type="text" inputmode="decimal" value="18" min="0" max="100" step="0.1"></label>
   </div>
 
   <div id="detailedDeductions" class="grid hidden deductionBox">
     <div class="fullWidth"><strong data-i18n="detailedTitle">🧾 Descontos detalhados</strong><small data-i18n="detailedHint">Use esta opção quando quiser reproduzir o holerite real.</small></div>
-    <label><span data-i18n="employmentInsurance">Seguro emprego (¥)</span><input id="employmentInsurance" type="number" inputmode="decimal" value="0" min="0"></label>
-    <label><span data-i18n="incomeTax">Imposto de renda (¥)</span><input id="incomeTax" type="number" inputmode="decimal" value="0" min="0"></label>
-    <label><span data-i18n="advanceSalary">Salário adiantado (¥)</span><input id="advanceSalary" type="number" inputmode="decimal" value="0" min="0"></label>
-    <label><span data-i18n="utilities">Água / luz / gás (¥)</span><input id="utilities" type="number" inputmode="decimal" value="0" min="0"></label>
-    <label><span data-i18n="rentDeduction">Aluguel (¥)</span><input id="rentDeduction" type="number" inputmode="decimal" value="0" min="0"></label>
-    <label><span data-i18n="otherDeduction">Outros descontos (¥)</span><input id="otherDeduction" type="number" inputmode="decimal" value="0" min="0"></label>
+    <label><span data-i18n="employmentInsurance">Seguro emprego (¥)</span><input id="employmentInsurance" type="text" inputmode="decimal" value="0" min="0"></label>
+    <label><span data-i18n="incomeTax">Imposto de renda (¥)</span><input id="incomeTax" type="text" inputmode="decimal" value="0" min="0"></label>
+    <label><span data-i18n="advanceSalary">Salário adiantado (¥)</span><input id="advanceSalary" type="text" inputmode="decimal" value="0" min="0"></label>
+    <label><span data-i18n="utilities">Água / luz / gás (¥)</span><input id="utilities" type="text" inputmode="decimal" value="0" min="0"></label>
+    <label><span data-i18n="rentDeduction">Aluguel (¥)</span><input id="rentDeduction" type="text" inputmode="decimal" value="0" min="0"></label>
+    <label><span data-i18n="otherDeduction">Outros descontos (¥)</span><input id="otherDeduction" type="text" inputmode="decimal" value="0" min="0"></label>
   </div>
 
   <div class="result">
@@ -165,11 +165,11 @@
       <h3 data-i18n="reviewTitle">Confira a leitura e corrija o que estiver errado</h3>
       <p id="ocrFailNote" class="psFail hidden" data-i18n="ocrFail">Não consegui ler tudo desta foto. Confira e complete os valores abaixo — dá pra salvar mesmo assim.</p>
       <div class="grid">
-        <label><span data-i18n="psGrossLbl">Bruto total (¥)</span><input id="psGross" type="number" inputmode="numeric" min="0"></label>
-        <label><span data-i18n="psNetLbl">Líquido (¥)</span><input id="psNet" type="number" inputmode="numeric" min="0"></label>
-        <label><span data-i18n="psDaysLbl">Dias trabalhados</span><input id="psDays" type="number" inputmode="decimal" min="0" step="0.5"></label>
-        <label><span data-i18n="psOtLbl">Horas extras (h)</span><input id="psOt" type="number" inputmode="decimal" min="0" step="0.01"></label>
-        <label><span data-i18n="psNightLbl">Horas noturnas (h)</span><input id="psNight" type="number" inputmode="decimal" min="0" step="0.01"></label>
+        <label><span data-i18n="psGrossLbl">Bruto total (¥)</span><input id="psGross" type="text" inputmode="numeric" min="0"></label>
+        <label><span data-i18n="psNetLbl">Líquido (¥)</span><input id="psNet" type="text" inputmode="numeric" min="0"></label>
+        <label><span data-i18n="psDaysLbl">Dias trabalhados</span><input id="psDays" type="text" inputmode="decimal" min="0" step="0.5"></label>
+        <label><span data-i18n="psOtLbl">Horas extras (h)</span><input id="psOt" type="text" inputmode="decimal" min="0" step="0.01"></label>
+        <label><span data-i18n="psNightLbl">Horas noturnas (h)</span><input id="psNight" type="text" inputmode="decimal" min="0" step="0.01"></label>
         <label><span data-i18n="psEmployerLbl">Empresa deste holerite</span><input id="psEmployer" type="text"></label>
       </div>
       <h3 data-i18n="psEarnTitle">💴 Pagamentos</h3>
@@ -207,7 +207,7 @@
   </div>
 
   <div class="yukiuBox">
-    <label><span data-i18n="yukiuTotalLabel">Dias de yukiu cadastrados</span><input id="yukiuTotal" type="number" inputmode="decimal" value="0" min="0" step="0.5"></label>
+    <label><span data-i18n="yukiuTotalLabel">Dias de yukiu cadastrados</span><input id="yukiuTotal" type="text" inputmode="decimal" value="0" min="0" step="0.5"></label>
     <p id="yukiuStatus" class="yukiuStatus"></p>
     <p class="yukiuNote" data-i18n="yukiuNote">Marque o yukiu no editor do dia (toque no dia no calendário): o saldo diminui sozinho. Se apagar ou desmarcar o dia, o saldo volta.</p>
   </div>
@@ -370,7 +370,7 @@
   <p id="driveSync" class="backupReminder"></p>
 </section>
 
-<footer>Meu Salário Japão 🇯🇵 — V6.1<br><span data-i18n="copyrightLine">© 2026 Reges Massao da Costa — Todos os direitos reservados</span></footer>
+<footer>Meu Salário Japão 🇯🇵 — V6.1.1<br><span data-i18n="copyrightLine">© 2026 Reges Massao da Costa — Todos os direitos reservados</span></footer>
 </section>
 </main>
 
