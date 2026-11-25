@@ -32,7 +32,16 @@ function loadEmployees(){
 }
 const employees=loadEmployees();
 function saveEmployees(){localStorage.setItem(EMPLOYEES_KEY,JSON.stringify(employees))}
+// Dono do aparelho (V6.1.3): chave só DESTE aparelho (fora de todo
+// backup). Se estiver definido, o app sempre abre no perfil do dono —
+// é o que separa o celular de cada um num casal que compartilha os dados.
+const DEVICE_OWNER_KEY="msj-deviceOwner";
 let activeEmployee=employees.find(e=>e.id===localStorage.getItem(ACTIVE_EMPLOYEE_KEY))||employees[0];
+const deviceOwnerEmp=employees.find(e=>e.id===localStorage.getItem(DEVICE_OWNER_KEY));
+if(deviceOwnerEmp){
+  activeEmployee=deviceOwnerEmp;
+  localStorage.setItem(ACTIVE_EMPLOYEE_KEY,deviceOwnerEmp.id);
+}
 function employeeBases(emp){
   if(emp.id==="principal")return {days:"msj-v4-2-days",months:"msj-v4-3-months",settings:"msj-"};
   return {days:`msj-func-${emp.id}-days`,months:`msj-func-${emp.id}-months`,settings:`msj-func-${emp.id}-`};
@@ -192,6 +201,9 @@ annYukiuVal:"{v} dia(s)",
 annCoupleTotal:"💑 Total do casal em {year} (líquido)",annCoupleGross:"Bruto somado: {gross}",
 annNote:"Bruto e líquido somam o valor salvo de cada mês (ou a estimativa das configurações, quando o mês ainda não foi salvo na calculadora). Dias, horas e yukiu vêm dos dias registrados no calendário.",
 activeEmployeeLabel:"👤 Funcionário ativo",
+ownerLabel:"📱 Este aparelho é de",
+ownerNone:"— sem dono definido —",
+ownerNote:"O app abre sempre no perfil do dono deste aparelho, e o texto do Salro Link avisa a IA de quem são os dados. O dono fica salvo só neste aparelho — não viaja no backup.",
 employeeNote:"Tudo o que você preencher — calculadora e controle de jornada — fica salvo para este funcionário. Para lançar os dados da outra pessoa, troque o funcionário aqui.",
 langTitle:"🌐 Idioma",langNote:"O idioma escolhido vale só para este aparelho.",langLabel:"Idioma do aplicativo",
 backupTitle:"💾 Backup dos dados",
@@ -382,6 +394,9 @@ annYukiuVal:"{v} 日",
 annCoupleTotal:"💑 {year} 年のカップル合計（手取り）",annCoupleGross:"総支給の合計：{gross}",
 annNote:"総支給と手取りは、各月に保存された値（まだ保存されていない月は設定からの推定）を合計しています。日数・時間・有給はカレンダーに記録された日から来ています。",
 activeEmployeeLabel:"👤 使用中の従業員",
+ownerLabel:"📱 この端末の持ち主",
+ownerNone:"— 未設定 —",
+ownerNote:"アプリは常にこの端末の持ち主のプロフィールで開き、Salro LinkのテキストでもAIにデータの持ち主を伝えます。持ち主はこの端末にだけ保存され、バックアップには入りません。",
 employeeNote:"入力した内容 — 給与計算も勤務管理も — はこの従業員に保存されます。もう一人の分を入力するには、ここで従業員を切り替えてください。",
 langTitle:"🌐 言語",langNote:"選んだ言語はこの端末にだけ適用されます。",langLabel:"アプリの言語",
 backupTitle:"💾 データのバックアップ",
@@ -572,6 +587,9 @@ annYukiuVal:"{v} day(s)",
 annCoupleTotal:"💑 Couple total in {year} (net)",annCoupleGross:"Combined gross: {gross}",
 annNote:"Gross and net add up each month's saved value (or the estimate from the settings, when the month was not saved in the calculator yet). Days, hours and yukiu come from the days recorded on the calendar.",
 activeEmployeeLabel:"👤 Active employee",
+ownerLabel:"📱 This phone belongs to",
+ownerNone:"— no owner set —",
+ownerNote:"The app always opens on this phone's owner profile, and the Salro Link text tells the AI whose data it is. The owner is saved only on this phone — it never travels in a backup.",
 employeeNote:"Everything you fill in — calculator and work log — is saved for this employee. To enter the other person's data, switch the employee here.",
 langTitle:"🌐 Language",langNote:"The chosen language applies to this device only.",langLabel:"App language",
 backupTitle:"💾 Data backup",
@@ -1395,11 +1413,16 @@ const BACKUP_PREFIX="msj-";
 // secreta não pode viajar dentro de um arquivo exportado) e nunca
 // são tocadas pelas importações.
 const DRIVE_KEYS=["msj-driveUrl","msj-driveKey","msj-driveLastUp","msj-driveLastDown","msj-driveRemoteAt"];
+// Chaves que são DESTE aparelho e nunca viajam em backup (V6.1.3):
+// além das da nuvem, o funcionário ativo, o dono do aparelho e o
+// idioma — importar o backup de outro celular não pode trocar quem
+// está ativo neste aparelho nem de quem ele é.
+const DEVICE_KEYS=[...DRIVE_KEYS,ACTIVE_EMPLOYEE_KEY,DEVICE_OWNER_KEY,LANG_KEY];
 function collectBackup(){
   const data={};
   for(let i=0;i<localStorage.length;i++){
     const k=localStorage.key(i);
-    if(k&&k.startsWith(BACKUP_PREFIX)&&!DRIVE_KEYS.includes(k))data[k]=localStorage.getItem(k);
+    if(k&&k.startsWith(BACKUP_PREFIX)&&!DEVICE_KEYS.includes(k))data[k]=localStorage.getItem(k);
   }
   return {app:"meu-salario-japao",version:1,exportedAt:new Date().toISOString(),data};
 }
@@ -1411,16 +1434,17 @@ function applyBackup(backup){
   if(!backup||typeof backup!=="object"||!backup.data||typeof backup.data!=="object"){
     throw new Error("invalid backup");
   }
-  // Defesa extra (V6.0): as chaves da nuvem deste aparelho são
+  // Defesa extra (V6.0, ampliada na V6.1.3): as chaves DESTE
+  // aparelho (nuvem, funcionário ativo, dono e idioma) são
   // preservadas na troca e as que vierem dentro do arquivo são
-  // descartadas — a configuração da nuvem é de cada aparelho.
+  // descartadas — elas são de cada aparelho, não dos dados.
   const savedDrive={};
-  DRIVE_KEYS.forEach(k=>{const v=localStorage.getItem(k);if(v!=null)savedDrive[k]=v;});
-  const keys=Object.keys(backup.data).filter(k=>k.startsWith(BACKUP_PREFIX)&&!DRIVE_KEYS.includes(k));
+  DEVICE_KEYS.forEach(k=>{const v=localStorage.getItem(k);if(v!=null)savedDrive[k]=v;});
+  const keys=Object.keys(backup.data).filter(k=>k.startsWith(BACKUP_PREFIX)&&!DEVICE_KEYS.includes(k));
   const current=[];
   for(let i=0;i<localStorage.length;i++){
     const k=localStorage.key(i);
-    if(k&&k.startsWith(BACKUP_PREFIX)&&!DRIVE_KEYS.includes(k))current.push(k);
+    if(k&&k.startsWith(BACKUP_PREFIX)&&!DEVICE_KEYS.includes(k))current.push(k);
   }
   current.forEach(k=>localStorage.removeItem(k));
   keys.forEach(k=>localStorage.setItem(k,String(backup.data[k])));
@@ -1578,10 +1602,17 @@ function driveSaveConfig(){
 // Salro Link: texto de conexão que o dono cola no assistente dele (Muse),
 // pra ele ler e lançar neste app pela mesma ponte da nuvem.
 function linkPromptText(url,key){
+  const owner=employees.find(e=>e.id===localStorage.getItem(DEVICE_OWNER_KEY))||activeEmployee;
+  const keyDesc=e=>e.id==="principal"
+    ? "chaves msj- sem prefixo de funcionário (dias msj-v4-2-days-AAAA-MM-DD, meses msj-v4-3-months-AAAA-MM, configurações msj-*)"
+    : "chaves com o prefixo msj-func-"+e.id+"- (dias, meses e configurações)";
   return [
     "Você agora está conectado ao meu app Salro Salário (padrão Salro Link). Meus dados ficam numa ponte na nuvem, no meu próprio Google Drive:",
     "- Link da ponte: "+url,
     "- Chave: "+key,
+    "",
+    "DONO DESTE APARELHO: "+owner.name+" — "+keyDesc(owner)+". Os pedidos são sobre essa pessoa, salvo menção explícita a outra.",
+    "Funcionários cadastrados neste app: "+employees.map(e=>e.name+" ("+keyDesc(e)+")").join("; ")+".",
     "",
     "COMO LER: faça GET em \""+url+"?action=read&key="+key+"\". A resposta é um JSON com o envelope {app, version, exportedAt, data} — é dentro de data que ficam os registros. Os dados são um despejo das chaves internas do app (prefixo msj-); os meses fechados ficam nas chaves msj-v4-3-months-AAAA-MM e os dias nas chaves msj-v4-2-days-AAAA-MM-DD.",
     "COMO ESCREVER: primeiro leia o estado atual; aplique a alteração sobre ele; depois faça POST em \""+url+"?action=write&key="+key+"\" com o envelope COMPLETO atualizado (corpo JSON, content-type text/plain). Nunca envie um envelope parcial — a escrita substitui o arquivo inteiro. Confirme a escrita com um novo GET e compare o que voltou.",
@@ -1592,8 +1623,9 @@ function linkPromptText(url,key){
     "3. Nunca mostre a minha chave em respostas, arquivos ou registros; ela é uma senha.",
     "4. Valores e datas devem ser fiéis à fonte (foto, holerite, recibo) — o que não der para ler com segurança fica em branco, nunca inventado.",
     "5. Valores em ienes (¥) e em reais (R$) sempre separados; se converter, diga a taxa usada.",
+    "6. Antes de escrever, confirme de qual funcionário são os dados. Nunca altere dias, meses ou configurações de outro funcionário sem pedido explícito.",
     "",
-    "Para confirmar que entendeu: leia a ponte agora e me diga quantos registros encontrou e de que período eles são."
+    "Para confirmar que entendeu: leia a ponte agora e me diga quantos registros encontrou, de que período eles são e quem é o dono deste aparelho."
   ].join("\n");
 }
 function linkCopyText(){
@@ -2775,7 +2807,23 @@ function renderEmployeeSelect(){
   sel.innerHTML=employees.map(e=>`<option value="${e.id}"${e.id===activeEmployee.id?" selected":""}>${esc(e.name)}</option>`).join("");
   const chip=$("empChipName");
   if(chip)chip.textContent=activeEmployee.name;
+  renderOwnerSelect();
   renderEmployeeManage();
+}
+function renderOwnerSelect(){
+  const sel=$("ownerSelect");
+  if(!sel)return;
+  const owner=localStorage.getItem(DEVICE_OWNER_KEY)||"";
+  sel.innerHTML=`<option value="">${esc(t("ownerNone"))}</option>`+employees.map(e=>`<option value="${e.id}"${e.id===owner?" selected":""}>${esc(e.name)}</option>`).join("");
+}
+function setDeviceOwner(id){
+  if(id&&employees.some(e=>e.id===id)){
+    localStorage.setItem(DEVICE_OWNER_KEY,id);
+    setActiveEmployee(id);
+  }else{
+    localStorage.removeItem(DEVICE_OWNER_KEY);
+    renderOwnerSelect();
+  }
 }
 function setActiveEmployee(id){
   if(!employees.some(e=>e.id===id))return;
@@ -2932,6 +2980,7 @@ applyLang();
 $("langSelect").onchange=e=>{localStorage.setItem(LANG_KEY,e.target.value);location.reload();};
 renderEmployeeSelect();
 $("employeeSelect").onchange=e=>setActiveEmployee(e.target.value);
+$("ownerSelect").onchange=e=>setDeviceOwner(e.target.value);
 $("exportBackup").onclick=exportBackup;
 $("importBackup").onclick=()=>$("importFile").click();
 $("importFile").addEventListener("change",e=>{
