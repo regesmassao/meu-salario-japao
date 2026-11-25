@@ -219,6 +219,13 @@ driveUrlPh:"Cole o link do script (termina em /exec)",
 driveKeyLbl:"Chave secreta",
 driveKeyPh:"A mesma chave colocada no script",
 driveSaveBtn:"Salvar link e chave",
+linkTitle:"🔗 Salro Link — Conectar minha IA",
+linkDesc:"Gere o texto de conexão deste app e cole numa conversa com o SEU assistente (Muse). Ele passa a ler os seus dados, lançar registros e te avisar — seguindo as regras de segurança que vão embutidas no texto.",
+linkCopyBtn:"Copiar texto de conexão",
+linkWarn:"⚠️ O texto contém a chave da ponte — ela é uma senha. Cole só no seu próprio assistente, nunca em grupos ou com outras pessoas.",
+linkNeed:"Configure a nuvem acima primeiro: cole o link e a chave da ponte e toque em Salvar link e chave.",
+linkCopied:"Texto de conexão copiado ✔ Agora é só colar numa conversa com o seu Muse.",
+linkCopyFail:"Não consegui copiar automaticamente. Tente de novo.",
 driveSaved:"✔️ Link e chave salvos neste aparelho.",
 driveUpBtn:"⬆️ Enviar backup pra nuvem",
 driveDownBtn:"⬇️ Baixar da nuvem e juntar",
@@ -402,6 +409,13 @@ driveUrlPh:"スクリプトのリンクを貼り付け（末尾は /exec）",
 driveKeyLbl:"秘密キー",
 driveKeyPh:"スクリプトに入れたのと同じキー",
 driveSaveBtn:"リンクとキーを保存",
+linkTitle:"🔗 Salro Link — AIとつなぐ",
+linkDesc:"このアプリの接続テキストを生成して、あなたのAIアシスタント（Muse）との会話に貼り付けてください。データの読み取りや記録ができるようになります。安全ルールもテキストに含まれています。",
+linkCopyBtn:"接続テキストをコピー",
+linkWarn:"⚠️ テキストにはブリッジのキーが含まれます（パスワードと同じです）。自分のアシスタントにだけ貼ってください。",
+linkNeed:"まず上のクラウドを設定してください：リンクとキーを貼って「リンクとキーを保存」を押してください。",
+linkCopied:"接続テキストをコピーしました ✔ あとはMuseとの会話に貼るだけです。",
+linkCopyFail:"自動でコピーできませんでした。もう一度お試しください。",
 driveSaved:"✔️ リンクとキーをこの端末に保存しました。",
 driveUpBtn:"⬆️ バックアップをクラウドへ送信",
 driveDownBtn:"⬇️ クラウドからダウンロードして合体",
@@ -585,6 +599,13 @@ driveUrlPh:"Paste the script link (ends in /exec)",
 driveKeyLbl:"Secret key",
 driveKeyPh:"The same key you put in the script",
 driveSaveBtn:"Save link and key",
+linkTitle:"🔗 Salro Link — Connect my AI",
+linkDesc:"Generate this app's connection text and paste it into a conversation with YOUR assistant (Muse). It will be able to read your data, add records and warn you — following the safety rules embedded in the text.",
+linkCopyBtn:"Copy connection text",
+linkWarn:"⚠️ The text contains the bridge key — it is a password. Paste it only into your own assistant, never in groups or with other people.",
+linkNeed:"Set up the cloud above first: paste the bridge link and key and tap Save link and key.",
+linkCopied:"Connection text copied ✔ Now just paste it into a conversation with your Muse.",
+linkCopyFail:"Could not copy automatically. Please try again.",
 driveSaved:"✔️ Link and key saved on this device.",
 driveUpBtn:"⬆️ Send backup to the cloud",
 driveDownBtn:"⬇️ Download from cloud and merge",
@@ -1553,6 +1574,45 @@ function driveSaveConfig(){
   localStorage.setItem("msj-driveKey",String($("driveKey").value||"").trim());
   driveSetStatus(t("driveSaved"));
   driveCheckOnOpen();
+}
+// Salro Link: texto de conexão que o dono cola no assistente dele (Muse),
+// pra ele ler e lançar neste app pela mesma ponte da nuvem.
+function linkPromptText(url,key){
+  return [
+    "Você agora está conectado ao meu app Salro Salário (padrão Salro Link). Meus dados ficam numa ponte na nuvem, no meu próprio Google Drive:",
+    "- Link da ponte: "+url,
+    "- Chave: "+key,
+    "",
+    "COMO LER: faça GET em \""+url+"?action=read&key="+key+"\". A resposta é um JSON com o envelope {app, version, exportedAt, data} — é dentro de data que ficam os registros. Os dados são um despejo das chaves internas do app (prefixo msj-); os meses fechados ficam nas chaves msj-v4-3-months-AAAA-MM e os dias nas chaves msj-v4-2-days-AAAA-MM-DD.",
+    "COMO ESCREVER: primeiro leia o estado atual; aplique a alteração sobre ele; depois faça POST em \""+url+"?action=write&key="+key+"\" com o envelope COMPLETO atualizado (corpo JSON, content-type text/plain). Nunca envie um envelope parcial — a escrita substitui o arquivo inteiro. Confirme a escrita com um novo GET e compare o que voltou.",
+    "",
+    "REGRAS DE SEGURANÇA (obrigatórias):",
+    "1. Nunca sobrescreva um backup com MENOS registros do que o que você leu, sem me avisar antes.",
+    "2. Ao juntar dados, una pelos IDs dos registros — nunca apague um registro que você não criou.",
+    "3. Nunca mostre a minha chave em respostas, arquivos ou registros; ela é uma senha.",
+    "4. Valores e datas devem ser fiéis à fonte (foto, holerite, recibo) — o que não der para ler com segurança fica em branco, nunca inventado.",
+    "5. Valores em ienes (¥) e em reais (R$) sempre separados; se converter, diga a taxa usada.",
+    "",
+    "Para confirmar que entendeu: leia a ponte agora e me diga quantos registros encontrou e de que período eles são."
+  ].join("\n");
+}
+function linkCopyText(){
+  const st=$("linkStatus");
+  const c=driveConfig();
+  if(!c.url||!c.key){ if(st)st.textContent=t("linkNeed"); return; }
+  const text=linkPromptText(c.url,c.key);
+  const done=()=>{ if(st)st.textContent=t("linkCopied"); };
+  const fallback=()=>{
+    const ta=document.createElement("textarea");
+    ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); done(); }
+    catch(e){ if(st)st.textContent=t("linkCopyFail"); }
+    ta.remove();
+  };
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done,fallback);
+  }else fallback();
 }
 async function driveFetchJson(url,options){
   let res;
@@ -2888,6 +2948,7 @@ $("mergeFile").addEventListener("change",e=>{
 $("driveUrl").value=localStorage.getItem("msj-driveUrl")||"";
 $("driveKey").value=localStorage.getItem("msj-driveKey")||"";
 $("driveSave").onclick=driveSaveConfig;
+$("linkCopy").onclick=linkCopyText;
 $("driveUp").onclick=()=>{driveUpload()};
 $("driveDown").onclick=()=>{driveDownload()};
 $("driveNoticeClose").onclick=driveHideNotice;
