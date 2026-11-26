@@ -1917,10 +1917,10 @@ function openDay(key){
 // Valor estimado de um dia trabalhado, pelas configurações do
 // funcionário ativo: normais + extras (×1,25) + folga trabalhada
 // (com o adicional daquele dia) + adicional noturno.
-function dayPay(c){
+function dayPay(c,rate){
   if(!c||!c.worked)return 0;
-  const rate=hourlyRate();
-  let v=(c.normal||0)*rate+(c.overtime||0)*rate*1.25+(c.off||0)*rate*(1+(c.offRate||0)/100)+(c.night||0)*rate*(val("nightPercent")/100);
+  const r=(typeof rate==="number")?rate:hourlyRate();
+  let v=(c.normal||0)*r+(c.overtime||0)*r*1.25+(c.off||0)*r*(1+(c.offRate||0)/100)+(c.night||0)*r*(val("nightPercent")/100);
   if(c.nightDay)v+=val("nightFixed");
   return v;
 }
@@ -1940,7 +1940,7 @@ function updateDaySummary(){
   const night=c.night?t("sumNight",{hours:fmtHours(c.night)}):"";
   const nd=c.nightDay?t("sumNightDay"):"";
   const ykText=yk?t("sumYukiu",{label:ykLabel}):"";
-  const dp=c.worked?dayPay(c):0;
+  const dp=c.worked?dayPay(c,dayRateForMonth(selectedKey.slice(0,7),{key:selectedKey,normal:c.normal})):0;
   const payText=dp>0?t("sumDayPay",{v:money(dp)}):"";
   $("daySummary").textContent=c.worked?`${t("sumWorked",{hours:fmtHours(c.hours)})}${br}${extra}${offText}${night}${nd}${ykText}${payText}`:t("sumFillInOut");
 }
@@ -1963,6 +1963,7 @@ function renderHistory(){
   const y=viewDate.getFullYear(),m=viewDate.getMonth(),count=new Date(y,m+1,0).getDate();
   const h=$("history");h.innerHTML="";
   let total=0,normalTotal=0,overtimeTotal=0,nightTotal=0,nightDays=0,days=0,rows=0,yukiuMonth=0,offTotal=0,offWeighted=0,earnedTotal=0;
+  const drate=dayRateForMonth(monthlyKey());
   for(let d=1;d<=count;d++){
     const key=keyFor(y,m,d),data=dayData(key);
     if(!data)continue;
@@ -1970,7 +1971,7 @@ function renderHistory(){
     const yk=Number(data.yukiu)||0;
     if(!c.worked&&!yk)continue;
     yukiuMonth+=yk;
-    if(c.worked){days++;total+=c.hours;normalTotal+=c.normal;overtimeTotal+=c.overtime;nightTotal+=c.night;if(c.nightDay)nightDays++;offTotal+=c.off;offWeighted+=c.off*(1+(c.offRate||0)/100);earnedTotal+=dayPay(c);}
+    if(c.worked){days++;total+=c.hours;normalTotal+=c.normal;overtimeTotal+=c.overtime;nightTotal+=c.night;if(c.nightDay)nightDays++;offTotal+=c.off;offWeighted+=c.off*(1+(c.offRate||0)/100);earnedTotal+=dayPay(c,drate);}
     rows++;
     const row=document.createElement("div");row.className="row";
     const date=document.createElement("div");date.textContent=String(d).padStart(2,"0")+"/"+String(m+1).padStart(2,"0");
@@ -1978,7 +1979,7 @@ function renderHistory(){
     const offBadge=typeof data.off==="number"?(data.off===0?t("histOffNormal"):t("histOffPct",{rate:data.off})):"";
     if(c.worked)times.textContent=`${data.in} → ${data.out}${offBadge}${yk?t("histYukiu",{label:yk===0.5?t("halfDay"):t("fullDay")}):""}${data.note?" · "+data.note:""}`;
     else times.textContent=`${t("histYukiuOnly",{label:yk===0.5?t("halfDay"):t("fullDay")})}${data.note?" · "+data.note:""}`;
-    const hours=document.createElement("div");hours.className="hours";hours.textContent=c.worked?`${fmtHours(c.hours)} · ${money(dayPay(c))}`:"🏖️";
+    const hours=document.createElement("div");hours.className="hours";hours.textContent=c.worked?`${fmtHours(c.hours)} · ${money(dayPay(c,drate))}`:"🏖️";
     row.append(date,times,hours);row.onclick=()=>openDay(key);row.style.cursor="pointer";h.appendChild(row);
   }
   if(!rows)h.innerHTML=`<div class="empty">${t("histEmpty")}</div>`;
@@ -1997,6 +1998,57 @@ function renderHistory(){
 
 function hourlyRate(){
   return mode==="monthly" ? val("monthlySalary")/Math.max(1,val("baseHours")) : val("hourlyRate");
+}
+// ---------- V6.1.5: total do dia no modo mensal sem salário preenchido ----------
+// Com o salário mensal preenchido, vale a hourlyRate() de sempre e
+// nada muda. Com o campo vazio, a taxa saía 0 e todo dia cadastrado
+// valia ¥0. Agora o salário-base vem da leitura do holerite daquele
+// mês (snapshot salvo) ou, se aquele mês não tiver, do mês mais
+// recente com leitura do mesmo funcionário — e a taxa sai das horas
+// normais lançadas naquele mês. Sem nenhuma fonte, continua ¥0:
+// sem fonte não se inventa valor.
+function snapshotBaseSalary(key){
+  const snap=monthlySnapshot(key);
+  if(!snap||!snap.raiox)return 0;
+  const line=(snap.raiox.earnings||[]).find(l=>l.term==="basePay");
+  return line?Number(line.amount)||0:0;
+}
+function monthBaseSalary(monthKeyStr){
+  const own=snapshotBaseSalary(monthKeyStr);
+  if(own>0)return own;
+  const prefix=ACTIVE_BASES.months+"-";
+  const keys=[];
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k&&k.indexOf(prefix)===0)keys.push(k.slice(prefix.length));
+  }
+  keys.sort().reverse();
+  for(const k of keys){
+    if(k===monthKeyStr)continue;
+    const v=snapshotBaseSalary(k);
+    if(v>0)return v;
+  }
+  return 0;
+}
+function dayRateForMonth(monthKeyStr,extra){
+  const r=hourlyRate();
+  if(mode!=="monthly"||r>0)return r;
+  const salary=monthBaseSalary(monthKeyStr);
+  if(!salary)return 0;
+  const [y,m]=monthKeyStr.split("-").map(Number);
+  const count=new Date(y,m,0).getDate();
+  let normal=0,worked=0;
+  for(let d=1;d<=count;d++){
+    const data=dayData(monthKeyStr+"-"+String(d).padStart(2,"0"));
+    if(!data)continue;
+    const c=calcDay(data);
+    if(!c.worked)continue;
+    normal+=c.normal||0;worked+=c.hours||0;
+  }
+  // Na tela do dia, o dia em edição pode ainda não estar salvo.
+  if(extra&&extra.key&&extra.normal&&!dayData(extra.key))normal+=extra.normal;
+  const base=normal>0?normal:worked;
+  return base>0?salary/base:0;
 }
 function monthlyKey(date=viewDate){
   return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}`;
@@ -2177,7 +2229,10 @@ function daysForAliases(text,aliases){
   return null;
 }
 const PS_NO_LINE=new Set(["socialInsTotal"]);
-function parsePayslip(rawText){
+// Passe original (V5.7): procura o valor logo depois do rótulo no
+// texto corrido sem espaços. Funciona na foto aproximada; na folha
+// inteira o valor cai em outra linha e este passe sozinho erra.
+function parsePayslipFlat(rawText){
   const text=ocrStrip(rawText);
   const out={gross:null,net:null,dedTotal:null,days:null,otHours:null,nightHours:null,totalHours:null,earnings:[],deductions:[]};
   if(!text)return out;
@@ -2195,12 +2250,141 @@ function parsePayslip(rawText){
   out.dedTotal=amountForAliases(text,["控除合計額","控除合計","控除総額"]);
   out.net=amountForAliases(text,["差引支給額","差引支給","手取額","手取り金額","手取","銀行振込額","振込額"]);
   out.gross=amountForAliases(text,["総支給額","支給合計額","総支給金額","支給総額","総支給"]);
+  return out;
+}
+// ---------- V6.1.5: passe por linhas (foto da folha inteira) ----------
+// Na folha inteira, o OCR devolve a linha de rótulos separada da linha
+// de valores (o valor cai na linha de baixo, na mesma ordem das
+// colunas). Este passe casa rótulo e valor por linha e só aceita os
+// totais quando a conta bruto − descontos = líquido fecha. O que não
+// for lido com segurança fica em branco, nunca inventado.
+const PS_TOTAL_ALIASES=[
+  {field:"gross",aliases:["総支給金額","総支給額","支給合計額","支給総額","総支給"]},
+  {field:"dedTotal",aliases:["控除合計額","控除合計","控除総額"]},
+  {field:"net",aliases:["差引支給額","差引支給","手取り金額","手取額","銀行振込額","振込額","手取"]}
+];
+function psLineNorm(l){
+  // Normaliza a linha pro passe por linhas: some com os espaços dos
+  // rótulos ("基 本 給" → "基本給") e os de dentro dos valores
+  // ("239, 800" → "239,800"), mas MANTÉM o espaço entre dois números
+  // ("21.0 1.0" são dois valores, não um).
+  return (l||"").replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0))
+    .replace(/([.,])\s+(?=\d)/g,"$1")
+    .replace(/(\D)\s+/g,"$1").replace(/\s+(\D)/g,"$1");
+}
+function psLineSlots(s){
+  // Slots numéricos de uma linha normalizada. Horário (162:45) não
+  // é slot: nem o número antes nem o depois dos dois-pontos entra.
+  const out=[];const re=/(\d{1,3}(?:[.,]+\d{3})+|\d+\.\d+|\d+)/g;let m;
+  while((m=re.exec(s))){
+    if(s[m.index+m[0].length]===":"||s[m.index-1]===":")continue;
+    const raw=m[0],dec=raw.split(/[.,]/).pop();
+    const isInt=dec.length===3||(raw.indexOf(".")<0&&raw.indexOf(",")<0);
+    const v=isInt?Number(raw.replace(/[.,]/g,"")):parseFloat(raw);
+    if(Number.isFinite(v))out.push({v,idx:m.index,isInt});
+  }
+  return out;
+}
+function psLineLabels(s){
+  const hits=[];
+  for(const term of PAYSLIP_TERMS){
+    if(PS_NO_LINE.has(term.id))continue;
+    for(const alias of term.match){const i=s.indexOf(alias);if(i>=0){hits.push({term:term.id,idx:i,end:i+alias.length});break}}
+  }
+  for(const t of PS_TOTAL_ALIASES){
+    for(const alias of t.aliases){const i=s.indexOf(alias);if(i>=0){hits.push({total:t.field,idx:i,end:i+alias.length});break}}
+  }
+  return hits.sort((a,b)=>a.idx-b.idx);
+}
+function psTotalsFromSlots(hits,vals){
+  // Pareamento na ordem das colunas; só vale se a conta fechar.
+  const byField={};
+  hits.forEach((h,k)=>{if(byField[h.total]==null&&vals[k]!=null)byField[h.total]=vals[k]});
+  if(byField.gross!=null&&byField.dedTotal!=null&&byField.net!=null&&byField.gross-byField.dedTotal===byField.net)
+    return{gross:byField.gross,dedTotal:byField.dedTotal,net:byField.net};
+  // A linha de valores pode trazer um valor a mais à esquerda (ex.:
+  // 累計課税支給額 antes do 総支給金額): procura um trio em ordem
+  // que feche bruto − descontos = líquido.
+  for(let a=0;a<vals.length;a++)for(let b=a+1;b<vals.length;b++)for(let c=b+1;c<vals.length;c++)
+    if(vals[b]>0&&vals[a]-vals[b]===vals[c])return{gross:vals[a],dedTotal:vals[b],net:vals[c]};
+  return null;
+}
+function psLinePass(rawText){
+  const info=(rawText||"").split(/\r?\n/).map(l=>{const s=psLineNorm(l);return{s,slots:psLineSlots(s),labels:psLineLabels(s)}});
+  const terms={},totals={gross:null,dedTotal:null,net:null};
+  let days=null;
+  // Mesma linha: rótulo com o valor logo depois dele, na própria linha.
+  for(const it of info){
+    it.labels.forEach((h,hi)=>{
+      if(!h.term||terms[h.term]!=null)return;
+      const next=it.labels[hi+1];
+      const slot=it.slots.find(sl=>sl.isInt&&sl.v>0&&sl.idx>=h.end&&(!next||sl.idx<next.idx));
+      if(slot)terms[h.term]=slot.v;
+    });
+  }
+  // Linha de rótulos pura + os valores nas linhas logo abaixo, na
+  // mesma ordem das colunas. Só casa quando as contagens batem.
+  for(let i=0;i<info.length;i++){
+    const it=info[i];
+    // Linha de rótulos: tem rótulo e nenhum valor de verdade (dígitos
+    // pequenos dentro do rótulo, como o "1" de 銀行1振込額, não contam).
+    if(!it.labels.length||it.slots.some(sl=>sl.isInt&&sl.v>=100))continue;
+    const pool=[];let scanned=0;
+    for(let j=i+1;j<info.length&&scanned<3;j++){
+      if(info[j].labels.length)break;
+      if(info[j].s)scanned++; // linha vazia não gasta a janela
+      pool.push(...info[j].slots.filter(sl=>sl.isInt));
+      if(pool.length>=it.labels.length)break;
+    }
+    if(!pool.length)continue;
+    const termHits=it.labels.filter(h=>h.term),totalHits=it.labels.filter(h=>h.total);
+    if(termHits.length&&termHits.length===it.labels.length&&pool.length===termHits.length){
+      termHits.forEach((h,k)=>{if(pool[k].v>0&&terms[h.term]==null)terms[h.term]=pool[k].v});
+    }
+    if(totalHits.length>=2){
+      const t=psTotalsFromSlots(totalHits,pool.map(sl=>sl.v));
+      if(t){if(totals.gross==null)totals.gross=t.gross;if(totals.dedTotal==null)totals.dedTotal=t.dedTotal;if(totals.net==null)totals.net=t.net}
+    }
+  }
+  // Dias trabalhados: primeiro valor da linha de valores sob o rótulo.
+  for(let i=0;i<info.length&&days==null;i++){
+    if(!["出勤日数","勤務日数","就労日数"].some(a=>info[i].s.includes(a)))continue;
+    for(let j=i+1;j<Math.min(i+3,info.length);j++){
+      if(!info[j].slots.length)continue;
+      const sl=info[j].slots.find(x=>!x.isInt&&x.v>0&&x.v<=40)||info[j].slots.find(x=>x.isInt&&x.v>0&&x.v<=40);
+      if(sl)days=sl.v;
+      break;
+    }
+  }
+  return{terms,totals,days};
+}
+function parsePayslip(rawText){
+  const out=parsePayslipFlat(rawText);
+  const lp=psLinePass(rawText);
+  // As linhas do passe por linhas têm prioridade sobre o passe corrido.
+  for(const id of Object.keys(lp.terms)){
+    const term=PAYSLIP_TERMS.find(x=>x.id===id);if(!term)continue;
+    const arr=term.kind==="earn"?out.earnings:out.deductions;
+    const ex=arr.find(l=>l.term===id);
+    if(ex)ex.amount=lp.terms[id];else arr.push({label:term.match[0],amount:lp.terms[id],term:id});
+  }
+  if(lp.days!=null&&out.days==null)out.days=lp.days;
+  if(lp.totals.gross!=null&&lp.totals.dedTotal!=null&&lp.totals.net!=null){
+    out.gross=lp.totals.gross;out.dedTotal=lp.totals.dedTotal;out.net=lp.totals.net;
+  }
   const sumE=out.earnings.reduce((a,l)=>a+l.amount,0);
   const sumD=out.deductions.reduce((a,l)=>a+l.amount,0);
   if(out.dedTotal==null&&sumD>0)out.dedTotal=sumD;
   if(out.gross==null&&sumE>0)out.gross=sumE;
   if(out.gross==null&&out.net!=null&&out.dedTotal!=null)out.gross=out.net+out.dedTotal;
   if(out.net==null&&out.gross!=null&&out.dedTotal!=null)out.net=out.gross-out.dedTotal;
+  // Trava de segurança: quando os totais vieram conferidos pelo passe
+  // por linhas, linhas de desconto só do passe corrido que não fecham
+  // com o total são descartadas — melhor em branco do que errado.
+  if(lp.totals.gross!=null&&out.dedTotal!=null&&out.gross!=null&&out.net!=null&&out.gross-out.dedTotal===out.net){
+    const sd=out.deductions.reduce((a,l)=>a+l.amount,0);
+    if(sd>0&&sd!==out.dedTotal)out.deductions=out.deductions.filter(l=>lp.terms[l.term]!=null);
+  }
   return out;
 }
 // ---------- V5.7: OCR (Tesseract.js sob demanda) ----------
@@ -2249,6 +2433,10 @@ async function runPayslipOcr(file){
     const worker=await Tesseract.createWorker("jpn",1,{logger:m=>{
       if(m.status==="recognizing text"){$("ocrStatusText").textContent=t("ocrReading",{pct:Math.round((m.progress||0)*100)});$("ocrBar").style.width=(10+Math.round((m.progress||0)*85))+"%"}
     }});
+    // V6.1.5: sem isto o Tesseract.js usa o modo de bloco único e a
+    // folha inteira sai fragmentada (os totais somem do texto). O modo
+    // automático (3) segmenta a folha em linhas, como o parser espera.
+    await worker.setParameters({tessedit_pageseg_mode:"3"});
     const canvas=await payslipPreprocess(file);
     const {data}=await worker.recognize(canvas);
     await worker.terminate();
@@ -2581,9 +2769,10 @@ function renderDashboard(){
   const dash=$("monthlyDashboard");
   if(!dash)return;
   const months=[];
-  // No iPhone, seis meses dão uma leitura muito mais clara sem esconder
-  // os valores. O mês selecionado no calendário fica sempre por último.
-  for(let i=5;i>=0;i--){
+  // V6.1.5: 12 meses no gráfico — a faixa desliza na horizontal (com
+  // snap) e abre posicionada no fim, com o mês atual por último,
+  // como antes. O toque numa barra continua abrindo aquele mês.
+  for(let i=11;i>=0;i--){
     const d=new Date(viewDate.getFullYear(),viewDate.getMonth()-i,1);
     months.push(monthStats(monthlyKey(d)));
   }
@@ -2615,6 +2804,8 @@ function renderDashboard(){
   dash.querySelectorAll("[data-month]").forEach(el=>{
     el.onclick=()=>openMonth(el.dataset.month);
   });
+  // V6.1.5: a faixa de 12 meses abre no fim (mês atual visível).
+  dash.querySelectorAll(".bars").forEach(b=>{b.scrollLeft=b.scrollWidth});
   renderCouple();
   renderAnnual();
   renderPayslipCard();
@@ -2629,7 +2820,7 @@ function renderDashboard(){
 function monthComposition(key){
   const [y,m]=key.split("-").map(Number);
   const count=new Date(y,m,0).getDate();
-  const rate=hourlyRate();
+  const rate=dayRateForMonth(key);
   let base=0,overtime=0,off=0,night=0,total=0;
   for(let d=1;d<=count;d++){
     const data=dayData(`${key}-${String(d).padStart(2,"0")}`);
@@ -2640,7 +2831,7 @@ function monthComposition(key){
     overtime+=(c.overtime||0)*rate*1.25;
     off+=(c.off||0)*rate*(1+(c.offRate||0)/100);
     night+=(c.night||0)*rate*(val("nightPercent")/100)+(c.nightDay?val("nightFixed"):0);
-    total+=dayPay(c);
+    total+=dayPay(c,rate);
   }
   return {base,overtime,off,night,total};
 }
@@ -2662,7 +2853,7 @@ function renderHomeDash(){
   const prev=monthStats(monthlyKey(new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1)));
   const comp=monthComposition(key);
   const months=[];
-  for(let i=5;i>=0;i--){
+  for(let i=11;i>=0;i--){
     const d=new Date(viewDate.getFullYear(),viewDate.getMonth()-i,1);
     months.push(monthStats(monthlyKey(d)));
   }
@@ -2699,6 +2890,7 @@ function renderHomeDash(){
   body.querySelectorAll("[data-dmonth]").forEach(el=>{
     el.onclick=()=>openMonthCalc(el.dataset.dmonth);
   });
+  body.querySelectorAll(".bars").forEach(b=>{b.scrollLeft=b.scrollWidth});
   body.querySelectorAll("[data-comp]").forEach(el=>{
     el.onclick=()=>el.classList.toggle("sel");
   });
@@ -2746,7 +2938,7 @@ function renderCouple(){
   const box=$("coupleDashboard");
   if(!box)return;
   const months=[];
-  for(let i=5;i>=0;i--){
+  for(let i=11;i>=0;i--){
     const d=new Date(viewDate.getFullYear(),viewDate.getMonth()-i,1);
     months.push(monthlyKey(d));
   }
@@ -2795,6 +2987,7 @@ function renderCouple(){
   box.querySelectorAll("[data-chart]").forEach(el=>{
     el.onclick=()=>pairTap(el.dataset.chart,el.dataset.month,el);
   });
+  box.querySelectorAll(".bars").forEach(b=>{b.scrollLeft=b.scrollWidth});
   wireEmployeeManage(box);
 }
 function employeeManageHTML(){
