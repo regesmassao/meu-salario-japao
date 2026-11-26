@@ -246,6 +246,8 @@ driveNever:"nunca",
 driveNeedConfig:"Primeiro cole o link do script e a chave secreta, e toque em Salvar.",
 driveSending:"Enviando pra nuvem…",
 driveUpDone:"✔️ Backup enviado pra nuvem com {days} dia(s).",
+driveOverwriteWarn:"⚠️ A nuvem tem {remote} dia(s) registrado(s) e este aparelho tem {local}. Enviar agora substituiria o backup maior pelo menor — dias podem sumir.\n\nBaixe da nuvem e junte primeiro, se for o caso. Enviar mesmo assim?",
+confirmDeleteDay:"Excluir o dia {date}? Não tem volta.",
 driveReading:"Consultando a nuvem…",
 driveNoRemote:"Ainda não há backup na nuvem. Envie o primeiro pelo botão de enviar.",
 driveUnauthorized:"❌ O script recusou a chave. Confira se a chave salva aqui é igual à chave do script.",
@@ -439,6 +441,8 @@ driveNever:"まだ",
 driveNeedConfig:"まずスクリプトのリンクと秘密キーを貼り付けて「保存」を押してください。",
 driveSending:"クラウドへ送信中…",
 driveUpDone:"✔️ バックアップをクラウドへ送信しました（{days} 日分）。",
+driveOverwriteWarn:"⚠️ クラウドには {remote} 日分、この端末には {local} 日分の記録があります。このまま送信すると、多い方のバックアップが少ない方で上書きされ、記録が消えるおそれがあります。\n\n必要なら先にクラウドからダウンロードして結合してください。それでも送信しますか？",
+confirmDeleteDay:"{date} の記録を削除しますか？元に戻せません。",
 driveReading:"クラウドを確認中…",
 driveNoRemote:"クラウドにはまだバックアップがありません。送信ボタンで最初のバックアップを送ってください。",
 driveUnauthorized:"❌ スクリプトにキーを拒否されました。保存したキーがスクリプトのキーと同じか確認してください。",
@@ -632,6 +636,8 @@ driveNever:"never",
 driveNeedConfig:"First paste the script link and the secret key, then tap Save.",
 driveSending:"Sending to the cloud…",
 driveUpDone:"✔️ Backup sent to the cloud with {days} day(s).",
+driveOverwriteWarn:"⚠️ The cloud has {remote} recorded day(s) and this device has {local}. Sending now would replace the bigger backup with the smaller one — days could be lost.\n\nDownload from the cloud and merge first, if that's the case. Send anyway?",
+confirmDeleteDay:"Delete the day {date}? There is no undo.",
 driveReading:"Checking the cloud…",
 driveNoRemote:"There is no backup in the cloud yet. Send the first one with the send button.",
 driveUnauthorized:"❌ The script refused the key. Check that the saved key matches the key in the script.",
@@ -1675,6 +1681,23 @@ async function driveUpload(){
   // montar o backup, pra ela viajar dentro do próprio arquivo.
   localStorage.setItem("msj-lastBackupAt",String(Date.now()));
   const backup=collectBackup();
+  // Trava de segurança (V6.1.4, padrão do ecossistema Salro): antes
+  // de sobrescrever, lê a nuvem e compara o nº de dias. Se a nuvem
+  // tiver MAIS dias que este aparelho, pede confirmação — backup
+  // maior nunca é substituído por um menor em silêncio. Se a leitura
+  // falhar ou não houver backup válido lá, segue o fluxo sem travar.
+  const localDays=countBackupDays(backup.data);
+  try{
+    const remote=await driveReadRemote();
+    const remoteBackup=(remote&&remote.exists&&remote.data&&typeof remote.data==="object"&&remote.data.app==="meu-salario-japao"&&remote.data.data&&typeof remote.data.data==="object")?remote.data:null;
+    if(remoteBackup){
+      const remoteDays=countBackupDays(remoteBackup.data);
+      if(remoteDays>localDays&&!confirm(t("driveOverwriteWarn",{remote:remoteDays,local:localDays}))){
+        driveSetStatus("");
+        return;
+      }
+    }
+  }catch(e){/* leitura da nuvem falhou: não trava o envio */}
   try{
     const r=await driveFetchJson(driveApiUrl("write"),{
       method:"POST",
@@ -2973,7 +2996,14 @@ $("prevMonth").onclick=()=>{viewDate.setMonth(viewDate.getMonth()-1);renderCalen
 $("nextMonth").onclick=()=>{viewDate.setMonth(viewDate.getMonth()+1);renderCalendar();renderDashboard()};
 $("saveDay").onclick=saveCurrentDay;
 $("deleteDay").onclick=()=>{
-  if(selectedKey&&dayData(selectedKey)){deleteData(selectedKey);renderCalendar();renderDashboard();openDay(selectedKey)}
+  if(selectedKey&&dayData(selectedKey)){
+    // Trava (V6.1.4): excluir dia é destrutivo e não tem desfazer —
+    // pede confirmação antes, como já acontece ao excluir funcionário.
+    const pd=parseKey(selectedKey);
+    const dateLabel=new Date(pd.y,pd.m,pd.d).toLocaleDateString(LOCALES[LANG],{day:"2-digit",month:"2-digit",year:"numeric"});
+    if(!confirm(t("confirmDeleteDay",{date:dateLabel})))return;
+    deleteData(selectedKey);renderCalendar();renderDashboard();openDay(selectedKey);
+  }
 };
 $("closeEditor").onclick=()=>{$("dayEditor").classList.add("hidden");selectedKey=null};
 applyLang();
